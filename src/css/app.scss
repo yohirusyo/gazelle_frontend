@@ -1,0 +1,65 @@
+// app global css in SCSS form
+
+$radius-multiplier: 1.5;
+
+.border-xs {
+  border-radius: $space-base * $radius-multiplier * 0.25;
+}
+
+.border-sm {
+  border-radius: $space-base * $radius-multiplier * 0.5;
+}
+
+.border-md {
+  border-radius: $space-base * $radius-multiplier;
+}
+
+.border-lg {
+  border-radius: $space-base * $radius-multiplier * 1.5;
+}
+
+.border-xl {
+  border-radius: $space-base * $radius-multiplier * 3;
+}
+
+.shadow-white {
+  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-white-inset {
+  box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05);
+}
+
+.datepicker {
+  border: none !important;
+  background: transparent !important;
+}
+
+.datepicker-menu {
+  overflow: hidden !important;
+  box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05) !important;
+  border-radius: $space-base * $radius-multiplier !important;
+}
+
+.dp__selection_preview {
+  width: 0px !important;
+  display: none !important;
+}
+
+.dp__action_buttons {
+  display: flex !important;
+  width: 100%  !important;
+  justify-content: space-evenly !important;
+}
+
+.dp__cancel {
+  color: lightgray !important;
+}
+
+.q-tab {
+  padding: 0 4px !important;
+}
+
+.q-tab-panel {
+  padding: 0 !important;
+}
