@@ -1,10 +1,31 @@
 <template>
-  <q-form @submit="onAddPlace" @reset="resetForm" class="col column justify-between" ref="form">
-    <q-input v-model="_name" type="text" borderless class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
-      hide-bottom-space hide-hint label-color="grey" label="Введите название места назначения" lazy-rules
-      :rules="[(val) => (val !== null && val !== '') || 'Обязательное поле!']" />
-    <q-btn text-color="white" label="Создать" unelevated class="border-sm shadow-white col col-shrink" color="primary"
-      type="submit" />
+  <q-form
+    @submit="onAddPlace"
+    @reset="resetForm"
+    class="col column justify-between"
+    ref="form"
+  >
+    <q-input
+      v-model="_name"
+      type="text"
+      borderless
+      class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+      hide-bottom-space
+      hide-hint
+      label-color="grey"
+      label="Введите название места назначения"
+      lazy-rules
+      :rules="[(val) => (val !== null && val !== '') || 'Обязательное поле!']"
+      :autocomplete="false"
+    />
+    <q-btn
+      text-color="white"
+      label="Создать"
+      unelevated
+      class="border-sm shadow-white col col-shrink"
+      color="primary"
+      type="submit"
+    />
   </q-form>
 </template>
 
@@ -40,5 +61,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

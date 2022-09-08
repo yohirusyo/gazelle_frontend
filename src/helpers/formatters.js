@@ -21,3 +21,8 @@ export const formatPlace = (p) => {
     if (!p) return '-';
     return `${p.name}`;
 }
+
+export const formatTransportNumber = (t) => {
+    if (!t) return '-';
+    return `${t.transportNumber}`
+}

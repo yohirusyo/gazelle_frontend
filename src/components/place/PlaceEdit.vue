@@ -17,6 +17,7 @@
         label="Введите название места назначения"
         lazy-rules
         :rules="[(val) => (val !== null && val !== '') || 'Обязательное поле!']"
+        :autocomplete="false"
       />
       <q-checkbox
         v-model="_changeCoords"

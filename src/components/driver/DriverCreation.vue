@@ -7,7 +7,7 @@
   >
     <div class="col row q-mb-md">
       <q-scroll-area class="col">
-        <div class="column q-gutter-y-md ">
+        <div class="column q-gutter-y-md">
           <q-input
             v-model="_surname"
             type="text"
@@ -21,6 +21,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
+            :autocomplete="false"
           />
           <q-input
             v-model="_name"
@@ -35,6 +36,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
+            :autocomplete="false"
           />
           <q-input
             v-model="_middlename"
@@ -49,6 +51,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
+            :autocomplete="false"
           />
           <q-input
             v-model="_phoneNumber"
@@ -64,6 +67,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
+            :autocomplete="false"
           />
           <q-input
             v-model="_login"
@@ -78,6 +82,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
+            :autocomplete="false"
           />
         </div>
       </q-scroll-area>
