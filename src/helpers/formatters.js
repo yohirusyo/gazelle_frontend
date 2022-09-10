@@ -9,7 +9,7 @@ export const formatContact = (c) => {
 
 export const formatCustomer = (c) => {
     if (!c) return '-';
-    return `${c.fullname}\n${c.phoneNumber}`;
+    return `${c.fullname} ( ${c.subdivision} )\n${c.phoneNumber}`;
 }
 
 export const formatDriver = (d) => {

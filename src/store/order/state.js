@@ -3,7 +3,10 @@ export default function () {
     orders: [],
     customerPhoneNumber: null,
     customerFullname: null,
+    customerSubdivision: null,
     contactPhoneNumber: null,
     contactFullname: null,
+    destinationName: null,
+    departurePointName: null,
   };
 }

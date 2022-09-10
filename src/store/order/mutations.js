@@ -10,7 +10,6 @@ export function update(state, order) {
   console.warn(order);
   const index = state.orders.findIndex((o) => o.id == order.id);
   state.orders[index] = order;
-  console.warn(state.orders);
 }
 
 export function remove(state, id) {
@@ -26,10 +25,22 @@ export function setCustomerPhoneNumber(state, phoneNumber) {
   state.customerPhoneNumber = phoneNumber;
 }
 
+export function setCustomerSubdivision(state, subdivision) {
+  state.customerSubdivision = subdivision;
+}
+
 export function setContactFullname(state, fullname) {
   state.contactFullname = fullname;
 }
 
 export function setContactPhoneNumber(state, phoneNumber) {
   state.contactPhoneNumber = phoneNumber;
+}
+
+export function setDestinationName(state, name) {
+  state.destinationName = name;
+}
+
+export function setDeparturePointName(state, name) {
+  state.departurePointName = name;
 }

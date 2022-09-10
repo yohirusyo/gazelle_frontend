@@ -17,7 +17,7 @@
             hide-hint
             label-color="grey"
             label="Введите тип ТС"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-input
             v-model="_transportNumber"
@@ -29,7 +29,7 @@
             label-color="grey"
             label="Введите номер ТС"
             mask="A ### AA ###"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-select
             v-model="_place"
@@ -44,7 +44,7 @@
             :option-label="(item) => item.name"
             :option-value="(item) => item.id"
             clearable
-            :autocomplete="false"
+            autocomplete="off"
           >
             <template v-slot:append>
               <q-btn
@@ -79,7 +79,7 @@
             "
             :option-value="(item) => item.id"
             clearable
-            :autocomplete="false"
+            autocomplete="off"
           />
         </div>
       </q-scroll-area>

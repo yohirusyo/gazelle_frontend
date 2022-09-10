@@ -42,10 +42,7 @@ export async function removeOrder({ commit }, { id }) {
 }
 
 export async function subscribeOrderSockets({ commit }) {
-  socketio.on('order_update', order => {
-    if (order.isDone) return commit("remove", order.id)
-    commit("update", order)
-  })
+  socketio.on('order_update', order => commit("update", order))
   socketio.on('order_create', order => commit("add", order))
   socketio.on("order_delete", id => commit("remove", id))
 }

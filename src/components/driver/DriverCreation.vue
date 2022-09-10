@@ -21,7 +21,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-input
             v-model="_name"
@@ -36,7 +36,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-input
             v-model="_middlename"
@@ -51,7 +51,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-input
             v-model="_phoneNumber"
@@ -67,7 +67,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
-            :autocomplete="false"
+            autocomplete="off"
           />
           <q-input
             v-model="_login"
@@ -82,7 +82,7 @@
             :rules="[
               (val) => (val !== null && val !== '') || 'Обязательное поле!',
             ]"
-            :autocomplete="false"
+            autocomplete="off"
           />
         </div>
       </q-scroll-area>

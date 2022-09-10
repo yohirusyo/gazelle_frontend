@@ -1,7 +1,7 @@
 <template>
   <div class="row items-center col col-shrink q-pr-md">
     <div class="col-2 text-center">Время подачи</div>
-    <div class="col-2">Заказчик</div>
+    <div class="col-2">Ответственный</div>
     <div class="col-2">Контактное лицо</div>
     <div class="col-2">Место отправления</div>
     <div class="col-2">Место назначения</div>

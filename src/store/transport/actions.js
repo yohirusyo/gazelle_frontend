@@ -15,7 +15,6 @@ export async function addTransport(
   return api
     .post(`transport`, form)
     .then(({ data }) => {
-      commit("add", data);
       showNotifyResult(true, "Транспорт успешно создан!");
     })
     .catch((err) => {
@@ -27,7 +26,6 @@ export async function updateTransport({ commit }, { id, ...form }) {
   return api
     .patch(`transport/${id}`, form)
     .then(({ data }) => {
-      commit("update", data);
       showNotifyResult(true, "Транспорт успешно изменен!");
     })
     .catch((err) => {
@@ -39,7 +37,6 @@ export async function removeTransport({ commit }, { id }) {
   return api
     .delete(`transport/${id}`)
     .then((_) => {
-      commit("remove", id);
       showNotifyResult(true, "Транспорт успешно удален!");
     })
     .catch((err) => {
@@ -49,5 +46,6 @@ export async function removeTransport({ commit }, { id }) {
 
 export async function subscribeTransportSockets({ commit }) {
   socketio.on('transport_update', transport => commit("update", transport))
+  socketio.on('transport_create', transport => commit("add", transport))
+  socketio.on("transport_delete", id => commit("remove", id))
 }
-

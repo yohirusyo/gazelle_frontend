@@ -1,5 +1,6 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
+import { socketio } from "boot/socketio";
 
 export async function requestPlaces({ commit }) {
   return api.get(`place`).then(({ data }) => {
@@ -11,7 +12,6 @@ export async function addPlace({ commit }, form) {
   return api
     .post(`place`, form)
     .then(({ data }) => {
-      commit("add", data);
       showNotifyResult(true, "Место назначения успешно создано!");
     })
     .catch((err) => {
@@ -23,7 +23,6 @@ export async function updatePlace({ commit }, { id, ...form }) {
   return api
     .patch(`place/${id}`, form)
     .then(({ data }) => {
-      commit("update", data);
       showNotifyResult(true, "Место назначения успешно изменено!");
     })
     .catch((err) => {
@@ -35,10 +34,15 @@ export async function removePlace({ commit }, { id }) {
   return api
     .delete(`place/${id}`)
     .then((_) => {
-      commit("remove", id);
       showNotifyResult(true, "Место назначения успешно удалено!");
     })
     .catch((err) => {
       showNotifyResult(false, "Ошибка удаления места назначения!");
     });
+}
+
+export async function subscribePlaceSockets({ commit }) {
+  socketio.on('place_update', place => commit("update", place))
+  socketio.on('place_create', place => commit("add", place))
+  socketio.on("place_delete", id => commit("remove", id))
 }
