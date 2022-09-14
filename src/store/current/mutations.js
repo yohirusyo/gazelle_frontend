@@ -1,5 +1,4 @@
 export function setCoords(state, coords) {
-  console.warn(coords);
   state.coords = coords;
 }
 

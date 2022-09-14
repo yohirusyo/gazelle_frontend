@@ -49,10 +49,9 @@ export default {
       "order",
       "orderIsEmergency",
     ]),
-    ...mapState('order', ['customerPhoneNumber', 'customerFullname']),
+    ...mapState('order', ['customerPhoneNumber', 'customerFullname', 'customerSubdivision']),
     _isNotDisabled() {
-      if (this.customerPhoneNumber == this.transport.lastCustomerPhoneNumber && this.customerFullname ==
-        this.transport.lastCustomerFullname) return true;
+      if (this.customerSubdivision == this.transport.lastCustomerSubdivision) return true;
       if (this.orderIsEmergency) return true;
       if (this._isFreeMoreThan15Minutes) return true;
       return false;

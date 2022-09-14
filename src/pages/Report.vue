@@ -4,7 +4,8 @@
             <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
                 class="border-sm shadow-white bg-green q-mx-lg q-mb-sm q-mt-md" flat no-caps />
         </download-excel>
-        <q-table :rows="orderStats" :columns="columns" row-key="name" hide-bottom class="q-mx-lg q-my-sm" />
+        <q-table :rows="orderStats" :columns="columns" row-key="name" hide-bottom class="q-mx-lg q-my-sm" virtual-scroll
+            v-model:pagination="pagination" :rows-per-page-options="[0]" style="height: 80vh;" />
     </q-page>
 </template>
   
@@ -16,120 +17,153 @@ export default {
     name: "Report",
     data() {
         return {
+            pagination: {
+                rowsPerPage: 0
+            },
             fields: {
-                "Номер заказа": "orderId",
-                'Наименование груза': 'order.name',
+                "Номер заказа": {
+                    field: "orderId",
+                    callback: this.regular,
+                },
+                "Диспетчер": {
+                    field: "operatorFullname",
+                    callback: this.regular,
+                },
+                "Статус": {
+                    field: "order.isDeleted",
+                    callback: val => !val ? 'Завершен' : 'Удален',
+                },
+                'Наименование груза': {
+                    field: 'order.name',
+                    callback: this.regular,
+                },
                 'Комментарий': {
                     field: "order.description",
-                    callback: (val) => {
-                        return val ? val : '-';
-                    },
+                    callback: this.regular,
                 },
                 'Время заказа': {
                     field: "order.orderedAt",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Дата': {
                     field: "order.orderTime",
-                    callback: (val) => {
-                        return moment(val).format('DD.MM.YYYY');
-                    },
+                    callback: this.DDMMYYYY,
                 },
                 'Время подачи ( плановое )': {
                     field: "order.orderTime",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Время принятия заявки водителем': {
                     field: "acceptedAt",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Время подачи ( фактическое )': {
                     field: "entryToCustomerFact",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Время убытия в место назначения': {
                     field: "exitToDestinationFact",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Время прибытия в место назначения': {
                     field: "entryToDestinationFact",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
-                'Подразделение': 'order.customer.subdivision',
-                'Ответственный': 'order.customer.fullname',
-                'Телефон': 'order.customer.phoneNumber',
-                'Место отправления': 'order.departurePoint.name',
-                'Место назначения': 'order.destination.name',
-                'Кол-во пассажиров': 'order.passengerCount',
-                'Вес': 'order.weight',
-                'Длина': 'order.length',
-                'Ширина': 'order.width',
-                'Высота': 'order.height',
-                'Контактное лицо': 'order.contact.fullname',
-                'Телефон ': 'order.contact.phoneNumber',
-                'Тип траспорта': 'transportNumber',
-                'Номер': 'transportNumber',
-                'Водитель': 'driverFullname',
-                'Телефон  ': 'driverPhoneNumber',
+                'Подразделение': {
+                    field: 'order.customer.subdivision',
+                    callback: this.regular
+                },
+                'Ответственный': {
+                    field: 'order.customer.fullname',
+                    callback: this.regular
+                },
+                'Телефон': {
+                    field: 'order.customer.phoneNumber',
+                    callback: this.regular
+                },
+                'Место отправления': {
+                    field: 'order.departurePoint.name',
+                    callback: this.regular
+                },
+                'Место назначения': {
+                    field: 'order.destination.name',
+                    callback: this.regular
+                },
+                'Кол-во пассажиров': {
+                    field: 'order.passengerCount',
+                    callback: this.regular
+                },
+                'Вес': {
+                    field: 'order.weight',
+                    callback: this.regular
+                },
+                'Длина': {
+                    field: 'order.length',
+                    callback: this.regular
+                },
+                'Ширина': {
+                    field: 'order.width',
+                    callback: this.regular
+                },
+                'Высота': {
+                    field: 'order.height',
+                    callback: this.regular
+                },
+                'Контактное лицо': {
+                    field: 'order.contact.fullname',
+                    callback: this.regular
+                },
+                'Телефон ': {
+                    field: 'order.contact.phoneNumber',
+                    callback: this.regular
+                },
+                'Тип траспорта': {
+                    field: 'transportNumber',
+                    callback: this.regular
+                },
+                'Номер': {
+                    field: 'transportNumber',
+                    callback: this.regular
+                },
+                'Водитель': {
+                    field: 'driverFullname',
+                    callback: this.regular
+                },
+                'Телефон  ': {
+                    field: 'driverPhoneNumber',
+                    callback: this.regular
+                },
                 'Место получения текущей заявки': {
                     field: "place.name",
-                    callback: (val) => {
-                        return val ? val : '-'
-                    },
+                    callback: this.regular,
                 },
                 'Время окончания заказа': {
                     field: "doneAt",
-                    callback: (val) => {
-                        return moment(val).format('HH:mm');
-                    },
+                    callback: this.HHmm,
                 },
                 'Время между заказами': {
                     field: "timeBetweenOrders",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
                 'Время до принятия заявки': {
                     field: "timeBeforeAccepted",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
                 'Время до прибытия к заказчику': {
                     field: "timeEntryToCustomer",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
                 'Время загрузки': {
                     field: "loadingTime",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
                 'Время в движении': {
                     field: "driveTime",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
                 'Время разгрузки': {
                     field: "unloadingTime",
-                    callback: (val) => {
-                        return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
-                    },
+                    callback: this.secondsDuration,
                 },
             },
             columns: [
@@ -139,7 +173,25 @@ export default {
                     label: 'Номер заказа',
                     align: 'left',
                     field: row => row.orderId,
-                    format: val => `${val}`,
+                    format: this.regular,
+                    sortable: true
+                },
+                {
+                    name: 'operatorFullname',
+                    required: true,
+                    label: 'Диспетчер',
+                    align: 'left',
+                    field: row => row.operatorFullname,
+                    format: this.regular,
+                    sortable: true
+                },
+                {
+                    name: 'isDeleted',
+                    required: true,
+                    label: 'Номер заказа',
+                    align: 'left',
+                    field: row => row.order.isDeleted,
+                    format: val => !val ? 'Завершен' : 'Удален',
                     sortable: true
                 },
                 {
@@ -148,7 +200,7 @@ export default {
                     label: 'Наименование груза',
                     align: 'left',
                     field: row => row.order.name,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -157,7 +209,7 @@ export default {
                     label: 'Комментарий',
                     align: 'left',
                     field: row => row.order.description,
-                    format: val => val ? val : '-',
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -166,7 +218,7 @@ export default {
                     label: 'Время заказа',
                     align: 'left',
                     field: row => row.order.orderedAt,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -175,7 +227,7 @@ export default {
                     label: 'Дата',
                     align: 'left',
                     field: row => row.order.orderTime,
-                    format: val => moment(val).format('DD.MM.YYYY'),
+                    format: this.DDMMYYYY,
                     sortable: true
                 },
                 {
@@ -184,7 +236,7 @@ export default {
                     label: 'Время подачи ( плановое )',
                     align: 'left',
                     field: row => row.order.orderTime,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -193,7 +245,7 @@ export default {
                     label: 'Время принятия заявки водителем',
                     align: 'left',
                     field: row => row.acceptedAt,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -202,7 +254,7 @@ export default {
                     label: 'Время подачи ( фактическое )',
                     align: 'left',
                     field: row => row.entryToCustomerFact,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -211,7 +263,7 @@ export default {
                     label: 'Время убытия в место назначения',
                     align: 'left',
                     field: row => row.exitToDestinationFact,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -220,7 +272,7 @@ export default {
                     label: 'Время прибытия в место назначения',
                     align: 'left',
                     field: row => row.exitToDestinationFact,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -229,7 +281,7 @@ export default {
                     label: 'Подразделение',
                     align: 'left',
                     field: row => row.order.customer.subdivision,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -238,7 +290,7 @@ export default {
                     label: 'Ответственный',
                     align: 'left',
                     field: row => row.order.customer.fullname,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -247,7 +299,7 @@ export default {
                     label: 'Телефон',
                     align: 'left',
                     field: row => row.order.customer.phoneNumber,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -256,7 +308,7 @@ export default {
                     label: 'Место отправления',
                     align: 'left',
                     field: row => row.order.departurePoint.name,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -265,7 +317,7 @@ export default {
                     label: 'Место назначения',
                     align: 'left',
                     field: row => row.order.destination.name,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -274,7 +326,7 @@ export default {
                     label: 'Кол-во пассажиров',
                     align: 'left',
                     field: row => row.order.passengerCount,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -283,7 +335,7 @@ export default {
                     label: 'Вес',
                     align: 'left',
                     field: row => row.order.weight,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -292,7 +344,7 @@ export default {
                     label: 'Длина',
                     align: 'left',
                     field: row => row.order.length,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -301,7 +353,7 @@ export default {
                     label: 'Ширина',
                     align: 'left',
                     field: row => row.order.width,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -310,7 +362,7 @@ export default {
                     label: 'Высота',
                     align: 'left',
                     field: row => row.order.height,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -319,7 +371,7 @@ export default {
                     label: 'Контактное лицо',
                     align: 'left',
                     field: row => row.order.contact.fullname,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -328,7 +380,7 @@ export default {
                     label: 'Телефон',
                     align: 'left',
                     field: row => row.order.contact.phoneNumber,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -337,7 +389,7 @@ export default {
                     label: 'Тип траспорта',
                     align: 'left',
                     field: row => row.transportType,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -346,7 +398,7 @@ export default {
                     label: 'Номер',
                     align: 'left',
                     field: row => row.transportNumber,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -355,7 +407,7 @@ export default {
                     label: 'Водитель',
                     align: 'left',
                     field: row => row.driverFullname,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -364,7 +416,7 @@ export default {
                     label: 'Телефон',
                     align: 'left',
                     field: row => row.driverPhoneNumber,
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -373,7 +425,7 @@ export default {
                     label: 'Место получения текущей заявки',
                     align: 'left',
                     field: row => row.place ? row.place.name : '-',
-                    format: val => `${val}`,
+                    format: this.regular,
                     sortable: true
                 },
                 {
@@ -382,7 +434,7 @@ export default {
                     label: 'Время окончания заказа',
                     align: 'left',
                     field: row => row.doneAt,
-                    format: val => moment(val).format('HH:mm'),
+                    format: this.HHmm,
                     sortable: true
                 },
                 {
@@ -391,7 +443,7 @@ export default {
                     label: 'Время между заказами',
                     align: 'left',
                     field: row => row.timeBetweenOrders,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
                 {
@@ -400,7 +452,7 @@ export default {
                     label: 'Время до принятия заявки',
                     align: 'left',
                     field: row => row.timeBeforeAccepted,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
                 {
@@ -409,7 +461,7 @@ export default {
                     label: 'Время до прибытия к заказчику',
                     align: 'left',
                     field: row => row.timeEntryToCustomer,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
                 {
@@ -418,7 +470,7 @@ export default {
                     label: 'Время загрузки',
                     align: 'left',
                     field: row => row.loadingTime,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
                 {
@@ -427,7 +479,7 @@ export default {
                     label: 'Время в движении',
                     align: 'left',
                     field: row => row.driveTime,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
                 {
@@ -436,7 +488,7 @@ export default {
                     label: 'Время разгрузки',
                     align: 'left',
                     field: row => row.unloadingTime,
-                    format: val => moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss"),
+                    format: this.secondsDuration,
                     sortable: true
                 },
             ]
@@ -447,7 +499,26 @@ export default {
     },
     methods: {
         ...mapActions('orderStats', ['requestOrderStats']),
-        moment
+        moment,
+        checkNull(val) {
+            return val === null || val === undefined;
+        },
+        secondsDuration(val) {
+            if (this.checkNull(val)) return null;
+            return moment.utc(moment.duration(val, "milliseconds").asMilliseconds()).format("HH:mm:ss");
+        },
+        DDMMYYYY(val) {
+            if (this.checkNull(val)) return null;
+            return moment(val).format('DD.MM.YYYY');
+        },
+        HHmm(val) {
+            if (this.checkNull(val)) return null;
+            return moment(val).format('HH:mm');
+        },
+        regular(val) {
+            if (this.checkNull(val)) return null;
+            return val;
+        }
     },
     async mounted() {
         this.requestOrderStats();

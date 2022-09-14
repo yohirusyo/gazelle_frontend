@@ -138,28 +138,28 @@
                 ]" autocomplete="off" />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_weight" type="number" :min="_passengerCount == 0 ? 0.01 : 0" borderless
+              <q-input v-model="_weight" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
                 class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
                 label="Вес" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_length" type="number" :min="_passengerCount == 0 ? 0.01 : 0" borderless
+              <q-input v-model="_length" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
                 class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
                 label="Длина" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_width" type="number" :min="_passengerCount == 0 ? 0.01 : 0" borderless
+              <q-input v-model="_width" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
                 class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
                 label="Ширина" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_height" type="number" :min="_passengerCount == 0 ? 0.01 : 0" borderless
+              <q-input v-model="_height" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
                 class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
                 label="Высота" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',

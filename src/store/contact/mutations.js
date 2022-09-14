@@ -7,7 +7,6 @@ export function set(state, contacts) {
 }
 
 export function update(state, contact) {
-  console.warn(contact);
   const index = state.contacts.findIndex((o) => o.id == contact.id);
   state.contacts[index] = contact;
 }

@@ -7,7 +7,6 @@ export function set(state, orders) {
 }
 
 export function update(state, order) {
-  console.warn(order);
   const index = state.orders.findIndex((o) => o.id == order.id);
   state.orders[index] = order;
 }
