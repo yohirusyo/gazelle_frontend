@@ -1,6 +1,6 @@
 <template>
-  <div @click="setTransport(transport)">
-    <div class="row items-center">
+  <div @click="setTransport(transport)" @mouseover="_hovered = transport.id" @mouseleave="_hovered = null">
+    <div class="row items-center q-py-md">
       <div class="col-1 text-center">
         <q-checkbox v-model="_selected" :disable="
           !_isNotDisabled
@@ -29,7 +29,7 @@
         </q-chip>
       </div>
     </div>
-    <q-separator spaced inset />
+    <q-separator  class="q-ma-none" />
   </div>
 </template>
 
@@ -48,9 +48,11 @@ export default {
       "selectedTransportId",
       "order",
       "orderIsEmergency",
+      "hoveredTransportId"
     ]),
     ...mapState('order', ['customerPhoneNumber', 'customerFullname', 'customerSubdivision']),
     _isNotDisabled() {
+      if (this.transport.driverId == null) return false;
       if (this.customerSubdivision == this.transport.lastCustomerSubdivision) return true;
       if (this.orderIsEmergency) return true;
       if (this._isFreeMoreThan15Minutes) return true;
@@ -64,9 +66,17 @@ export default {
         this.setSelectedTransportId(newValue ? this.transport.id : null);
       },
     },
+    _hovered: {
+      get() {
+        return this.hoveredTransportId;
+      },
+      set(val) {
+        this.setHoveredTransportId(val)
+      }
+    },
   },
   methods: {
-    ...mapMutations("current", ["setTransport", "setSelectedTransportId"]),
+    ...mapMutations("current", ["setTransport", "setSelectedTransportId", "setHoveredTransportId"]),
     timeFormat,
     formatDriver,
     formatPlace,
@@ -76,6 +86,7 @@ export default {
       duration: null,
       _isFreeMoreThan15Minutes: false,
       _isBusyMoreThan1Hour: false,
+
     };
   },
   mounted() {

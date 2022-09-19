@@ -35,9 +35,10 @@
               </q-select>
             </div>
             <div class="col-4 q-px-sm">
-              <q-input v-model="_customerSubdivision" type="text" borderless
-                class="bg-grey-2 border-sm shadow-white-inset q-px-md" hide-bottom-space hide-hint label-color="grey"
-                label="Подразделение" lazy-rules :rules="[
+              <q-select :model-value="_customerSubdivision" type="text" borderless fill-input hide-selected use-input
+                input-debounce="0" :options="getFilteredSubdivisions(_filterSubdivision)" @filter="filterFnSubdivisions"
+                @input-value="_setCustomerSubdivision" class="bg-grey-2 border-sm shadow-white-inset q-px-md"
+                hide-bottom-space hide-hint label-color="grey" label="Подразделение" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
@@ -204,7 +205,7 @@ export default {
     ]),
     ...mapState("place", ["places"]),
     ...mapGetters("contact", ["getFilteredContacts"]),
-    ...mapGetters("customer", ["getFilteredCustomers"]),
+    ...mapGetters("customer", ["getFilteredCustomers", "getFilteredSubdivisions"]),
     ...mapGetters("place", ["getFilteredPlaces"]),
     _orderIsEmergency: {
       get() {
@@ -263,7 +264,6 @@ export default {
       "setCustomerSubdivision",
       "setContactPhoneNumber",
       "setContactFullname",
-      "clearOrder",
       "setDeparturePointName",
       "setDestinationName"
     ]),
@@ -272,11 +272,15 @@ export default {
       "setSelectedTransportId",
       "setOrderIsEmergency",
       "setPlace",
+      "clearOrder",
     ]),
 
     _setCustomerFullname(val) {
       if (val.fullname) return this.setCustomerFullname(val.fullname);
       this.setCustomerFullname(val);
+    },
+    _setCustomerSubdivision(val) {
+      this._customerSubdivision = val;
     },
     _setContactFullname(val) {
       if (val.fullname) return this.setContactFullname(val.fullname);
@@ -326,6 +330,11 @@ export default {
             return;
           }
         this._filterContacts = val;
+      });
+    },
+    filterFnSubdivisions(val, update) {
+      update(() => {
+        this._filterSubdivision = val;
       });
     },
     filterFnDestinations(val, update) {
@@ -396,6 +405,7 @@ export default {
       this._width = null;
       this._height = null;
       this._filterCustomers = null;
+      this._filterSubdivision = null;
       this._filterContacts = null;
       this._filterDeparturePoints = null;
       this._filterDestinations = null;
@@ -426,6 +436,7 @@ export default {
       _width: null,
       _height: null,
       _filterCustomers: null,
+      _filterSubdivision: null,
       _filterContacts: null,
       _filterDeparturePoints: null,
       _filterDestinations: null,

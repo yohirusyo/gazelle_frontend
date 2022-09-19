@@ -8,6 +8,7 @@ export default function () {
     selectedTransportId: null,
     currentUser: null,
     onlyFree: false,
-    orderIsEmergency: false
+    orderIsEmergency: false,
+    hoveredTransportId: null,
   };
 }

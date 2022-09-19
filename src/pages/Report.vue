@@ -1,22 +1,72 @@
 <template>
-    <q-page>
-        <download-excel :data="orderStats" :fields="fields" :name="`Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`">
-            <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
-                class="border-sm shadow-white bg-green q-mx-lg q-mb-sm q-mt-md" flat no-caps />
-        </download-excel>
-        <q-table :rows="orderStats" :columns="columns" row-key="name" hide-bottom class="q-mx-lg q-my-sm" virtual-scroll
-            v-model:pagination="pagination" :rows-per-page-options="[0]" style="height: 80vh;" />
+    <q-page style="overflow-y: hidden">
+        <div class="row q-mx-lg q-mb-sm q-mt-md items-center q-gutter-x-md justify-between">
+            <div class="col col-1">
+                <download-excel :data="orderStats" :fields="fields"
+                    :name="`Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`">
+                    <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
+                        class="border-sm shadow-white bg-green" flat no-caps />
+                </download-excel>
+            </div>
+
+            <q-select type="text" borderless fill-input hide-selected use-input input-debounce="0"
+                :options="getStatsSubidivisions(_filterSubdivision)" @filter="filterFnSubdivisions"
+                @input-value="_setSubdivision" :model-value="_selectedSubdivision"
+                class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-3" hide-bottom-space hide-hint
+                label-color="grey" label="Подразделение" autocomplete="off">
+                <template v-if="_selectedSubdivision" v-slot:append>
+                    <q-icon name="cancel" @click.stop.prevent="_setSubdivision(null)" class="cursor-pointer" />
+                </template>
+            </q-select>
+            <q-select type="text" borderless fill-input hide-selected use-input input-debounce="0"
+                :options="getDriversFullnames(_filterDriverFullname)" @filter="filterFnDriverFullnames"
+                @input-value="_setDriverFullname" :model-value="_selectedDriverFullname"
+                class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-3" hide-bottom-space hide-hint
+                label-color="grey" label="Ф.И.О. водителя" autocomplete="off">
+                <template v-if="_selectedDriverFullname" v-slot:append>
+                    <q-icon name="cancel" @click.stop.prevent="_setDriverFullname(null)" class="cursor-pointer" />
+                </template>
+            </q-select>
+            <q-input v-model="_selectedDate" borderless fill-input
+                class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-2" hide-bottom-space hide-hint
+                label-color="grey" label="Дата" flat>
+                <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                            <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal :options="optionsFn">
+                                <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                                </div>
+                            </q-date>
+                        </q-popup-proxy>
+                    </q-icon>
+                    <q-icon v-if="_selectedDate" name="cancel" @click.stop.prevent="_selectedDate = null"
+                        class="cursor-pointer" />
+                </template>
+
+            </q-input>
+        </div>
+        <q-table :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision, _selectedDate)"
+            :columns="columns" row-key="name" hide-bottom class="q-mx-lg q-my-sm my-sticky-virtscroll-table"
+            virtual-scroll v-model:pagination="pagination" :rows-per-page-options="[0]" style="height: 85vh;" />
     </q-page>
 </template>
   
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import * as moment from 'moment';
-
+import {
+    Loading,
+} from 'quasar'
 export default {
     name: "Report",
     data() {
         return {
+            _selectedDate: null,
+            _selectedSubdivision: null,
+            _selectedDriverFullname: null,
+            _filterSubdivision: null,
+            _filterDriverFullname: null,
             pagination: {
                 rowsPerPage: 0
             },
@@ -495,7 +545,9 @@ export default {
         }
     },
     computed: {
-        ...mapState('orderStats', ['orderStats'])
+        ...mapState('orderStats', ['orderStats']),
+        ...mapGetters('orderStats', ['getStatsSubidivisions', 'getDriversFullnames', 'getMinDate', 'getMaxDate', 'getFilteredStats']),
+
     },
     methods: {
         ...mapActions('orderStats', ['requestOrderStats']),
@@ -518,15 +570,52 @@ export default {
         regular(val) {
             if (this.checkNull(val)) return null;
             return val;
+        },
+        filterFnSubdivisions(val, update) {
+            update(() => {
+                this._filterSubdivision = val;
+            });
+        },
+        filterFnDriverFullnames(val, update) {
+            update(() => {
+                this._filterDriverFullname = val;
+            });
+        },
+        _setSubdivision(val) {
+            this._selectedSubdivision = val;
+        },
+        _setDriverFullname(val) {
+            this._selectedDriverFullname = val;
+        },
+        optionsFn(date) {
+            return date >= this.getMinDate() && date <= this.getMaxDate();
         }
     },
     async mounted() {
-        this.requestOrderStats();
+        Loading.show();
+        await this.requestOrderStats();
+        Loading.hide();
     }
 };
 </script>
   
-<style lang="scss" scoped>
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
 
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #fff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
 </style>
-  

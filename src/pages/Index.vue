@@ -42,6 +42,9 @@ import Driver from "src/components/driver/DriverComponent.vue";
 import Place from "src/components/place/PlaceComponent.vue";
 import YaMap from "src/components/map/YaMap.vue";
 import { mapActions } from "vuex";
+import {
+    Loading,
+} from 'quasar'
 export default {
   name: "PageIndex",
   components: {
@@ -56,7 +59,9 @@ export default {
     ...mapActions("status", ["requestStatuses"]),
   },
   async mounted() {
+    Loading.show();
     await this.requestStatuses();
+    Loading.hide();
   },
 };
 </script>

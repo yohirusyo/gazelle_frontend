@@ -7,3 +7,11 @@ export const getFilteredCustomers = (state) => (fullname) => {
   return data
 }
 
+export const getFilteredSubdivisions = (state) => (name) => {
+  const subdivisions = state.customers.map(customer => customer.subdivision)
+  const data = (!!name && name != '') ?
+    subdivisions.filter((subdivision) => subdivision.toLowerCase().includes(name.toLowerCase())) : subdivisions
+  return [...new Set(data)]
+}
+
+

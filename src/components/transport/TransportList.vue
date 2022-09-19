@@ -8,7 +8,7 @@
     <div class="col-2 text-center">Статус</div>
     <div class="col-1 text-center">В текущем статусе</div>
   </div>
-  <q-separator spaced />
+  <q-separator  class="q-ma-none" />
   <q-scroll-area class="col">
     <TransportListElement
       v-for="transport in getByOnlyFreeFilter(onlyFree, freeStatuses.map(s => s.id))"

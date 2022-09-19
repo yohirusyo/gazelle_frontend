@@ -2,18 +2,13 @@
   <div class="row items-center col col-shrink q-pr-md" ref="top">
     <div class="col-12">Название</div>
   </div>
-  <q-separator spaced />
-  <q-virtual-scroll
-    :items="places"
-    separator
-    v-slot="{ item }"
-    :style="`height: ${height}px`"
-  >
+  <q-separator class="q-ma-none" />
+  <q-virtual-scroll :items="places" separator v-slot="{ item }" :style="`height: ${height}px`">
     <div :key="item.id" @click="setPlace(place)">
-      <div class="row items-center">
+      <div class="row items-center q-py-md">
         <div class="col-12">{{ item.name }}</div>
       </div>
-      <q-separator spaced inset />
+      <q-separator class="q-ma-none" />
     </div>
   </q-virtual-scroll>
 </template>
@@ -42,4 +37,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

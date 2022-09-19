@@ -4,15 +4,16 @@
     <div class="col-3">Номер телефона</div>
     <div class="col-2 text-center">На смене</div>
   </div>
-  <q-separator spaced />
+  <q-separator class="q-ma-none" />
   <q-scroll-area class="col q-pr-md">
     <div v-for="driver in drivers" :key="driver.id" @click="setDriver(driver)">
-      <div class="row items-center">
+      <div class="row items-center q-py-md">
         <div class="col-7">{{ `${driver.surname} ${driver.name} ${driver.middlename}` }}</div>
         <div class="col-3">{{ driver.workingPhoneNumber }}</div>
+        
         <div class="col-2 text-center">{{ driver.isOnDriverShift ? 'Да' : "Нет" }}</div>
       </div>
-      <q-separator spaced inset />
+      <q-separator class="q-ma-none" />
     </div>
   </q-scroll-area>
 </template>
@@ -35,4 +36,5 @@ export default {
 </script>
 
 <style>
+
 </style>

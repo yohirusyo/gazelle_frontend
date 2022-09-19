@@ -1,8 +1,8 @@
 export default function () {
   return {
-    username: "",
-    password: "",
-    token: localStorage.getItem("token") || "",
+    username: null,
+    password: null,
+    token: localStorage.getItem("token") || null,
     localUser: null,
   };
 }

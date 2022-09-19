@@ -73,3 +73,7 @@ export function setOnlyFree(state, onlyFree) {
 export function setOrderIsEmergency(state, orderIsEmergency) {
   state.orderIsEmergency = orderIsEmergency;
 }
+
+export function setHoveredTransportId(state, hoveredTransportId) {
+  state.hoveredTransportId = hoveredTransportId;
+}
