@@ -77,3 +77,7 @@ export function setOrderIsEmergency(state, orderIsEmergency) {
 export function setHoveredTransportId(state, hoveredTransportId) {
   state.hoveredTransportId = hoveredTransportId;
 }
+
+export function setCustomer(state, customer) {
+  state.customer = customer;
+}

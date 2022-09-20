@@ -33,7 +33,6 @@ export const getMaxDate = (state) => () => {
 
 export const getFilteredStats = (state) => (fullname, subdivision, date) => {
     return state.orderStats.filter(os => {
-        console.warn(os.order.customer.subdivision)
         if (
             ((!fullname || fullname == '') || (fullname && os.driverFullname.toLowerCase().includes(fullname.toLowerCase()))) &&
             ((!subdivision || subdivision == '') || (subdivision && os.order.customer.subdivision.toLowerCase().includes(subdivision.toLowerCase()))) &&

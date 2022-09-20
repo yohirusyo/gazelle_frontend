@@ -43,3 +43,11 @@ export function setDestinationName(state, name) {
 export function setDeparturePointName(state, name) {
   state.departurePointName = name;
 }
+
+export function setNames(state, names) {
+  state.names = names.map(n => n.name)
+}
+
+export function setName(state, name) {
+  state.name = name
+}

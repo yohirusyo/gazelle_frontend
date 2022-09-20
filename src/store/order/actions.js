@@ -13,6 +13,15 @@ export async function addOrder({ commit }, form) {
     });
 }
 
+export async function requestNames({ commit }) {
+  return api
+    .get(`order/names`)
+    .then(({ data }) => {
+      commit("setNames", data);
+    })
+}
+
+
 export async function requestOrders({ commit }) {
   return api.get(`order`).then(({ data }) => {
     commit("set", data);

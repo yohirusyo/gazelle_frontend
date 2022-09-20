@@ -10,5 +10,6 @@ export default function () {
     onlyFree: false,
     orderIsEmergency: false,
     hoveredTransportId: null,
+    customer: null,
   };
 }

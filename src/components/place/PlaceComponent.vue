@@ -18,7 +18,7 @@
     <q-separator spaced />
     <q-tab-panels v-model="tab" animated class="col" keep-alive>
       <q-tab-panel name="main" class="col column">
-        <PlaceList />
+        <PlaceList :col="col"/>
       </q-tab-panel>
 
       <q-tab-panel name="create" class="col column">
@@ -44,6 +44,7 @@ export default {
     PlaceCreation,
     PlaceEdit,
   },
+  props: ['col'],
   computed: {
     ...mapState("current", ["place"]),
   },

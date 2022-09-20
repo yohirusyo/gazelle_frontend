@@ -5,8 +5,10 @@
         <div class="column col q-gutter-y-md">
           <div class="row items-center">
             <div class="col q-px-sm">
-              <q-input v-model="_name" type="text" borderless class="bg-grey-2 border-sm q-px-md shadow-white-inset"
-                hide-bottom-space hide-hint label-color="grey" label="Наименование груза" lazy-rules :rules="[
+              <q-select :model-value="_name" type="text" borderless fill-input hide-selected use-input
+                input-debounce="0" :options="getFilteredNames(_filterName)" @filter="filterFnNames"
+                @input-value="_setName" class="bg-grey-2 border-sm shadow-white-inset q-px-md" hide-bottom-space
+                hide-hint label-color="grey" label="Наименование груза" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
@@ -68,9 +70,7 @@
             <div class="col-4 q-px-sm">
               <q-input v-model="_contactPhoneNumber" type="text" borderless
                 class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Телефон" mask="+7 (###) ### ## ##" lazy-rules :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                label="Телефон" mask="+7 (###) ### ## ##" autocomplete="off" />
             </div>
           </div>
           <div class="row items-stretch">
@@ -201,11 +201,13 @@ export default {
       "contactPhoneNumber",
       "contactFullname",
       "destinationName",
-      "departurePointName"
+      "departurePointName",
+      "name"
     ]),
     ...mapState("place", ["places"]),
     ...mapGetters("contact", ["getFilteredContacts"]),
     ...mapGetters("customer", ["getFilteredCustomers", "getFilteredSubdivisions"]),
+    ...mapGetters('order', ["getFilteredNames"]),
     ...mapGetters("place", ["getFilteredPlaces"]),
     _orderIsEmergency: {
       get() {
@@ -229,6 +231,14 @@ export default {
       },
       set(newVal) {
         this.setCustomerSubdivision(newVal);
+      },
+    },
+    _name: {
+      get() {
+        return this.name;
+      },
+      set(newVal) {
+        this.setName(newVal);
       },
     },
     _contactPhoneNumber: {
@@ -265,7 +275,8 @@ export default {
       "setContactPhoneNumber",
       "setContactFullname",
       "setDeparturePointName",
-      "setDestinationName"
+      "setDestinationName",
+      "setName"
     ]),
     ...mapMutations("current", [
       "setTransport",
@@ -281,6 +292,9 @@ export default {
     },
     _setCustomerSubdivision(val) {
       this._customerSubdivision = val;
+    },
+    _setName(val) {
+      this._name = val;
     },
     _setContactFullname(val) {
       if (val.fullname) return this.setContactFullname(val.fullname);
@@ -337,6 +351,11 @@ export default {
         this._filterSubdivision = val;
       });
     },
+    filterFnNames(val, update) {
+      update(() => {
+        this._filterName = val;
+      });
+    },
     filterFnDestinations(val, update) {
       update(() => {
         if (val.name) {
@@ -383,7 +402,7 @@ export default {
         contactFullname: this.contactFullname,
         transportId: this.selectedTransportId,
         description: this._description,
-        name: this._name,
+        name: this.name,
       });
       this.$emit("done");
       this.$refs.form.reset();
@@ -409,8 +428,8 @@ export default {
       this._filterContacts = null;
       this._filterDeparturePoints = null;
       this._filterDestinations = null;
-      this._name = null;
       this._description = null;
+      this.setName(null);
       this.setCustomerFullname(null);
       this.setCustomerPhoneNumber(null);
       this.setCustomerSubdivision(null);
@@ -437,10 +456,10 @@ export default {
       _height: null,
       _filterCustomers: null,
       _filterSubdivision: null,
+      _filterName: null,
       _filterContacts: null,
       _filterDeparturePoints: null,
       _filterDestinations: null,
-      _name: null,
       _description: null,
     };
   },

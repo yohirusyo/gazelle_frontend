@@ -63,3 +63,8 @@ $radius-multiplier: 1.5;
 .q-tab-panel {
   padding: 0 !important;
 }
+
+@font-face {
+  font-family: RoadNumbers2; /* Имя шрифта */
+  src: url(RoadNumbers2.0.otf); /* Путь к файлу со шрифтом */
+}

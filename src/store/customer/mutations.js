@@ -14,3 +14,15 @@ export function update(state, customer) {
 export function remove(state, id) {
   state.customers = state.customers.filter((customer) => customer.id != id);
 }
+
+export function setCustomerFullname(state, fullname) {
+  state.customerFullname = fullname;
+}
+
+export function setCustomerPhoneNumber(state, phoneNumber) {
+  state.customerPhoneNumber = phoneNumber;
+}
+
+export function setCustomerSubdivision(state, subdivision) {
+  state.customerSubdivision = subdivision;
+}

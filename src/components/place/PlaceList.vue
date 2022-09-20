@@ -20,19 +20,18 @@ export default {
   computed: {
     ...mapState("place", ["places"]),
   },
+  props: ['col'],
   data() {
     return {
       height: 0,
     };
   },
   methods: {
-    ...mapActions("place", ["requestPlaces"]),
     ...mapMutations("current", ["setPlace"]),
   },
   async mounted() {
-    await this.requestPlaces();
     this.height =
-      document.getElementsByClassName("ymap-container")[0]?.clientHeight - this.$refs.top.clientHeight - 25;
+      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12 * this.col) - this.$refs.top.clientHeight - 98;
   },
 };
 </script>

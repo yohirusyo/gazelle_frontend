@@ -8,5 +8,7 @@ export default function () {
     contactFullname: null,
     destinationName: null,
     departurePointName: null,
+    name: null,
+    names: [],
   };
 }

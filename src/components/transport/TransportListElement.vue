@@ -8,14 +8,16 @@
 
       </div>
       <div class="col">{{ transport.type }}</div>
-      <div class="col">{{ transport.transportNumber }}</div>
-      <div class="col-3 column pre">
+      <div class="col">
+        <AutoNumber :number="transport?.transportNumber" />
+      </div>
+      <div class="col-3 column pre text-center">
         {{ formatDriver(getDriverById(transport.driverId)) }}
       </div>
-      <div class="col-2 pre">
+      <div class="col-2 pre text-center">
         {{ formatPlace(getPlaceById(transport.placeId)) }}
       </div>
-      <div class="col-2 row justify-center">
+      <div class="col-2 row justify-center text-center">
         <q-chip :class="_isFreeMoreThan15Minutes ? 'bg-green text-white' : ''">
           {{ getStatusById(transport.statusId)?.isBusy ? "Занят" : "Свободен" }}
           <q-tooltip>
@@ -29,16 +31,21 @@
         </q-chip>
       </div>
     </div>
-    <q-separator  class="q-ma-none" />
+    <q-separator class="q-ma-none" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
-import { timeFormat, formatDriver, formatPlace } from "src/helpers/formatters";
+import { timeFormat, formatDriver, formatPlace, formatTransportNumber } from "src/helpers/formatters";
+import AutoNumber from "../base/AutoNumber.vue";
 import * as moment from "moment";
+
 export default {
   name: "TransportListElement",
+  components: {
+    AutoNumber
+  },
   props: ["transport", "freeStatuses"],
   computed: {
     ...mapGetters("status", ["getStatusById"]),
@@ -80,6 +87,7 @@ export default {
     timeFormat,
     formatDriver,
     formatPlace,
+    formatTransportNumber
   },
   data() {
     return {

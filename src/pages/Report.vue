@@ -420,7 +420,7 @@ export default {
                     required: true,
                     label: 'Контактное лицо',
                     align: 'left',
-                    field: row => row.order.contact.fullname,
+                    field: row => row.order.contact?.fullname,
                     format: this.regular,
                     sortable: true
                 },
@@ -429,7 +429,7 @@ export default {
                     required: true,
                     label: 'Телефон',
                     align: 'left',
-                    field: row => row.order.contact.phoneNumber,
+                    field: row => row.order.contact?.phoneNumber,
                     format: this.regular,
                     sortable: true
                 },

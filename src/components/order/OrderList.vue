@@ -12,7 +12,7 @@
     <div :key="item.id" :class="_hoveredOrder?.id == item.id ? 'bg-light-green-2' : ''" @click="setOrder(item)">
       <div class="row items-center q-py-md">
         <div class="col-2 text-center column items-center">
-          <span >
+          <span>
             {{ '№ ' + item.id }}
           </span>
           <q-chip class="q-ma-none" :class="item.isEmergency ? 'bg-red text-white' : ''">
@@ -31,8 +31,9 @@
         <div class="col-2">
           {{ formatPlace(getPlaceById(item.destinationId)) }}
         </div>
-        <div class="col-2 text-center gosnumber">
-          {{ formatTransportNumber(getTransportById(item.transportId)) }}
+
+        <div class="col-2 gosnumber">
+          <AutoNumber :number="formatTransportNumber(getTransportById(item.transportId))" />
         </div>
       </div>
       <q-tooltip>
@@ -54,8 +55,13 @@ import {
   formatPlace,
   formatTransportNumber,
 } from "src/helpers/formatters";
+import AutoNumber from "../base/AutoNumber.vue";
 export default {
   name: "OrderList",
+  props: ['col'],
+  components: {
+    AutoNumber
+  },
   computed: {
     ...mapState("order", ["orders"]),
     ...mapGetters("contact", ["getContactById"]),
@@ -89,7 +95,6 @@ export default {
     };
   },
   methods: {
-    ...mapActions("order", ["requestOrders"]),
     ...mapMutations("current", ["setOrder"]),
     timeFormat,
     formatContact,
@@ -98,9 +103,8 @@ export default {
     formatTransportNumber,
   },
   async mounted() {
-    await this.requestOrders();
     this.height =
-      document.getElementsByClassName("ymap-container")[0]?.clientHeight - this.$refs.top.clientHeight - 25;
+      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12 * this.col) - this.$refs.top.clientHeight - 98;
   },
 };
 </script>

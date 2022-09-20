@@ -26,7 +26,7 @@
     <q-separator spaced />
     <q-tab-panels v-model="tab" animated class="col" keep-alive>
       <q-tab-panel name="main" class="col column">
-        <TransportList />
+        <TransportList :col="col"/>
       </q-tab-panel>
 
       <q-tab-panel name="create" class="col column">
@@ -52,6 +52,7 @@ export default {
     TransportCreation,
     TransportEdit,
   },
+  props: ['col'],
   computed: {
     ...mapState("current", ["transport", "onlyFree"]),
     _onlyFree: {
