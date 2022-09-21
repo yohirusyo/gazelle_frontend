@@ -52,27 +52,7 @@
                 ]" autocomplete="off" />
             </div>
           </div>
-          <div class="row items-stretch">
-            <div class="col-8 q-px-sm">
-              <q-select class="bg-grey-2 border-sm q-px-md shadow-white-inset" fill-input hide-selected use-input
-                input-debounce="0" :options="getFilteredContacts(_filterContacts)" @filter="filterFnContacts"
-                @input-value="_setContactFullname" :model-value="contactFullname" borderless hide-bottom-space hide-hint
-                label-color="grey" label="Контактное лицо" autocomplete="off">
-                <template v-slot:option="{ opt, itemProps, itemEvents }">
-                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onContactSelect(opt)">
-                    <q-item-section>
-                      <q-item-label>{{ `${opt.fullname} ${opt.phoneNumber}` }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-            </div>
-            <div class="col-4 q-px-sm">
-              <q-input v-model="_contactPhoneNumber" type="text" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Телефон" mask="+7 (###) ### ## ##" autocomplete="off" />
-            </div>
-          </div>
+
           <div class="row items-stretch">
             <div class="col-5 q-px-sm row">
               <q-select v-model="_departurePointName" type="text" fill-input hide-selected use-input input-debounce="0"
@@ -166,8 +146,32 @@
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
-            <div class="col-2 q-px-sm">
-              <q-checkbox v-model="_orderIsEmergency" label="Аварийная" />
+            <div class="col-2 q-px-sm column justify-between">
+              <q-checkbox v-model="_orderIsEmergency" label="Аварийная" dense />
+              <q-checkbox v-model="_allowContact" label="Контактное лицо" dense
+                v-if="_passengerCount && _passengerCount >= 1" />
+            </div>
+          </div>
+
+          <div class="row items-stretch">
+            <div class="col-8 q-px-sm">
+              <q-select class="bg-grey-2 border-sm q-px-md shadow-white-inset" fill-input hide-selected use-input
+                input-debounce="0" :options="getFilteredContacts(_filterContacts)" @filter="filterFnContacts"
+                @input-value="_setContactFullname" :model-value="contactFullname" borderless hide-bottom-space hide-hint
+                label-color="grey" label="Контактное лицо" autocomplete="off">
+                <template v-slot:option="{ opt, itemProps, itemEvents }">
+                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onContactSelect(opt)">
+                    <q-item-section>
+                      <q-item-label>{{ `${opt.fullname} ${opt.phoneNumber}` }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
+            <div class="col-4 q-px-sm">
+              <q-input v-model="_contactPhoneNumber" type="text" borderless
+                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
+                label="Телефон" mask="+7 (###) ### ## ##" autocomplete="off" />
             </div>
           </div>
         </div>
@@ -395,8 +399,8 @@ export default {
         customerPhoneNumber: this.customerPhoneNumber,
         customerFullname: this.customerFullname,
         customerSubdivision: this.customerSubdivision,
-        contactPhoneNumber: this.contactPhoneNumber,
-        contactFullname: this.contactFullname,
+        contactPhoneNumber: this._allowContact && this._passengerCount && this._passengerCount >= 1 ? this.contactPhoneNumber : null,
+        contactFullname: this._allowContact && this._passengerCount && this._passengerCount >= 1 ? this.contactFullname : null,
         transportId: this.selectedTransportId ?? null,
         name: this.name,
         description: this._description,
@@ -428,8 +432,9 @@ export default {
       this._filterCustomers = null;
       this._filterSubdivision = null;
       this._filterContacts = null;
-      this.setName(null);
       this._description = null;
+      this._allowContact = false;
+      this.setName(null);
       this.setCustomerFullname(null);
       this.setCustomerPhoneNumber(null);
       this.setCustomerSubdivision(null);
@@ -455,6 +460,7 @@ export default {
       this.setName(this.order.name);
       this._description = this.order.description;
       const contact = this.getContactById(this.order?.contactId);
+      this._allowContact = !!contact && !!this._passengerCount && this._passengerCount >= 1;
       const customer = this.getCustomerById(this.order.customerId);
       this.setCustomerFullname(customer.fullname);
       this.setCustomerPhoneNumber(customer.phoneNumber);
@@ -482,6 +488,7 @@ export default {
       _filterDeparturePoints: null,
       _filterDestinations: null,
       _description: null,
+      _allowContact: false,
     };
   },
   watch: {
