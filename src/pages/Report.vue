@@ -128,7 +128,7 @@
       :columns="columns"
       row-key="name"
       hide-bottom
-      class="q-mx-lg q-my-sm my-sticky-virtscroll-table"
+      class="q-mx-lg q-my-sm my-sticky-header-table"
       virtual-scroll
       v-model:pagination="pagination"
       :rows-per-page-options="[0]"
