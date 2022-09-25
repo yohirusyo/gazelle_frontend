@@ -1,5 +1,5 @@
 <template>
-  <q-form @submit="onAddOrder" @reset="resetForm" class="col column justify-between" ref="form">
+  <q-form @submit="onSubmit" @reset="resetForm" class="col column justify-between" ref="form">
     <div class="col row q-mb-md">
       <q-scroll-area class="col">
         <div class="column col q-gutter-y-md">
@@ -26,11 +26,13 @@
               <q-select class="bg-grey-2 q-px-md border-sm shadow-white-inset" fill-input hide-selected use-input
                 input-debounce="0" :options="getFilteredCustomers(_filterCustomers)" @filter="filterFnCustomers"
                 @input-value="_setCustomerFullname" :model-value="customerFullname" borderless hide-bottom-space
-                hide-hint label-color="grey" label="Ответственный" autocomplete="off" map-options ref="customer">
+                hide-hint label-color="grey" label="Ответственный" autocomplete="off">
                 <template v-slot:option="{ opt, itemProps, itemEvents }">
                   <q-item v-bind="itemProps" v-on="itemEvents" @click="onCustomerSelect(opt)">
                     <q-item-section>
-                      <q-item-label>{{ `${opt.fullname} ( ${opt.subdivision} ) ${opt.phoneNumber}` }}</q-item-label>
+                      <q-item-label>{{
+                      `${opt.fullname} ( ${opt.subdivision} ) ${opt.phoneNumber}`
+                      }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -111,10 +113,12 @@
 
           <div class="row items-center">
             <div class="col-2 q-px-sm">
-              <q-input v-model="_passengerCount" type="number"
-                :min="_weight != 0 && _length != 0 && _width != 0 && _height != 0 ? 0 : 1" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Пассажиров" lazy-rules :rules="[
+              <q-input v-model="_passengerCount" type="number" :min="
+                _weight != 0 && _length != 0 && _width != 0 && _height != 0
+                  ? 0
+                  : 1
+              " borderless class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint
+                label-color="grey" label="Пассажиров" lazy-rules :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]" autocomplete="off" />
             </div>
@@ -162,7 +166,9 @@
                 <template v-slot:option="{ opt, itemProps, itemEvents }">
                   <q-item v-bind="itemProps" v-on="itemEvents" @click="onContactSelect(opt)">
                     <q-item-section>
-                      <q-item-label>{{ `${opt.fullname} ${opt.phoneNumber}` }}</q-item-label>
+                      <q-item-label>{{
+                      `${opt.fullname} ${opt.phoneNumber}`
+                      }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -177,27 +183,31 @@
         </div>
       </q-scroll-area>
     </div>
-    <q-btn text-color="white" label="Создать" unelevated class="border-sm shadow-white col col-shrink" color="primary"
-      type="submit" />
+    <div class="row">
+      <q-btn v-if="_creationMode" text-color="white" label="Создать" unelevated class="border-sm shadow-white col"
+        color="primary" type="submit" />
+      <q-btn v-if="!_creationMode" text-color="white" label="Изменить" unelevated
+        class="border-sm shadow-white col q-mr-md" color="primary" type="submit" />
+      <q-btn v-if="!_creationMode" text-color="white" label="Удалить" unelevated
+        class="border-sm shadow-white col col-shrink " color="red" @click="onRemoveOrder" />
+      <q-btn text-color="white" label="Отмена" unelevated class="border-sm shadow-white col col-shrink q-ml-md"
+        color="green" @click="resetForm()" />
+    </div>
   </q-form>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
-import { showNotifyResult } from "src/helpers/notification";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { showNotifyResult } from "src/helpers/notification";
 export default {
   name: "OrderCreation",
   components: {
     Datepicker,
   },
   computed: {
-    ...mapState("current", [
-      "selectedTransportId",
-      "orderIsEmergency",
-      "place",
-    ]),
+    ...mapState("current", ["selectedTransportId", "orderIsEmergency"]),
     ...mapState("order", [
       "customerPhoneNumber",
       "customerFullname",
@@ -206,12 +216,18 @@ export default {
       "contactFullname",
       "destinationName",
       "departurePointName",
-      "name"
+      "name",
     ]),
+    ...mapState("current", ["order", "place"]),
     ...mapState("place", ["places"]),
-    ...mapGetters("contact", ["getFilteredContacts"]),
-    ...mapGetters("customer", ["getFilteredCustomers", "getFilteredSubdivisions"]),
-    ...mapGetters('order', ["getFilteredNames"]),
+    ...mapGetters("contact", ["getFilteredContacts", "getContactById"]),
+    ...mapGetters("customer", [
+      "getFilteredCustomers",
+      "getCustomerById",
+      "getFilteredSubdivisions",
+    ]),
+    ...mapGetters("place", ["getPlaceById"]),
+    ...mapGetters("order", ["getFilteredNames"]),
     ...mapGetters("place", ["getFilteredPlaces"]),
     _orderIsEmergency: {
       get() {
@@ -271,7 +287,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("order", ["addOrder"]),
+    ...mapActions("order", ["updateOrder", "removeOrder", "addOrder"]),
     ...mapMutations("order", [
       "setCustomerPhoneNumber",
       "setCustomerFullname",
@@ -280,16 +296,15 @@ export default {
       "setContactFullname",
       "setDeparturePointName",
       "setDestinationName",
-      "setName"
+      "setName",
     ]),
     ...mapMutations("current", [
       "setTransport",
       "setSelectedTransportId",
+      "clearOrder",
       "setOrderIsEmergency",
       "setPlace",
-      "clearOrder",
     ]),
-
     _setCustomerFullname(val) {
       if (val.fullname) return this.setCustomerFullname(val.fullname);
       this.setCustomerFullname(val);
@@ -313,11 +328,9 @@ export default {
       this.setDeparturePointName(val);
     },
     onCustomerSelect(val) {
-      this.$refs.customer.reset();
       this.setCustomerFullname(val.fullname);
       this._customerPhoneNumber = val.phoneNumber;
       this._customerSubdivision = val.subdivision;
-      this.$refs.customer.blur();
     },
     onContactSelect(val) {
       this.setContactFullname(val.fullname);
@@ -402,13 +415,67 @@ export default {
         customerPhoneNumber: this.customerPhoneNumber,
         customerFullname: this.customerFullname,
         customerSubdivision: this.customerSubdivision,
-        contactPhoneNumber: this._allowContact && this._passengerCount && this._passengerCount >= 1 ? this.contactPhoneNumber : null,
-        contactFullname: this._allowContact && this._passengerCount && this._passengerCount >= 1 ? this.contactFullname : null,
+        contactPhoneNumber:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this.contactPhoneNumber
+            : null,
+        contactFullname:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this.contactFullname
+            : null,
         transportId: this.selectedTransportId,
         description: this._description,
         name: this.name,
       });
-      this.$emit("done");
+      this.$refs.form.reset();
+    },
+    async onUpdateOrder() {
+      const d = new Date();
+      d.setHours(this._orderTime.hours);
+      d.setMinutes(this._orderTime.minutes);
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      await this.updateOrder({
+        id: this.order.id,
+        orderTime: d,
+        departurePointName: this.departurePointName,
+        destinationName: this.destinationName,
+        isEmergency: this._orderIsEmergency,
+        passengerCount: this._passengerCount,
+        weight: this._weight,
+        length: this._length,
+        width: this._width,
+        height: this._height,
+        customerPhoneNumber: this.customerPhoneNumber,
+        customerFullname: this.customerFullname,
+        customerSubdivision: this.customerSubdivision,
+        contactPhoneNumber:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this.contactPhoneNumber
+            : null,
+        contactFullname:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this.contactFullname
+            : null,
+        transportId: this.selectedTransportId ?? null,
+        name: this.name,
+        description: this._description,
+      });
+      this.$refs.form.reset();
+    },
+    async onSubmit() {
+      this._creationMode ? await this.onAddOrder() : await this.onUpdateOrder();
+    },
+    async onRemoveOrder() {
+      await this.removeOrder({ id: this.order.id });
       this.$refs.form.reset();
     },
     resetForm() {
@@ -430,8 +497,6 @@ export default {
       this._filterCustomers = null;
       this._filterSubdivision = null;
       this._filterContacts = null;
-      this._filterDeparturePoints = null;
-      this._filterDestinations = null;
       this._description = null;
       this._allowContact = false;
       this.setName(null);
@@ -441,15 +506,54 @@ export default {
       this.setContactFullname(null);
       this.setContactPhoneNumber(null);
       this.clearOrder();
+      this.$emit("done");
+    },
+    loadData() {
+      if (this.order) {
+        const d = new Date(this.order.orderTime);
+        this._orderTime = {
+          hours: d.getHours(),
+          minutes: d.getMinutes(),
+          seconds: 0,
+        };
+        this.setDeparturePointName(
+          this.getPlaceById(this.order.departurePointId).name
+        ); //
+        this._setDestinatioName(
+          this.getPlaceById(this.order.destinationId).name
+        ); //
+        this._orderIsEmergency = this.order.isEmergency;
+        this._passengerCount = this.order.passengerCount;
+        this._weight = this.order.weight;
+        this._length = this.order["length"];
+        this._width = this.order.width;
+        this._height = this.order.height;
+        this.setName(this.order.name);
+        this._description = this.order.description;
+        const contact = this.getContactById(this.order?.contactId);
+        this._allowContact =
+          !!contact && !!this._passengerCount && this._passengerCount >= 1;
+        const customer = this.getCustomerById(this.order.customerId);
+        this.setCustomerFullname(customer.fullname);
+        this.setCustomerPhoneNumber(customer.phoneNumber);
+        this.setCustomerSubdivision(customer.subdivision);
+        this.setContactFullname(contact?.fullname);
+        this.setContactPhoneNumber(contact?.phoneNumber);
+        this.setSelectedTransportId(this.order.transportId);
+        this._creationMode = false;
+      } else {
+        const d = new Date();
+        this._orderTime = {
+          hours: d.getHours(),
+          minutes: d.getMinutes(),
+          seconds: 0,
+        };
+        this._creationMode = true;
+      }
     },
   },
   mounted() {
-    const d = new Date();
-    this._orderTime = {
-      hours: d.getHours(),
-      minutes: d.getMinutes(),
-      seconds: 0,
-    };
+    this.loadData();
   },
   data() {
     return {
@@ -467,7 +571,16 @@ export default {
       _filterDestinations: null,
       _description: null,
       _allowContact: false,
+      _creationMode: true,
     };
+  },
+  watch: {
+    "order.id"() {
+      if (this.order) this.loadData();
+    },
+    order() {
+      this._creationMode = !this.order;
+    },
   },
 };
 </script>

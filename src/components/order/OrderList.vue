@@ -1,53 +1,94 @@
 <template>
-  <div class="row items-center col col-shrink q-pr-md" ref="top">
-    <div class="col-2 text-center">Время подачи</div>
-    <div class="col-2">Ответственный</div>
-    <div class="col-2">Контактное лицо</div>
-    <div class="col-2">Место отправления</div>
-    <div class="col-2">Место назначения</div>
-    <div class="col-2 text-center">Номер ТС</div>
-  </div>
-  <q-separator class="q-ma-none" />
-  <q-virtual-scroll :items="orders" separator v-slot="{ item }" :style="`height: ${height}px`" ref="scroll">
-    <div :key="item.id" :class="_hoveredOrder?.id == item.id ? 'bg-light-green-2' : ''" @click="setOrder(item)">
-      <div class="row items-center q-py-md">
-        <div class="col-2 text-center column items-center">
-          <span>
-            {{ '№ ' + item.id }}
-          </span>
-          <q-chip class="q-ma-none" :class="item.isEmergency ? 'bg-red text-white' : ''">
-            {{ timeFormat(item?.orderTime) }}
-          </q-chip>
-        </div>
-        <div class="col-2 pre">
-          {{ formatCustomer(getCustomerById(item.customerId)) }}
-        </div>
-        <div class="col-2 pre">
-          {{ formatContact(getContactById(item.contactId)) }}
-        </div>
-        <div class="col-2">
-          {{ formatPlace(getPlaceById(item.departurePointId)) }}
-        </div>
-        <div class="col-2">
-          {{ formatPlace(getPlaceById(item.destinationId)) }}
-        </div>
+  <q-table
+    :rows="orders"
+    :columns="columns"
+    row-key="time"
+    wrap-cells
+    virtual-scroll
+    :rows-per-page-options="[0]"
+    hide-bottom
+    :style="`height: ${height}px`"
+    ref="scroll"
+    flat
+    class="my-sticky-header-table"
+    dense
+    table-header-class="bg-white"
+    square
+    separator="cell"
+  >
+    <template v-slot:body="props">
+      <q-tr
+        :props="props"
+        :class="_hoveredOrder?.id == props.row.id ? 'bg-light-green-2' : ''"
+        @click="setOrder(props.row)"
+      >
+        <q-td
+          key="time"
+          :props="props"
+        >
+          <div class="col-2 text-center column items-center">
+            <span>
+              {{ "№ " + props.row.id }}
+            </span>
+            <q-chip
+              class="q-ma-none"
+              :class="props.row.isEmergency ? 'bg-red text-white' : ''"
+            >
+              {{ timeFormat(props.row?.orderTime) }}
+            </q-chip>
+          </div>
+          <q-tooltip>
+            <span>Наименование груза: {{ props.row.name }}</span>
+            <br v-if="props.row.description && props.row.description != ''" />
+            <span v-if="props.row.description && props.row.description != ''">Описание: {{ props.row.description
+            }}</span>
+          </q-tooltip>
+        </q-td>
+        <q-td
+          key="customer"
+          :props="props"
+          class="pre"
+        >
+          {{ formatCustomer(getCustomerById(props.row.customerId)) }}
+        </q-td>
 
-        <div class="col-2 gosnumber">
-          <AutoNumber :number="formatTransportNumber(getTransportById(item.transportId))" />
-        </div>
-      </div>
-      <q-tooltip>
-        Наименование груза: {{ item.name }}
-        <br />
-        Описание: {{ item.description }}
-      </q-tooltip>
-      <q-separator class="q-ma-none" />
-    </div>
-  </q-virtual-scroll>
+        <q-td
+          key="departurePoint"
+          :props="props"
+        >
+          {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
+        </q-td>
+        <q-td
+          key="destination"
+          :props="props"
+        >
+          {{ formatPlace(getPlaceById(props.row.destinationId)) }}
+        </q-td>
+
+        <q-td
+          key="transportId"
+          :props="props"
+        >
+          <div class="row justify-center">
+            <AutoNumber :number="
+              formatTransportNumber(getTransportById(props.row.transportId))
+            " />
+          </div>
+        </q-td>
+        <q-td
+          key="status"
+          :props="props"
+        >
+          <OrderStatus :orderId="props.row.id" />
+        </q-td>
+      </q-tr>
+    </template>
+  </q-table>
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
+import { mapState, mapMutations, mapGetters } from "vuex";
+import OrderStatus from "./OrderStatus.vue";
 import {
   timeFormat,
   formatContact,
@@ -58,9 +99,10 @@ import {
 import AutoNumber from "../base/AutoNumber.vue";
 export default {
   name: "OrderList",
-  props: ['col'],
+  props: ["col"],
   components: {
-    AutoNumber
+    AutoNumber,
+    OrderStatus,
   },
   computed: {
     ...mapState("order", ["orders"]),
@@ -68,30 +110,76 @@ export default {
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("transport", ["getTransportById"]),
-    ...mapState("current", [
-      "hoveredTransportId"
-    ]),
-
+    ...mapState("current", ["hoveredTransportId"]),
   },
   watch: {
     hoveredTransportId(_) {
       if (this.hoveredTransportId == null) {
         this._hoveredOrder = null;
       } else {
-        const fOrders = this.orders.filter(order => order.transportId == this.hoveredTransportId)
-        if (fOrders.length == 0) return this._hoveredOrder = null;
+        const fOrders = this.orders.filter(
+          (order) => order.transportId == this.hoveredTransportId
+        );
+        if (fOrders.length == 0) return (this._hoveredOrder = null);
         this._hoveredOrder = fOrders.reduce(function (prev, current) {
-          return (prev.createdAt < current?.createdAt) ? prev : current
-        }, fOrders[0])
-        const scrollTo = this.orders.findIndex(o => o.id == this._hoveredOrder.id)
-        this.$refs.scroll.scrollTo(scrollTo)
+          return prev.createdAt < current?.createdAt ? prev : current;
+        }, fOrders[0]);
+        const scrollTo = this.orders.findIndex(
+          (o) => o.id == this._hoveredOrder.id
+        );
+        this.$refs.scroll.scrollTo(scrollTo);
       }
-    }
+    },
   },
   data() {
     return {
       height: 0,
       _hoveredOrder: null,
+      columns: [
+        {
+          name: "time",
+          required: true,
+          label: "Время подачи",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "customer",
+          required: true,
+          label: "Ответственный",
+          align: "center",
+          sortable: false,
+        },
+
+        {
+          name: "departurePoint",
+          required: true,
+          label: "Место отправления",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "destination",
+          required: true,
+          label: "Место назначения",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "transportId",
+          required: false,
+          label: "Номер ТС",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "status",
+          required: false,
+          label: "Статус",
+          align: "center",
+          sortable: false,
+        },
+      ],
     };
   },
   methods: {
@@ -104,13 +192,9 @@ export default {
   },
   async mounted() {
     this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12 * this.col) - this.$refs.top.clientHeight - 98;
+      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
+      this.col -
+      81;
   },
 };
 </script>
-
-<style>
-.pre {
-  white-space: pre-wrap;
-}
-</style>

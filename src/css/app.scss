@@ -14,6 +14,12 @@ $radius-multiplier: 1.5;
   border-radius: $space-base * $radius-multiplier;
 }
 
+.border-bottom-md {
+  border-bottom-left-radius: $space-base * $radius-multiplier;
+  border-bottom-right-radius: $space-base * $radius-multiplier;
+}
+
+
 .border-lg {
   border-radius: $space-base * $radius-multiplier * 1.5;
 }
@@ -27,7 +33,7 @@ $radius-multiplier: 1.5;
 }
 
 .shadow-white-inset {
-  box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 8px 25px 0 rgba(128, 124, 124, 0.05);
 }
 
 .datepicker {
@@ -38,7 +44,7 @@ $radius-multiplier: 1.5;
 .datepicker-menu {
   overflow: hidden !important;
   box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05) !important;
-  border-radius: $space-base * $radius-multiplier !important;
+  border-radius: $space-base * $radius-multiplier  !important;
 }
 
 .dp__selection_preview {
@@ -48,7 +54,7 @@ $radius-multiplier: 1.5;
 
 .dp__action_buttons {
   display: flex !important;
-  width: 100%  !important;
+  width: 100% !important;
   justify-content: space-evenly !important;
 }
 
@@ -65,6 +71,33 @@ $radius-multiplier: 1.5;
 }
 
 @font-face {
-  font-family: RoadNumbers2; /* Имя шрифта */
-  src: url(RoadNumbers2.0.otf); /* Путь к файлу со шрифтом */
+  font-family: RoadNumbers2;
+  /* Имя шрифта */
+  src: url(RoadNumbers2.0.otf);
+  /* Путь к файлу со шрифтом */
+}
+
+.pre {
+  white-space: pre-wrap;
+}
+
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: 310px;
+  /* this is when the loading indicator appears */
+}
+
+
+.my-sticky-header-table thead tr th {
+  position: sticky;
+  z-index: 1;
+}
+
+.my-sticky-header-table thead tr:first-child th {
+  top: 0;
+}
+
+.my-sticky-header-table.q-table--loading thead tr:last-child th {
+  /* height of all previous header rows */
+  top: 48px;
 }

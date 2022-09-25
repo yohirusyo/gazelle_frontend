@@ -1,41 +1,108 @@
 <template>
-  <div class="row items-center col col-shrink q-pr-md" ref="top">
-    <div class="col-1 text-center">Выбрать</div>
-    <div class="col">Тип ТС</div>
-    <div class="col text-center">Номер ТС</div>
-    <div class="col-3 text-center">Водитель</div>
-    <div class="col-2 text-center">Место нахождения</div>
-    <div class="col-2 text-center">Статус</div>
-    <div class="col-1 text-center">В текущем статусе</div>
-  </div>
-  <q-separator class="q-ma-none" />
-  <q-virtual-scroll :items="getByOnlyFreeFilter(onlyFree, freeStatuses.map(s => s.id))" separator v-slot="{ item }"
-    :style="`height: ${height}px`" ref="scroll">
-    <div :key="item.id">
-      <TransportListElement :transport="item" :freeStatuses="freeStatuses" />
-    </div>
-  </q-virtual-scroll>
+  <q-table
+    :rows="
+      getByOnlyFreeFilter(
+        onlyFree,
+        onlyWithDrivers,
+        freeStatuses.map((s) => s.id)
+      )
+    "
+    :columns="columns"
+    row-key="number"
+    wrap-cells
+    virtual-scroll
+    :rows-per-page-options="[0]"
+    hide-bottom
+    :style="`height: ${height}px`"
+    ref="scroll"
+    flat
+    class="my-sticky-header-table"
+    dense
+    table-header-class="bg-white"
+    square
+    separator="cell"
+  >
+    <template v-slot:body="props">
+      <TransportListElement
+        :id="props.row.id"
+        :freeStatuses="freeStatuses"
+      />
+    </template>
+  </q-table>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import TransportListElement from "./TransportListElement.vue";
-
 export default {
   name: "TransportList",
   components: {
     TransportListElement,
   },
-  props: ['col'],
+  props: ["col"],
   data() {
     return {
       height: 0,
-    }
+      columns: [
+        {
+          name: "select",
+          required: true,
+          label: "Выбрать",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "type",
+          required: true,
+          label: "Тип ТС",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "number",
+          required: true,
+          label: "Номер ТС",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "driver",
+          required: false,
+          label: "Водитель",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "place",
+          required: true,
+          label: "Место нахождения",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "status",
+          required: true,
+          label: "Статус",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "time",
+          required: false,
+          label: "В текущем статусе",
+          align: "center",
+          sortable: false,
+        },
+      ],
+    };
   },
   computed: {
-    ...mapState("current", ["onlyFree"]),
+    ...mapState("current", ["onlyFree", "onlyWithDrivers"]),
     ...mapState("status", ["statuses"]),
     ...mapGetters("transport", ["getByOnlyFreeFilter"]),
+    ...mapGetters("status", ["getStatusById"]),
+    ...mapGetters("user", ["getDriverById"]),
+    ...mapGetters("place", ["getPlaceById"]),
     freeStatuses: {
       get() {
         return this.statuses.filter((s) => s.isBusy == false);
@@ -44,11 +111,11 @@ export default {
   },
   async mounted() {
     this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12 * this.col) - this.$refs.top.clientHeight - 98;
+      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
+        this.col -
+      81;
   },
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

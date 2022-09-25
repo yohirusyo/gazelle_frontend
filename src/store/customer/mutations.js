@@ -1,5 +1,7 @@
 export function add(state, customer) {
-  state.customers.push(customer);
+  const index = state.customers.findIndex((o) => o.id == customer.id);
+  if (index == -1)
+    state.customers.push(customer);
 }
 
 export function set(state, customers) {

@@ -8,6 +8,7 @@ export default function () {
     selectedTransportId: null,
     currentUser: null,
     onlyFree: false,
+    onlyWithDrivers: true,
     orderIsEmergency: false,
     hoveredTransportId: null,
     customer: null,

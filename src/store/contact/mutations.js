@@ -1,5 +1,7 @@
 export function add(state, contact) {
-  state.contacts.push(contact);
+  const index = state.contacts.findIndex((o) => o.id == contact.id);
+  if (index == -1)
+    state.contacts.push(contact);
 }
 
 export function set(state, contacts) {

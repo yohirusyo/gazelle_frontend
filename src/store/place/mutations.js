@@ -1,5 +1,7 @@
 export function add(state, place) {
-  state.places.push(place);
+  const index = state.places.findIndex((p) => p.id == place.id);
+  if (index == -1)
+    state.places.push(place);
 }
 
 export function set(state, places) {

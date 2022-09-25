@@ -1,6 +1,6 @@
-export const getByOnlyFreeFilter = (state) => (onlyFree, freeStatuses) => {
-    if (!onlyFree) return state.transports;
-    return state.transports.filter(t => freeStatuses.includes(t.statusId))
+export const getByOnlyFreeFilter = (state) => (onlyFree, onlyWithDrivers, freeStatuses) => {
+    if (!onlyFree && !onlyWithDrivers) return state.transports;
+    return state.transports.filter(t => (!onlyFree || freeStatuses.includes(t.statusId)) && (!onlyWithDrivers || (onlyWithDrivers && t.driverId != null)))
 }
 
 export const getTransportById = (state) => (id) =>

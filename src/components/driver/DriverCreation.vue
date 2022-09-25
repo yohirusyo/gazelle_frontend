@@ -1,6 +1,6 @@
 <template>
   <q-form
-    @submit="onAddDriver"
+    @submit="onSubmit"
     @reset="resetForm"
     class="col column justify-between"
     ref="form"
@@ -87,24 +87,57 @@
         </div>
       </q-scroll-area>
     </div>
-
-    <q-btn
-      text-color="white"
-      label="Создать"
-      unelevated
-      class="border-sm shadow-white col col-shrink"
-      color="primary"
-      type="submit"
-    />
+    <div class="row">
+      <q-btn
+        v-if="_creationMode"
+        text-color="white"
+        label="Создать"
+        unelevated
+        class="border-sm shadow-white col"
+        color="primary"
+        type="submit"
+      />
+      <q-btn
+        v-if="!_creationMode"
+        text-color="white"
+        label="Изменить"
+        unelevated
+        class="border-sm shadow-white col q-mr-md"
+        color="primary"
+        type="submit"
+      />
+      <q-btn
+        v-if="!_creationMode"
+        text-color="white"
+        label="Удалить"
+        unelevated
+        class="border-sm shadow-white col col-shrink"
+        color="red"
+        @click="onRemoveDriver"
+      />
+      <q-btn
+        text-color="white"
+        label="Отмена"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ml-md"
+        color="green"
+        @click="resetForm()"
+      />
+    </div>
   </q-form>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
+
 export default {
   name: "DriverCreation",
+  computed: {
+    ...mapState("current", ["coords", "driver"]),
+  },
   methods: {
-    ...mapActions("user", ["addDriver"]),
+    ...mapActions("user", ["updateDriver", "removeDriver", "addDriver"]),
+    ...mapMutations("current", ["clearCoords", "clearDriver"]),
     async onAddDriver() {
       await this.addDriver({
         name: this._name,
@@ -113,11 +146,47 @@ export default {
         phoneNumber: this._phoneNumber,
         login: this._login,
       });
-      this.$emit("done");
       this.$refs.form.reset();
+    },
+    async onUpdateDriver() {
+      await this.updateDriver({
+        id: this.driver.id,
+        name: this._name,
+        surname: this._surname,
+        middlename: this._middlename,
+        phoneNumber: this._phoneNumber,
+        login: this._login,
+      });
+      this.$refs.form.reset();
+    },
+    async onRemoveDriver() {
+      await this.removeDriver({ id: this.driver.id });
+      this.$refs.form.reset();
+    },
+    async onSubmit() {
+      this._creationMode ? await this.onAddDriver() : await this.onUpdateDriver()
     },
     resetForm() {
       this._name = null;
+      this._surname = null;
+      this._middlename = null;
+      this._phoneNumber = null;
+      this._login = null;
+      this.$emit("done");
+      this.clearDriver();
+    },
+    loadData() {
+      if (this.driver) {
+        this._name = this.driver.name;
+        this._surname = this.driver.surname;
+        this._middlename = this.driver.middlename;
+        this._phoneNumber = this.driver.phoneNumber;
+        this._login = this.driver.login;
+        this._creationMode = true;
+      } else {
+        c;
+        this._creationMode = false;
+      }
     },
   },
   data() {
@@ -127,9 +196,27 @@ export default {
       _middlename: null,
       _phoneNumber: null,
       _login: null,
+      _creationMode: true,
     };
+  },
+  mounted() { },
+  watch: {
+    "driver.name"() {
+      if (this.driver) {
+        this._name = this.driver.name;
+        this._surname = this.driver.surname;
+        this._middlename = this.driver.middlename;
+        this._phoneNumber = this.driver.phoneNumber;
+        this._login = this.driver.login;
+      }
+    },
+    driver() {
+      this._creationMode = !this.driver;
+    },
   },
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

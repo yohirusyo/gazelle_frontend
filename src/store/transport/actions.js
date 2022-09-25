@@ -44,8 +44,8 @@ export async function removeTransport({ commit }, { id }) {
     });
 }
 
-export async function subscribeTransportSockets({ commit }) {
-  socketio.on('transport_update', transport => commit("update", transport))
-  socketio.on('transport_create', transport => commit("add", transport))
+export async function subscribeTransportSockets({ commit, rootGetters }) {
+  socketio.on('transport_update', transport => commit("update", { ...transport, driver: rootGetters['user/getDriverById'](transport.driverId) }))
+  socketio.on('transport_create', transport => commit("add", { ...transport, driver: rootGetters['user/getDriverById'](transport.driverId) }))
   socketio.on("transport_delete", id => commit("remove", id))
 }

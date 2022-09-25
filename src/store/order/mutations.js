@@ -1,14 +1,24 @@
+function sort(state) {
+  state.orders.sort((a, b) => a.id - b.id)
+}
+
+
 export function add(state, order) {
-  state.orders.push(order);
+  const index = state.orders.findIndex((o) => o.id == order.id);
+  if (index == -1)
+    state.orders.push(order);
+  sort(state)
 }
 
 export function set(state, orders) {
   state.orders = orders;
+  sort(state)
 }
 
 export function update(state, order) {
   const index = state.orders.findIndex((o) => o.id == order.id);
   state.orders[index] = order;
+  sort(state)
 }
 
 export function remove(state, id) {

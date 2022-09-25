@@ -1,27 +1,42 @@
 <template>
-  <div class="row items-center col col-shrink q-pr-md" ref="top">
-    <div class="col-7">ФИО</div>
-    <div class="col-3">Номер телефона</div>
-    <div class="col-2 text-center">На смене</div>
-  </div>
-  <q-separator class="q-ma-none" />
-  <q-virtual-scroll :items="drivers" separator v-slot="{ item }" :style="`height: ${height}px`" ref="scroll">
-    <div :key="item.id" @click="setDriver(item)">
-      <div class="row items-center q-py-md">
-        <div class="col-7">{{ `${item.surname} ${item.name} ${item.middlename}` }}</div>
-        <div class="col-3">{{ item.workingPhoneNumber }}</div>
-        <div class="col-2 text-center">{{ item.isOnDriverShift ? 'Да' : "Нет" }}</div>
-      </div>
-      <q-separator class="q-ma-none" />
-    </div>
-  </q-virtual-scroll>
+  <q-table
+    :rows="drivers"
+    :columns="columns"
+    row-key="time"
+    virtual-scroll
+    :rows-per-page-options="[0]"
+    hide-bottom
+    :style="`height: ${height}px`"
+    ref="scroll"
+    wrap-cells
+    flat
+    class="my-sticky-header-table"
+    dense
+    table-header-class="bg-white"
+    square
+    separator="cell"
+  >
+    <template v-slot:body="props">
+      <q-tr :props="props" @click="setDriver(props.row)" class="text-center">
+        <q-td key="fullname" :props="props" class="pre">
+          {{ `${props.row.surname} ${props.row.name} ${props.row.middlename}` }}
+        </q-td>
+        <q-td key="phoneNumber" :props="props">
+          {{ props.row.workingPhoneNumber }}
+        </q-td>
+        <q-td key="isOnDriverShift" :props="props">
+          {{ props.row.isOnDriverShift ? "Да" : "Нет" }}
+        </q-td>
+      </q-tr>
+    </template>
+  </q-table>
 </template>
 
 <script>
 import { mapActions, mapState, mapMutations } from "vuex";
 export default {
   name: "DriverList",
-  props: ['col'],
+  props: ["col"],
   computed: {
     ...mapState("user", ["drivers"]),
   },
@@ -30,16 +45,39 @@ export default {
   },
   async mounted() {
     this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12 * this.col) - this.$refs.top.clientHeight - 98;
+      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
+        this.col -
+      81;
   },
   data() {
     return {
       height: 0,
-    }
-  }
+      columns: [
+        {
+          name: "fullname",
+          required: true,
+          label: "ФИО",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "phoneNumber",
+          required: true,
+          label: "Номер телефона",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "isOnDriverShift",
+          required: false,
+          label: "На смене",
+          align: "center",
+          sortable: false,
+        },
+      ],
+    };
+  },
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header bordered class="bg-secondary text-white">
+    <q-header bordered class="bg-secondary text-white q-mx-xs border-bottom-md q-px-md">
       <q-toolbar class="row justify-between">
         <div class="text-h5">
           Автотранспортное Управление

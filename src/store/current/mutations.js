@@ -70,6 +70,11 @@ export function setOnlyFree(state, onlyFree) {
   state.onlyFree = onlyFree;
 }
 
+
+export function setOnlyWithDrivers(state, onlyWithDrivers) {
+  state.onlyWithDrivers = onlyWithDrivers;
+}
+
 export function setOrderIsEmergency(state, orderIsEmergency) {
   state.orderIsEmergency = orderIsEmergency;
 }

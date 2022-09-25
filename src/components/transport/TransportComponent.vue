@@ -6,35 +6,35 @@
         dense
         class="text-grey row justify-between fit"
         active-color="primary"
-        indicator-color="primary"
+        indicator-color="transparent"
         narrow-indicator
       >
         <div class="row col justify-start">
-          <q-tab name="main" label="Транспорт" no-caps />
-          <q-tab name="create" label="Создание" no-caps />
+          <q-tab name="main" label="Транспорт" no-caps :ripple="false" />
           <q-tab
-            name="edit"
-            label="Редактирование"
-            :disable="transport == null"
+            name="create"
+            :label="!transport ? 'Создание' : 'Редактирование'"
             no-caps
+            :ripple="false"
           />
         </div>
-
-        <q-checkbox left-label v-model="_onlyFree" label="Только свободные" />
+        <div class="row q-gutter-x-md">
+          <q-checkbox
+            v-model="_onlyWithDrivers"
+            label="Только с водителем"
+            dense
+          />
+          <q-checkbox v-model="_onlyFree" label="Только свободные" dense />
+        </div>
       </q-tabs>
     </div>
-    <q-separator spaced />
     <q-tab-panels v-model="tab" animated class="col" keep-alive>
       <q-tab-panel name="main" class="col column">
-        <TransportList :col="col"/>
+        <TransportList :col="col" />
       </q-tab-panel>
 
       <q-tab-panel name="create" class="col column">
         <TransportCreation @done="onDone" />
-      </q-tab-panel>
-
-      <q-tab-panel name="edit" class="col column">
-        <TransportEdit @done="onDone" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -43,18 +43,16 @@
 <script>
 import TransportList from "./TransportList.vue";
 import TransportCreation from "./TransportCreation.vue";
-import TransportEdit from "./TransportEdit.vue";
 import { mapMutations, mapState } from "vuex";
 export default {
   name: "Transport",
   components: {
     TransportList,
     TransportCreation,
-    TransportEdit,
   },
-  props: ['col'],
+  props: ["col"],
   computed: {
-    ...mapState("current", ["transport", "onlyFree"]),
+    ...mapState("current", ["transport", "onlyFree", "onlyWithDrivers"]),
     _onlyFree: {
       get() {
         return this.onlyFree;
@@ -63,9 +61,17 @@ export default {
         this.setOnlyFree(newVal);
       },
     },
+    _onlyWithDrivers: {
+      get() {
+        return this.onlyWithDrivers;
+      },
+      set(newVal) {
+        this.setOnlyWithDrivers(newVal);
+      },
+    },
   },
   methods: {
-    ...mapMutations("current", ["setOnlyFree"]),
+    ...mapMutations("current", ["setOnlyFree", "setOnlyWithDrivers"]),
     onDone() {
       this.tab = "main";
     },
@@ -78,7 +84,7 @@ export default {
   watch: {
     transport(newTransport) {
       if (!!newTransport) {
-        this.tab = "edit";
+        this.tab = "create";
       }
     },
   },
