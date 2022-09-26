@@ -17,15 +17,30 @@
     separator="cell"
   >
     <template v-slot:body="props">
-      <q-tr :props="props" @click="setDriver(props.row)" class="text-center">
-        <q-td key="fullname" :props="props" class="pre">
+      <q-tr
+        :props="props"
+        @click="setDriver(props.row)"
+        class="text-center"
+      >
+        <q-td
+          key="fullname"
+          :props="props"
+          class="pre"
+        >
           {{ `${props.row.surname} ${props.row.name} ${props.row.middlename}` }}
         </q-td>
-        <q-td key="phoneNumber" :props="props">
+        <q-td
+          key="phoneNumber"
+          :props="props"
+        >
           {{ props.row.workingPhoneNumber }}
         </q-td>
-        <q-td key="isOnDriverShift" :props="props">
-          {{ props.row.isOnDriverShift ? "Да" : "Нет" }}
+        <q-td
+          key="isOnDriverShift"
+          :props="props"
+          :class="props.row.isOnDriverShift && (version != props.row.version) ? 'text-red' : ''"
+        >
+          {{ props.row.isOnDriverShift ? `Да (Версия: ${props.row.version ?? '1.1.0 или ниже'})`: "Нет" }}
         </q-td>
       </q-tr>
     </template>
@@ -33,6 +48,7 @@
 </template>
 
 <script>
+import { axios } from "src/boot/axios";
 import { mapActions, mapState, mapMutations } from "vuex";
 export default {
   name: "DriverList",
@@ -46,12 +62,14 @@ export default {
   async mounted() {
     this.height =
       (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-        this.col -
+      this.col -
       81;
+    this.version = '1.1.1'
   },
   data() {
     return {
       height: 0,
+      version: null,
       columns: [
         {
           name: "fullname",
@@ -80,4 +98,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

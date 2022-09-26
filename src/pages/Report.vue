@@ -3,7 +3,7 @@
     <div
       class="row q-mx-lg q-mb-sm q-mt-md items-center q-gutter-x-md justify-between"
     >
-      <div class="col col-1">
+      <div class="col col-2">
         <download-excel
           :data="orderStats"
           :fields="fields"
@@ -20,97 +20,64 @@
           />
         </download-excel>
       </div>
-
-      <q-select
-        type="text"
-        borderless
-        fill-input
-        hide-selected
-        use-input
-        input-debounce="0"
-        :options="getStatsSubidivisions(_filterSubdivision)"
-        @filter="filterFnSubdivisions"
-        @input-value="_setSubdivision"
-        :model-value="_selectedSubdivision"
-        class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-3"
-        hide-bottom-space
-        hide-hint
-        label-color="grey"
-        label="Подразделение"
-        autocomplete="off"
-      >
-        <template v-if="_selectedSubdivision" v-slot:append>
-          <q-icon
-            name="cancel"
-            @click.stop.prevent="_setSubdivision(null)"
-            class="cursor-pointer"
-          />
-        </template>
-      </q-select>
-      <q-select
-        type="text"
-        borderless
-        fill-input
-        hide-selected
-        use-input
-        input-debounce="0"
-        :options="getDriversFullnames(_filterDriverFullname)"
-        @filter="filterFnDriverFullnames"
-        @input-value="_setDriverFullname"
-        :model-value="_selectedDriverFullname"
-        class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-3"
-        hide-bottom-space
-        hide-hint
-        label-color="grey"
-        label="Ф.И.О. водителя"
-        autocomplete="off"
-      >
-        <template v-if="_selectedDriverFullname" v-slot:append>
-          <q-icon
-            name="cancel"
-            @click.stop.prevent="_setDriverFullname(null)"
-            class="cursor-pointer"
-          />
-        </template>
-      </q-select>
-      <q-input
-        v-model="_selectedDate"
-        borderless
-        fill-input
-        class="bg-grey-2 border-sm shadow-white-inset q-px-md col col-2"
-        hide-bottom-space
-        hide-hint
-        label-color="grey"
-        label="Дата"
-        flat
-      >
-        <template v-slot:append>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy
-              cover
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date
-                v-model="_selectedDate"
-                mask="DD.MM.YYYY"
-                minimal
-                :options="optionsFn"
+      <div class="col-3">
+        <ISelect
+          :options="statsSubidivisions"
+          v-model="_selectedSubdivision"
+          :labelFn="(item) => item"
+          label="Подразделение"
+          @selected="(val) => (_selectedSubdivision = val)"
+        />
+      </div>
+      <div class="col-3">
+        <ISelect
+          :options="driversFullnames"
+          v-model="_selectedDriverFullname"
+          :labelFn="(item) => item"
+          label="Ф.И.О. водителя"
+          @selected="(val) => (_selectedDriverFullname = val)"
+        />
+      </div>
+      <div class="col-3">
+        <q-input
+          v-model="_selectedDate"
+          fill-input
+          label-color="grey"
+          label="Дата"
+          square
+          outlined
+          hide-bottom-space
+          hide-hint
+          dense
+        >
+          <template v-slot:append>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
               >
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-icon>
-          <q-icon
-            v-if="_selectedDate"
-            name="cancel"
-            @click.stop.prevent="_selectedDate = null"
-            class="cursor-pointer"
-          />
-        </template>
-      </q-input>
+                <q-date
+                  v-model="_selectedDate"
+                  mask="DD.MM.YYYY"
+                  minimal
+                  :options="optionsFn"
+                >
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-icon>
+            <q-icon
+              v-if="_selectedDate"
+              name="cancel"
+              @click.stop.prevent="_selectedDate = null"
+              class="cursor-pointer"
+            />
+          </template>
+        </q-input>
+      </div>
     </div>
     <q-table
       :rows="
@@ -141,8 +108,12 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import * as moment from "moment";
 import { Loading } from "quasar";
+import ISelect from "components/base/ISelect.vue";
 export default {
   name: "Report",
+  components: {
+    ISelect,
+  },
   data() {
     return {
       _selectedDate: null,
@@ -630,11 +601,11 @@ export default {
   computed: {
     ...mapState("orderStats", ["orderStats"]),
     ...mapGetters("orderStats", [
-      "getStatsSubidivisions",
-      "getDriversFullnames",
       "getMinDate",
       "getMaxDate",
       "getFilteredStats",
+      "statsSubidivisions",
+      "driversFullnames",
     ]),
   },
   methods: {
@@ -660,22 +631,6 @@ export default {
     regular(val) {
       if (this.checkNull(val)) return null;
       return val;
-    },
-    filterFnSubdivisions(val, update) {
-      update(() => {
-        this._filterSubdivision = val;
-      });
-    },
-    filterFnDriverFullnames(val, update) {
-      update(() => {
-        this._filterDriverFullname = val;
-      });
-    },
-    _setSubdivision(val) {
-      this._selectedSubdivision = val;
-    },
-    _setDriverFullname(val) {
-      this._selectedDriverFullname = val;
     },
     optionsFn(date) {
       return date >= this.getMinDate() && date <= this.getMaxDate();

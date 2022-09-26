@@ -15,3 +15,8 @@ export const getFilteredSubdivisions = (state) => (name) => {
 }
 
 
+export const subdivisions = (state) => {
+  return [...new Set(state.customers.map(customer => customer.subdivision))];
+}
+
+

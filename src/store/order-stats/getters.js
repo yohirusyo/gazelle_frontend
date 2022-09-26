@@ -1,20 +1,14 @@
 import * as moment from 'moment';
-import order from '../order';
-
-export const getStatsSubidivisions = (state) => (name) => {
+export const statsSubidivisions = (state) => {
     const orders = state.orderStats.map(os => os.order);
     const customers = orders.map(order => order.customer);
     const subdivisions = customers.map(customer => customer.subdivision);
-    const data = [...new Set(subdivisions)]
-    if (name == null || name == '') return data;
-    return data.filter(n => n.toLowerCase().includes(name.toLowerCase()));
+    return [...new Set(subdivisions)]
 }
 
-export const getDriversFullnames = (state) => (name) => {
+export const driversFullnames = (state) => {
     const driversFullnames = state.orderStats.map(os => os.driverFullname);
-    const data = [...new Set(driversFullnames)]
-    if (name == null || name == '') return data;
-    return data.filter(n => n.toLowerCase().includes(name.toLowerCase()));
+    return [...new Set(driversFullnames)]
 }
 
 export const getMinDate = (state) => () => {

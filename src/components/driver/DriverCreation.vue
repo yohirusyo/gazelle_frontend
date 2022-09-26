@@ -2,7 +2,7 @@
   <q-form
     @submit="onSubmit"
     @reset="resetForm"
-    class="col column justify-between"
+    class="col column justify-between q-pa-md"
     ref="form"
   >
     <div class="col row q-mb-md">
@@ -11,10 +11,11 @@
           <q-input
             v-model="_surname"
             type="text"
-            borderless
-            class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+            square
+            outlined
             hide-bottom-space
             hide-hint
+            dense
             label-color="grey"
             label="Введите фамилию водителя"
             lazy-rules
@@ -26,10 +27,11 @@
           <q-input
             v-model="_name"
             type="text"
-            borderless
-            class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+            square
+            outlined
             hide-bottom-space
             hide-hint
+            dense
             label-color="grey"
             label="Введите имя водителя"
             lazy-rules
@@ -41,10 +43,11 @@
           <q-input
             v-model="_middlename"
             type="text"
-            borderless
-            class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+            square
+            outlined
             hide-bottom-space
             hide-hint
+            dense
             label-color="grey"
             label="Введите отчество водителя"
             lazy-rules
@@ -57,10 +60,11 @@
             v-model="_phoneNumber"
             mask="+7 (###) ### ## ##"
             type="text"
-            borderless
-            class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+            square
+            outlined
             hide-bottom-space
             hide-hint
+            dense
             label-color="grey"
             label="Введите регистрационный номер телефона водителя"
             lazy-rules
@@ -72,10 +76,11 @@
           <q-input
             v-model="_login"
             type="text"
-            borderless
-            class="bg-grey-2 border-sm q-pl-md shadow-white-inset"
+            square
+            outlined
             hide-bottom-space
             hide-hint
+            dense
             label-color="grey"
             label="Введите логин водителя"
             lazy-rules
@@ -121,7 +126,7 @@
         unelevated
         class="border-sm shadow-white col col-shrink q-ml-md"
         color="green"
-        @click="resetForm()"
+        @click="onCancel()"
       />
     </div>
   </q-form>
@@ -159,12 +164,17 @@ export default {
       });
       this.$refs.form.reset();
     },
+    onCancel() {
+      this.$refs.form.reset();
+    },
     async onRemoveDriver() {
       await this.removeDriver({ id: this.driver.id });
       this.$refs.form.reset();
     },
     async onSubmit() {
-      this._creationMode ? await this.onAddDriver() : await this.onUpdateDriver()
+      this._creationMode
+        ? await this.onAddDriver()
+        : await this.onUpdateDriver();
     },
     resetForm() {
       this._name = null;
@@ -182,10 +192,9 @@ export default {
         this._middlename = this.driver.middlename;
         this._phoneNumber = this.driver.phoneNumber;
         this._login = this.driver.login;
-        this._creationMode = true;
-      } else {
-        c;
         this._creationMode = false;
+      } else {
+        this._creationMode = true;
       }
     },
   },
@@ -199,15 +208,13 @@ export default {
       _creationMode: true,
     };
   },
-  mounted() { },
+  mounted() {
+    this.loadData();
+  },
   watch: {
     "driver.name"() {
       if (this.driver) {
-        this._name = this.driver.name;
-        this._surname = this.driver.surname;
-        this._middlename = this.driver.middlename;
-        this._phoneNumber = this.driver.phoneNumber;
-        this._login = this.driver.login;
+        this.loadData();
       }
     },
     driver() {
@@ -217,6 +224,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -55,7 +55,7 @@ export function setDeparturePointName(state, name) {
 }
 
 export function setNames(state, names) {
-  state.names = names.map(n => n.name)
+  state.names = names
 }
 
 export function setName(state, name) {

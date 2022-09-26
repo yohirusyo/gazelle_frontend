@@ -1,197 +1,314 @@
 <template>
-  <q-form @submit="onSubmit" @reset="resetForm" class="col column justify-between" ref="form">
+  <q-form
+    @submit="onSubmit"
+    @reset="resetForm"
+    class="col column justify-between q-pa-md"
+    ref="form"
+  >
     <div class="col row q-mb-md">
       <q-scroll-area class="col">
         <div class="column col q-gutter-y-md">
           <div class="row items-center">
             <div class="col q-px-sm">
-              <q-select :model-value="_name" type="text" borderless fill-input hide-selected use-input
-                input-debounce="0" :options="getFilteredNames(_filterName)" @filter="filterFnNames"
-                @input-value="_setName" class="bg-grey-2 border-sm shadow-white-inset q-px-md" hide-bottom-space
-                hide-hint label-color="grey" label="Наименование груза" lazy-rules :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+              <ISelect
+                :options="names"
+                v-model="_name"
+                :labelFn="(item) => item.name"
+                label="Наименование груза"
+                @selected="(val) => (_name = val.name)"
+                :required="true"
+                
+              />
             </div>
           </div>
           <div class="row items-center">
             <div class="col q-px-sm">
-              <q-input v-model="_description" type="text" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Комментарий" autocomplete="off" />
+              <q-input
+                v-model="_description"
+                type="text"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Комментарий"
+                autocomplete="off"
+              />
             </div>
           </div>
 
           <div class="row items-stretch">
             <div class="col-4 q-px-sm">
-              <q-select class="bg-grey-2 q-px-md border-sm shadow-white-inset" fill-input hide-selected use-input
-                input-debounce="0" :options="getFilteredCustomers(_filterCustomers)" @filter="filterFnCustomers"
-                @input-value="_setCustomerFullname" :model-value="customerFullname" borderless hide-bottom-space
-                hide-hint label-color="grey" label="Ответственный" autocomplete="off">
-                <template v-slot:option="{ opt, itemProps, itemEvents }">
-                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onCustomerSelect(opt)">
-                    <q-item-section>
-                      <q-item-label>{{
-                      `${opt.fullname} ( ${opt.subdivision} ) ${opt.phoneNumber}`
-                      }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
+              <ISelect
+                :options="customers"
+                v-model="_customerFullname"
+                :labelFn="
+                  (item) =>
+                    `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
+                "
+                label="Ответственный"
+                @selected="
+                  (val) => {
+                    _customerFullname = val.fullname;
+                    _customerPhoneNumber = val.phoneNumber;
+                    _customerSubdivision = val.subdivision;
+                  }
+                "
+                :required="true"
+              />
             </div>
             <div class="col-4 q-px-sm">
-              <q-select :model-value="_customerSubdivision" type="text" borderless fill-input hide-selected use-input
-                input-debounce="0" :options="getFilteredSubdivisions(_filterSubdivision)" @filter="filterFnSubdivisions"
-                @input-value="_setCustomerSubdivision" class="bg-grey-2 border-sm shadow-white-inset q-px-md"
-                hide-bottom-space hide-hint label-color="grey" label="Подразделение" lazy-rules :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+              <ISelect
+                :options="subdivisions"
+                v-model="_customerSubdivision"
+                :labelFn="(item) => item"
+                label="Подразделение"
+                @selected="(val) => (_customerSubdivision = val)"
+                :required="true"
+              />
             </div>
             <div class="col-4 q-px-sm">
-              <q-input v-model="_customerPhoneNumber" type="text" borderless
-                class="bg-grey-2 border-sm shadow-white-inset q-px-md" hide-bottom-space hide-hint label-color="grey"
-                label="Телефон" mask="+7 (###) ### ## ##" lazy-rules :rules="[
+              <q-input
+                v-model="_customerPhoneNumber"
+                type="text"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Телефон"
+                mask="+7 (###) ### ## ##"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
           </div>
 
           <div class="row items-stretch">
             <div class="col-5 q-px-sm row">
-              <q-select v-model="_departurePointName" type="text" fill-input hide-selected use-input input-debounce="0"
-                :options="getFilteredPlaces(_filterDeparturePoints)" @filter="filterFnDeparturePoints"
-                @input-value="_setDeparturePointName" :model-value="departurePointName" borderless hide-bottom-space
-                hide-hint class="bg-grey-2 border-sm q-px-md shadow-white-inset col" autocomplete="off"
-                label="Место отправления">
-                <template v-slot:option="{ opt, itemProps, itemEvents }">
-                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onDeparturePointSelect(opt)">
-                    <q-item-section>
-                      <q-item-label>{{ opt.name }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-                <template v-slot:append>
-                  <q-btn color="primary" icon="las la-map-marker" flat rounded class="q-ml-sm" :disable="!place"
-                    @click.stop="
-                      () => {
-                        onDeparturePointSelect(place);
-                        setPlace(null);
-                      }
-                    " />
-                </template>
-              </q-select>
+              <ISelect
+                :options="places"
+                v-model="_departurePointName"
+                :labelFn="(item) => item.name"
+                label="Место отправления"
+                @selected="(val) => (_departurePointName = val.name)"
+                :required="true"
+              />
             </div>
             <div class="col-5 q-px-sm">
-              <q-select v-model="_destinationName" type="text" fill-input hide-selected use-input input-debounce="0"
-                :options="getFilteredPlaces(_filterDestinations)" @filter="filterFnDestinations"
-                @input-value="_setDestinatioName" :model-value="destinationName" borderless hide-bottom-space hide-hint
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset col" autocomplete="off" label="Место назначения">
-                <template v-slot:option="{ opt, itemProps, itemEvents }">
-                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onDestinationSelect(opt)">
-                    <q-item-section>
-                      <q-item-label>{{ opt.name }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-                <template v-slot:append>
-                  <q-btn color="primary" icon="las la-map-marker" flat rounded class="q-ml-sm" :disable="!place"
-                    @click.stop="
-                      () => {
-                        onDestinationSelect(place);
-                        setPlace(null);
-                      }
-                    " />
-                </template>
-              </q-select>
+              <ISelect
+                :options="places"
+                v-model="_destinationName"
+                :labelFn="(item) => item.name"
+                label="Место назначения"
+                @selected="(val) => (_destinationName = val.name)"
+                :required="true"
+              />
             </div>
             <div class="col-2 q-px-sm row">
-              <div class="bg-grey-2 border-sm shadow-white-inset col row items-center justify-center">
-                <Datepicker inputClassName="datepicker col" menuClassName="datepicker-menu border-md"
-                  v-model="_orderTime" timePicker selectText="Выбрать" cancelText="Отмена" />
+              <div class="col row items-center justify-center">
+                <Datepicker
+                  inputClassName="datepicker col"
+                  menuClassName="datepicker-menu border-md"
+                  v-model="_orderTime"
+                  timePicker
+                  selectText="Выбрать"
+                  cancelText="Отмена"
+                />
               </div>
             </div>
           </div>
 
           <div class="row items-center">
             <div class="col-2 q-px-sm">
-              <q-input v-model="_passengerCount" type="number" :min="
-                _weight != 0 && _length != 0 && _width != 0 && _height != 0
-                  ? 0
-                  : 1
-              " borderless class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint
-                label-color="grey" label="Пассажиров" lazy-rules :rules="[
+              <q-input
+                v-model="_passengerCount"
+                type="number"
+                :min="
+                  _weight != 0 && _length != 0 && _width != 0 && _height != 0
+                    ? 0
+                    : 1
+                "
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Пассажиров"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_weight" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Вес" lazy-rules :rules="[
+              <q-input
+                v-model="_weight"
+                type="number"
+                :min="_passengerCount == 0 ? 1 : 0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Вес"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_length" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Длина" lazy-rules :rules="[
+              <q-input
+                v-model="_length"
+                type="number"
+                :min="_passengerCount == 0 ? 1 : 0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Длина"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_width" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Ширина" lazy-rules :rules="[
+              <q-input
+                v-model="_width"
+                type="number"
+                :min="_passengerCount == 0 ? 1 : 0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Ширина"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
             <div class="col-2 q-px-sm">
-              <q-input v-model="_height" type="number" :min="_passengerCount == 0 ? 1 : 0" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Высота" lazy-rules :rules="[
+              <q-input
+                v-model="_height"
+                type="number"
+                :min="_passengerCount == 0 ? 1 : 0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Высота"
+                lazy-rules
+                :rules="[
                   (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]" autocomplete="off" />
+                ]"
+                autocomplete="off"
+              />
             </div>
             <div class="col-2 q-px-sm column justify-between">
               <q-checkbox v-model="_orderIsEmergency" label="Аварийная" dense />
-              <q-checkbox v-model="_allowContact" label="Контактное лицо" dense
-                v-if="_passengerCount && _passengerCount >= 1" />
             </div>
           </div>
-
-          <div class="row items-stretch" v-if="_allowContact && _passengerCount && _passengerCount >= 1">
+          <div class="row q-pl-sm">
+            <q-checkbox
+              v-model="_allowContact"
+              label="Контактное лицо"
+              dense
+              v-if="_passengerCount && _passengerCount >= 1"
+            />
+          </div>
+          <div
+            class="row items-stretch"
+            v-if="_allowContact && _passengerCount && _passengerCount >= 1"
+          >
             <div class="col-8 q-px-sm">
-              <q-select class="bg-grey-2 border-sm q-px-md shadow-white-inset" fill-input hide-selected use-input
-                input-debounce="0" :options="getFilteredContacts(_filterContacts)" @filter="filterFnContacts"
-                @input-value="_setContactFullname" :model-value="contactFullname" borderless hide-bottom-space hide-hint
-                label-color="grey" label="Контактное лицо" autocomplete="off">
-                <template v-slot:option="{ opt, itemProps, itemEvents }">
-                  <q-item v-bind="itemProps" v-on="itemEvents" @click="onContactSelect(opt)">
-                    <q-item-section>
-                      <q-item-label>{{
-                      `${opt.fullname} ${opt.phoneNumber}`
-                      }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
+              <ISelect
+                :options="contacts"
+                v-model="_contactFullname"
+                :labelFn="(item) => `${item.fullname} ${item.phoneNumber}`"
+                label="Контактное лицо"
+                @selected="
+                  (val) => {
+                    _contactFullname = val.fullname;
+                    _contactPhoneNumber = val.phoneNumber;
+                  }
+                "
+              />
             </div>
             <div class="col-4 q-px-sm">
-              <q-input v-model="_contactPhoneNumber" type="text" borderless
-                class="bg-grey-2 border-sm q-px-md shadow-white-inset" hide-bottom-space hide-hint label-color="grey"
-                label="Телефон" mask="+7 (###) ### ## ##" autocomplete="off" />
+              <q-input
+                v-model="_contactPhoneNumber"
+                type="text"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Телефон"
+                mask="+7 (###) ### ## ##"
+                autocomplete="off"
+              />
             </div>
           </div>
         </div>
       </q-scroll-area>
     </div>
     <div class="row">
-      <q-btn v-if="_creationMode" text-color="white" label="Создать" unelevated class="border-sm shadow-white col"
-        color="primary" type="submit" />
-      <q-btn v-if="!_creationMode" text-color="white" label="Изменить" unelevated
-        class="border-sm shadow-white col q-mr-md" color="primary" type="submit" />
-      <q-btn v-if="!_creationMode" text-color="white" label="Удалить" unelevated
-        class="border-sm shadow-white col col-shrink " color="red" @click="onRemoveOrder" />
-      <q-btn text-color="white" label="Отмена" unelevated class="border-sm shadow-white col col-shrink q-ml-md"
-        color="green" @click="resetForm()" />
+      <q-btn
+        v-if="_creationMode"
+        text-color="white"
+        label="Создать"
+        unelevated
+        class="border-sm shadow-white col"
+        color="primary"
+        type="submit"
+      />
+      <q-btn
+        v-if="!_creationMode"
+        text-color="white"
+        label="Изменить"
+        unelevated
+        class="border-sm shadow-white col q-mr-md"
+        color="primary"
+        type="submit"
+      />
+      <q-btn
+        v-if="!_creationMode"
+        text-color="white"
+        label="Удалить"
+        unelevated
+        class="border-sm shadow-white col col-shrink"
+        color="red"
+        @click="onRemoveOrder"
+      />
+      <q-btn
+        text-color="white"
+        label="Отмена"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ml-md"
+        color="green"
+        @click="onCancel()"
+      />
     </div>
   </q-form>
 </template>
@@ -199,36 +316,25 @@
 <script>
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import Datepicker from "@vuepic/vue-datepicker";
+import ISelect from "components/base/ISelect.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { showNotifyResult } from "src/helpers/notification";
 export default {
   name: "OrderCreation",
   components: {
     Datepicker,
+    ISelect,
   },
   computed: {
     ...mapState("current", ["selectedTransportId", "orderIsEmergency"]),
-    ...mapState("order", [
-      "customerPhoneNumber",
-      "customerFullname",
-      "customerSubdivision",
-      "contactPhoneNumber",
-      "contactFullname",
-      "destinationName",
-      "departurePointName",
-      "name",
-    ]),
-    ...mapState("current", ["order", "place"]),
+    ...mapState("order", ["names"]),
+    ...mapState("current", ["order"]),
     ...mapState("place", ["places"]),
-    ...mapGetters("contact", ["getFilteredContacts", "getContactById"]),
-    ...mapGetters("customer", [
-      "getFilteredCustomers",
-      "getCustomerById",
-      "getFilteredSubdivisions",
-    ]),
+    ...mapState("contact", ["contacts"]),
+    ...mapGetters("contact", ["getContactById"]),
+    ...mapState("customer", ["customers"]),
+    ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("place", ["getPlaceById"]),
-    ...mapGetters("order", ["getFilteredNames"]),
-    ...mapGetters("place", ["getFilteredPlaces"]),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
@@ -237,162 +343,17 @@ export default {
         this.setOrderIsEmergency(newVal);
       },
     },
-    _customerPhoneNumber: {
-      get() {
-        return this.customerPhoneNumber;
-      },
-      set(newVal) {
-        this.setCustomerPhoneNumber(newVal);
-      },
-    },
-    _customerSubdivision: {
-      get() {
-        return this.customerSubdivision;
-      },
-      set(newVal) {
-        this.setCustomerSubdivision(newVal);
-      },
-    },
-    _name: {
-      get() {
-        return this.name;
-      },
-      set(newVal) {
-        this.setName(newVal);
-      },
-    },
-    _contactPhoneNumber: {
-      get() {
-        return this.contactPhoneNumber;
-      },
-      set(newVal) {
-        this.setContactPhoneNumber(newVal);
-      },
-    },
-    _departurePointName: {
-      get() {
-        return this.departurePointName;
-      },
-      set(newVal) {
-        this.setDeparturePointName(newVal);
-      },
-    },
-    _destinationName: {
-      get() {
-        return this.destinationName;
-      },
-      set(newVal) {
-        this.setDestinationName(newVal);
-      },
-    },
   },
   methods: {
     ...mapActions("order", ["updateOrder", "removeOrder", "addOrder"]),
-    ...mapMutations("order", [
-      "setCustomerPhoneNumber",
-      "setCustomerFullname",
-      "setCustomerSubdivision",
-      "setContactPhoneNumber",
-      "setContactFullname",
-      "setDeparturePointName",
-      "setDestinationName",
-      "setName",
-    ]),
     ...mapMutations("current", [
       "setTransport",
       "setSelectedTransportId",
-      "clearOrder",
       "setOrderIsEmergency",
-      "setPlace",
+      "clearOrder",
     ]),
-    _setCustomerFullname(val) {
-      if (val.fullname) return this.setCustomerFullname(val.fullname);
-      this.setCustomerFullname(val);
-    },
-    _setCustomerSubdivision(val) {
-      this._customerSubdivision = val;
-    },
-    _setName(val) {
-      this._name = val;
-    },
-    _setContactFullname(val) {
-      if (val.fullname) return this.setContactFullname(val.fullname);
-      this.setContactFullname(val);
-    },
-    _setDestinatioName(val) {
-      if (val.name) return this.setDestinationName(val.name);
-      this.setDestinationName(val);
-    },
-    _setDeparturePointName(val) {
-      if (val.name) return this.setDeparturePointName(val.name);
-      this.setDeparturePointName(val);
-    },
-    onCustomerSelect(val) {
-      this.setCustomerFullname(val.fullname);
-      this._customerPhoneNumber = val.phoneNumber;
-      this._customerSubdivision = val.subdivision;
-    },
-    onContactSelect(val) {
-      this.setContactFullname(val.fullname);
-      this._contactPhoneNumber = val.phoneNumber;
-    },
-    onDeparturePointSelect(val) {
-      this.setDeparturePointName(val.name);
-    },
-    onDestinationSelect(val) {
-      this.setDestinationName(val.name);
-    },
-    filterFnCustomers(val, update) {
-      update(() => {
-        if (val.fullname) {
-          this.setCustomerFullname(val.fullname);
-          this._filterCustomers = val.fullname;
-          return;
-        }
-        this._filterCustomers = val;
-      });
-    },
-    filterFnContacts(val, update) {
-      update(() => {
-        if (val.fullname)
-          if (val.fullname) {
-            this.setContactFullname(val.fullname);
-            this._filterContacts = val.fullname;
-            return;
-          }
-        this._filterContacts = val;
-      });
-    },
-    filterFnSubdivisions(val, update) {
-      update(() => {
-        this._filterSubdivision = val;
-      });
-    },
-    filterFnNames(val, update) {
-      update(() => {
-        this._filterName = val;
-      });
-    },
-    filterFnDestinations(val, update) {
-      update(() => {
-        if (val.name) {
-          this.setDestinationName(val.name);
-          this._filterDestinations = val.name;
-          return;
-        }
-        this._filterDestinations = val;
-      });
-    },
-    filterFnDeparturePoints(val, update) {
-      update(() => {
-        if (val.name)
-          if (val.name) {
-            this.setDeparturePointName(val.name);
-            this._filterDeparturePoints = val.name;
-            return;
-          }
-        this._filterDeparturePoints = val;
-      });
+    onCancel() {
+      this.$refs.form.reset();
     },
     async onAddOrder() {
       if (!this.selectedTransportId)
@@ -404,32 +365,32 @@ export default {
       d.setMilliseconds(0);
       await this.addOrder({
         orderTime: d,
-        departurePointName: this.departurePointName,
-        destinationName: this.destinationName,
+        departurePointName: this._departurePointName,
+        destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
         passengerCount: this._passengerCount,
         weight: this._weight,
         length: this._length,
         width: this._width,
         height: this._height,
-        customerPhoneNumber: this.customerPhoneNumber,
-        customerFullname: this.customerFullname,
-        customerSubdivision: this.customerSubdivision,
+        customerPhoneNumber: this._customerPhoneNumber,
+        customerFullname: this._customerFullname,
+        customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this.contactPhoneNumber
+          this._passengerCount &&
+          this._passengerCount >= 1
+            ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this.contactFullname
+          this._passengerCount &&
+          this._passengerCount >= 1
+            ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
         description: this._description,
-        name: this.name,
+        name: this._name,
       });
       this.$refs.form.reset();
     },
@@ -442,31 +403,31 @@ export default {
       await this.updateOrder({
         id: this.order.id,
         orderTime: d,
-        departurePointName: this.departurePointName,
-        destinationName: this.destinationName,
+        departurePointName: this._departurePointName,
+        destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
         passengerCount: this._passengerCount,
         weight: this._weight,
         length: this._length,
         width: this._width,
         height: this._height,
-        customerPhoneNumber: this.customerPhoneNumber,
-        customerFullname: this.customerFullname,
-        customerSubdivision: this.customerSubdivision,
+        customerPhoneNumber: this._customerPhoneNumber,
+        customerFullname: this._customerFullname,
+        customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this.contactPhoneNumber
+          this._passengerCount &&
+          this._passengerCount >= 1
+            ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this.contactFullname
+          this._passengerCount &&
+          this._passengerCount >= 1
+            ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
-        name: this.name,
+        name: this._name,
         description: this._description,
       });
       this.$refs.form.reset();
@@ -486,8 +447,8 @@ export default {
         minutes: d.getMinutes(),
         seconds: 0,
       };
-      this.setDeparturePointName(null);
-      this.setDestinationName(null);
+      this._departurePointName = null;
+      this._destinationName = null;
       this._orderIsEmergency = false;
       this._passengerCount = null;
       this._weight = null;
@@ -499,12 +460,12 @@ export default {
       this._filterContacts = null;
       this._description = null;
       this._allowContact = false;
-      this.setName(null);
-      this.setCustomerFullname(null);
-      this.setCustomerPhoneNumber(null);
-      this.setCustomerSubdivision(null);
-      this.setContactFullname(null);
-      this.setContactPhoneNumber(null);
+      this._name = null;
+      this._customerPhoneNumber = null;
+      this._customerFullname = null;
+      this._customerSubdivision = null;
+      this._contactFullname = null;
+      this._contactPhoneNumber = null;
       this.clearOrder();
       this.$emit("done");
     },
@@ -516,29 +477,29 @@ export default {
           minutes: d.getMinutes(),
           seconds: 0,
         };
-        this.setDeparturePointName(
-          this.getPlaceById(this.order.departurePointId).name
-        ); //
-        this._setDestinatioName(
-          this.getPlaceById(this.order.destinationId).name
-        ); //
+        this._departurePointName = this.getPlaceById(
+          this.order.departurePointId
+        ).name;
+        this._destinationName = this.getPlaceById(
+          this.order.destinationId
+        ).name;
         this._orderIsEmergency = this.order.isEmergency;
         this._passengerCount = this.order.passengerCount;
         this._weight = this.order.weight;
         this._length = this.order["length"];
         this._width = this.order.width;
         this._height = this.order.height;
-        this.setName(this.order.name);
+        this._name = this.order.name;
         this._description = this.order.description;
         const contact = this.getContactById(this.order?.contactId);
         this._allowContact =
           !!contact && !!this._passengerCount && this._passengerCount >= 1;
         const customer = this.getCustomerById(this.order.customerId);
-        this.setCustomerFullname(customer.fullname);
-        this.setCustomerPhoneNumber(customer.phoneNumber);
-        this.setCustomerSubdivision(customer.subdivision);
-        this.setContactFullname(contact?.fullname);
-        this.setContactPhoneNumber(contact?.phoneNumber);
+        this._customerPhoneNumber = customer.phoneNumber;
+        this._customerFullname = customer.fullname;
+        this._customerSubdivision = customer.subdivision;
+        this._contactFullname = contact?.fullname;
+        this._contactPhoneNumber = contact?.phoneNumber;
         this.setSelectedTransportId(this.order.transportId);
         this._creationMode = false;
       } else {
@@ -563,15 +524,18 @@ export default {
       _length: null,
       _width: null,
       _height: null,
-      _filterCustomers: null,
-      _filterSubdivision: null,
-      _filterName: null,
       _filterContacts: null,
-      _filterDeparturePoints: null,
-      _filterDestinations: null,
       _description: null,
       _allowContact: false,
       _creationMode: true,
+      _name: null,
+      _customerPhoneNumber: null,
+      _customerFullname: null,
+      _customerSubdivision: null,
+      _departurePointName: null,
+      _destinationName: null,
+      _contactFullname: null,
+      _contactPhoneNumber: null,
     };
   },
   watch: {
@@ -584,19 +548,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* 
-orderTime,
-departurePointId,
-destinationId,
-isEmergency,
-passengerCount,
-weight,
-length,
-width,
-height,
-customerId,
-contactId, 
-*/
-</style>
