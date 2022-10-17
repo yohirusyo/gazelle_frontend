@@ -69,10 +69,13 @@
           key="transportId"
           :props="props"
         >
-          <div class="row justify-center">
+          <div class="row justify-center" v-if="props.row.transportId">
             <AutoNumber :number="
               formatTransportNumber(getTransportById(props.row.transportId))
             " />
+          </div>
+          <div v-else>
+            Транспорт не выбран!
           </div>
         </q-td>
         <q-td
@@ -111,6 +114,7 @@ export default {
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("transport", ["getTransportById"]),
     ...mapState("current", ["hoveredTransportId"]),
+    ...mapState("current", ["currentUser"]),
   },
   watch: {
     hoveredTransportId(_) {
@@ -194,7 +198,7 @@ export default {
     this.height =
       (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
       this.col -
-      81;
+      (this.currentUser?.role == 'WATCHER' ? 41 :81);
   },
 };
 </script>

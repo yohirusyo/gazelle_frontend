@@ -1,5 +1,11 @@
 <template>
-  <div class="col column">
+  <div v-if="currentUser?.role == 'WATCHER'">
+    <OrderList :col="col" />
+  </div>
+  <div
+    class="col column"
+    v-else
+  >
     <div class="row justify-between items-center">
       <q-tabs
         v-model="tab"
@@ -10,7 +16,12 @@
         align="justify"
         narrow-indicator
       >
-        <q-tab name="main" label="Заказы" no-caps :ripple="false" />
+        <q-tab
+          name="main"
+          label="Заказы"
+          no-caps
+          :ripple="false"
+        />
         <q-tab
           name="create"
           :label="!order ? 'Создание' : 'Редактирование'"
@@ -19,12 +30,23 @@
         />
       </q-tabs>
     </div>
-    <q-tab-panels v-model="tab" animated class="col" keep-alive>
-      <q-tab-panel name="main" class="col column">
+    <q-tab-panels
+      v-model="tab"
+      animated
+      class="col"
+      keep-alive
+    >
+      <q-tab-panel
+        name="main"
+        class="col column"
+      >
         <OrderList :col="col" />
       </q-tab-panel>
 
-      <q-tab-panel name="create" class="col column">
+      <q-tab-panel
+        name="create"
+        class="col column"
+      >
         <OrderCreation @done="onDone" />
       </q-tab-panel>
     </q-tab-panels>
@@ -50,13 +72,14 @@ export default {
   },
   computed: {
     ...mapState("current", ["order"]),
+    ...mapState("current", ["currentUser"]),
   },
   methods: {
     async onDone() {
       this.tab = "main";
     },
   },
-  async mounted() {},
+  async mounted() { },
   watch: {
     order(newOrder) {
       if (!!newOrder) {
@@ -67,4 +90,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

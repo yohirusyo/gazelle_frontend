@@ -74,6 +74,24 @@
             autocomplete="off"
           />
           <q-input
+            v-model="_workingPhoneNumber"
+            mask="+7 (###) ### ## ##"
+            type="text"
+            square
+            outlined
+            hide-bottom-space
+            hide-hint
+            dense
+            label-color="grey"
+            label="Введите рабочий номер телефона водителя"
+            lazy-rules
+            :rules="[
+              (val) => (val !== null && val !== '') || 'Обязательное поле!',
+            ]"
+            v-if="!_creationMode"
+            autocomplete="off"
+          />
+          <q-input
             v-model="_login"
             type="text"
             square
@@ -160,6 +178,7 @@ export default {
         surname: this._surname,
         middlename: this._middlename,
         phoneNumber: this._phoneNumber,
+        workingPhoneNumber: this._workingPhoneNumber,
         login: this._login,
       });
       this.$refs.form.reset();
@@ -181,6 +200,7 @@ export default {
       this._surname = null;
       this._middlename = null;
       this._phoneNumber = null;
+      this._workingPhoneNumber = null;
       this._login = null;
       this.$emit("done");
       this.clearDriver();
@@ -191,6 +211,7 @@ export default {
         this._surname = this.driver.surname;
         this._middlename = this.driver.middlename;
         this._phoneNumber = this.driver.phoneNumber;
+        this._workingPhoneNumber = this.driver.workingPhoneNumber;
         this._login = this.driver.login;
         this._creationMode = false;
       } else {
@@ -204,6 +225,7 @@ export default {
       _surname: null,
       _middlename: null,
       _phoneNumber: null,
+      _workingPhoneNumber: null,
       _login: null,
       _creationMode: true,
     };

@@ -103,6 +103,7 @@ export default {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
+    ...mapState("current", ["currentUser"]),
     freeStatuses: {
       get() {
         return this.statuses.filter((s) => s.isBusy == false);
@@ -112,10 +113,12 @@ export default {
   async mounted() {
     this.height =
       (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-        this.col -
-      81;
+      this.col -
+      (this.currentUser?.role == 'WATCHER' ? 41 : 81);
   },
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

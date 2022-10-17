@@ -64,7 +64,7 @@ export default {
       (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
       this.col -
       81;
-    this.version = '1.1.1'
+    this.version = '1.1.2'
   },
   data() {
     return {

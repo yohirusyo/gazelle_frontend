@@ -13,16 +13,12 @@
       </div> -->
     </div>
     <div class="col column">
-      <div class="col-6 row q-pa-xs">
+      <div class="col-12 row q-pa-xs">
         <BaseCard class="col bg-white q-pa-md column">
-          <Transport :col="6" />
+          <Transport :col="12" />
         </BaseCard>
       </div>
-      <div class="col-6 row q-pa-xs">
-        <BaseCard class="col bg-white q-pa-md column">
-          <Driver :col="6" />
-        </BaseCard>
-      </div>
+      
     </div>
   </q-page>
 </template>

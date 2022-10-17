@@ -21,11 +21,32 @@ export async function requestNames({ commit }) {
     })
 }
 
-
 export async function requestOrders({ commit }) {
   return api.get(`order`).then(({ data }) => {
     commit("set", data);
   });
+}
+
+export async function approveOrder({ commit }, { id, ...form }) {
+  return api
+    .patch(`order/approve/${id}`, form)
+    .then(({ data }) => {
+      showNotifyResult(true, "Заявка успешно принята!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка принятия заявки!");
+    });
+}
+
+export async function declineOrder({ commit }, { id }) {
+  return api
+    .patch(`order/decline/${id}`)
+    .then(({ data }) => {
+      showNotifyResult(true, "Заявка успешно отклонена!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка отклонения заявки!");
+    });
 }
 
 export async function updateOrder({ commit }, { id, ...form }) {

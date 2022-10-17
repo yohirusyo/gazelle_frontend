@@ -1,5 +1,5 @@
 function sort(state) {
-  state.orders.sort((a, b) => a.id - b.id)
+  state.orders.sort((a, b) => a.id - b.id).filter(order => !order.isDone && !order.isDeleted)
 }
 
 

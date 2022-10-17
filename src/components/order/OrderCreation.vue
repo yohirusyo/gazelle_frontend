@@ -17,7 +17,6 @@
                 label="Наименование груза"
                 @selected="(val) => (_name = val.name)"
                 :required="true"
-                
               />
             </div>
           </div>
@@ -53,6 +52,7 @@
                     _customerFullname = val.fullname;
                     _customerPhoneNumber = val.phoneNumber;
                     _customerSubdivision = val.subdivision;
+                    setCustomerSubdivision(val.subdivision);
                   }
                 "
                 :required="true"
@@ -64,7 +64,10 @@
                 v-model="_customerSubdivision"
                 :labelFn="(item) => item"
                 label="Подразделение"
-                @selected="(val) => (_customerSubdivision = val)"
+                @selected="(val) => {
+                _customerSubdivision = val; 
+                setCustomerSubdivision(val);
+                }"
                 :required="true"
               />
             </div>
@@ -225,7 +228,11 @@
               />
             </div>
             <div class="col-2 q-px-sm column justify-between">
-              <q-checkbox v-model="_orderIsEmergency" label="Аварийная" dense />
+              <q-checkbox
+                v-model="_orderIsEmergency"
+                label="Аварийная"
+                dense
+              />
             </div>
           </div>
           <div class="row q-pl-sm">
@@ -275,6 +282,24 @@
     </div>
     <div class="row">
       <q-btn
+        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
+        text-color="white"
+        label="Принять и применить изменения"
+        unelevated
+        class="border-sm shadow-white col q-mr-md"
+        color="primary"
+        @click="onApprove"
+      />
+      <q-btn
+        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
+        text-color="white"
+        label="Отклонить"
+        unelevated
+        class="border-sm shadow-white col col-shrink"
+        color="red"
+        @click="onDecline"
+      />
+      <q-btn
         v-if="_creationMode"
         text-color="white"
         label="Создать"
@@ -284,7 +309,7 @@
         type="submit"
       />
       <q-btn
-        v-if="!_creationMode"
+        v-if="!_creationMode && getStatusById(order.statusId).code != 'REQUEST'"
         text-color="white"
         label="Изменить"
         unelevated
@@ -293,7 +318,7 @@
         type="submit"
       />
       <q-btn
-        v-if="!_creationMode"
+        v-if="!_creationMode && getStatusById(order.statusId).code != 'REQUEST'"
         text-color="white"
         label="Удалить"
         unelevated
@@ -335,6 +360,7 @@ export default {
     ...mapState("customer", ["customers"]),
     ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("place", ["getPlaceById"]),
+    ...mapGetters("status", ["getStatusById"]),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
@@ -345,14 +371,72 @@ export default {
     },
   },
   methods: {
-    ...mapActions("order", ["updateOrder", "removeOrder", "addOrder"]),
+    ...mapActions("order", [
+      "updateOrder",
+      "removeOrder",
+      "addOrder",
+      "approveOrder",
+      "declineOrder",
+    ]),
     ...mapMutations("current", [
       "setTransport",
       "setSelectedTransportId",
       "setOrderIsEmergency",
       "clearOrder",
     ]),
+    ...mapMutations("order", ['setCustomerSubdivision']),
     onCancel() {
+      this.$refs.form.reset();
+    },
+    async onApprove() {
+      if (!this.selectedTransportId)
+        return showNotifyResult(false, "Выберите транспорт!");
+      const d = new Date();
+      d.setHours(this._orderTime.hours);
+      d.setMinutes(this._orderTime.minutes);
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      await this.approveOrder({
+        id: this.order.id,
+        orderTime: d,
+        departurePointName: this._departurePointName,
+        destinationName: this._destinationName,
+        isEmergency: this._orderIsEmergency,
+        passengerCount: Number(this._passengerCount),
+        weight: Number(this._weight),
+        length: Number(this._length),
+        width: Number(this._width),
+        height: Number(this._height),
+        customerPhoneNumber: this._customerPhoneNumber,
+        customerFullname: this._customerFullname,
+        customerSubdivision: this._customerSubdivision,
+        contactPhoneNumber:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this._contactPhoneNumber
+            : null,
+        contactFullname:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this._contactFullname
+            : null,
+        transportId: this.selectedTransportId ?? null,
+        name: this._name,
+        description: this._description,
+      });
+      this.$refs.form.reset();
+    },
+    async onDecline() {
+      const d = new Date();
+      d.setHours(this._orderTime.hours);
+      d.setMinutes(this._orderTime.minutes);
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      await this.declineOrder({
+        id: this.order.id,
+      });
       this.$refs.form.reset();
     },
     async onAddOrder() {
@@ -368,24 +452,24 @@ export default {
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
-        passengerCount: this._passengerCount,
-        weight: this._weight,
-        length: this._length,
-        width: this._width,
-        height: this._height,
+        passengerCount: Number(this._passengerCount),
+        weight: Number(this._weight),
+        length: Number(this._length),
+        width: Number(this._width),
+        height: Number(this._height),
         customerPhoneNumber: this._customerPhoneNumber,
         customerFullname: this._customerFullname,
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -406,24 +490,24 @@ export default {
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
-        passengerCount: this._passengerCount,
-        weight: this._weight,
-        length: this._length,
-        width: this._width,
-        height: this._height,
+        passengerCount: Number(this._passengerCount),
+        weight: Number(this._weight),
+        length: Number(this._length),
+        width: Number(this._width),
+        height: Number(this._height),
         customerPhoneNumber: this._customerPhoneNumber,
         customerFullname: this._customerFullname,
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -466,6 +550,7 @@ export default {
       this._customerSubdivision = null;
       this._contactFullname = null;
       this._contactPhoneNumber = null;
+      this.setCustomerSubdivision(null);
       this.clearOrder();
       this.$emit("done");
     },

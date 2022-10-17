@@ -1,5 +1,8 @@
 <template>
-  <div class="col column">
+  <div v-if="currentUser?.role == 'WATCHER'">
+    <TransportList :col="col" />
+  </div>
+  <div class="col column" v-else>
     <div class="row justify-between items-center">
       <q-tabs
         v-model="tab"
@@ -10,7 +13,12 @@
         narrow-indicator
       >
         <div class="row col justify-start">
-          <q-tab name="main" label="Транспорт" no-caps :ripple="false" />
+          <q-tab
+            name="main"
+            label="Транспорт"
+            no-caps
+            :ripple="false"
+          />
           <q-tab
             name="create"
             :label="!transport ? 'Создание' : 'Редактирование'"
@@ -24,16 +32,31 @@
             label="Только с водителем"
             dense
           />
-          <q-checkbox v-model="_onlyFree" label="Только свободные" dense />
+          <q-checkbox
+            v-model="_onlyFree"
+            label="Только свободные"
+            dense
+          />
         </div>
       </q-tabs>
     </div>
-    <q-tab-panels v-model="tab" animated class="col" keep-alive>
-      <q-tab-panel name="main" class="col column">
+    <q-tab-panels
+      v-model="tab"
+      animated
+      class="col"
+      keep-alive
+    >
+      <q-tab-panel
+        name="main"
+        class="col column"
+      >
         <TransportList :col="col" />
       </q-tab-panel>
 
-      <q-tab-panel name="create" class="col column">
+      <q-tab-panel
+        name="create"
+        class="col column"
+      >
         <TransportCreation @done="onDone" />
       </q-tab-panel>
     </q-tab-panels>
@@ -53,6 +76,7 @@ export default {
   props: ["col"],
   computed: {
     ...mapState("current", ["transport", "onlyFree", "onlyWithDrivers"]),
+    ...mapState("current", ["currentUser"]),
     _onlyFree: {
       get() {
         return this.onlyFree;
@@ -91,4 +115,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

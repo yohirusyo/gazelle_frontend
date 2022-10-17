@@ -22,9 +22,14 @@
     hide-hint
     class="fit"
     dense
+    autocomplete="off"
   >
     <template v-slot:option="{ index, opt, itemProps, itemEvents }">
-      <q-item v-bind="itemProps" v-on="itemEvents" @click="selected(index)">
+      <q-item
+        v-bind="itemProps"
+        v-on="itemEvents"
+        @click="selected(index)"
+      >
         <q-item-section>
           <q-item-label>{{ opt }}</q-item-label>
         </q-item-section>
@@ -88,4 +93,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
