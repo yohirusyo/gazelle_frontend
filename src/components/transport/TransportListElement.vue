@@ -5,7 +5,7 @@
   >
     <q-td
       key="select "
-      class="col-1 text-center"
+      class="col-1 text-center" v-if="currentUser?.role != 'WATCHER'"
     >
       <q-checkbox
         v-model="_selected"
@@ -71,6 +71,7 @@ export default {
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters('transport', ['getTransportById']),
+    ...mapState("current", ["currentUser"]),
     ...mapState("current", [
       "selectedTransportId",
       "order",

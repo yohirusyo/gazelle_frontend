@@ -1,341 +1,377 @@
 <template>
-  <q-form
-    @submit="onSubmit"
-    @reset="resetForm"
-    class="col column justify-between q-pa-md"
-    ref="form"
-  >
-    <div class="col row q-mb-md">
-      <q-scroll-area class="col">
-        <div class="column col q-gutter-y-md">
-          <div class="row items-center">
-            <div class="col q-px-sm">
-              <ISelect
-                :options="names"
-                v-model="_name"
-                :labelFn="(item) => item.name"
-                label="Наименование груза"
-                @selected="(val) => (_name = val.name)"
-                :required="true"
-              />
+  <div class="col column">
+    <q-form
+      @submit="onSubmit"
+      @reset="resetForm"
+      class="col column justify-between"
+      ref="form"
+    >
+      <div class="col row q-mb-md">
+        <q-scroll-area class="col">
+          <div class="column col q-gutter-y-md">
+            <div class="row items-center">
+              <div class="col q-px-sm">
+                <ISelect
+                  :options="names"
+                  v-model="_name"
+                  :labelFn="(item) => item.name"
+                  label="Наименование груза"
+                  @selected="(val) => (_name = val.name)"
+                  :required="true"
+                />
+              </div>
             </div>
-          </div>
-          <div class="row items-center">
-            <div class="col q-px-sm">
-              <q-input
-                v-model="_description"
+            <div class="row items-center">
+              <div class="col q-px-sm">
+                <q-input
+                  v-model="_description"
+                  type="text"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Комментарий"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <div class="row items-stretch">
+              <div class="col-4 col-xs-12 q-px-sm">
+                <ISelect
+                  :options="customers"
+                  v-model="_customerFullname"
+                  :labelFn="
+                    (item) =>
+                      `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
+                  "
+                  label="Ответственный"
+                  @selected="
+                    (val) => {
+                      _customerFullname = val.fullname;
+                      _customerPhoneNumber = val.phoneNumber;
+                      _customerSubdivision = val.subdivision;
+                      setCustomerSubdivision(val.subdivision);
+                    }
+                  "
+                  :required="true"
+                />
+              </div>
+              <div class="col-4 col-xs-12 q-my-xs-md q-px-sm">
+                <ISelect
+                  :options="subdivisions"
+                  v-model="_customerSubdivision"
+                  :labelFn="(item) => item"
+                  label="Подразделение"
+                  @selected="
+                    (val) => {
+                      _customerSubdivision = val;
+                      setCustomerSubdivision(val);
+                    }
+                  "
+                  :required="true"
+                />
+              </div>
+              <div class="col-4 col-xs-12 q-px-sm">
+                <q-input
+                  v-model="_customerPhoneNumber"
+                  type="text"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Телефон"
+                  mask="+7 (###) ### ## ##"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <div class="row items-stretch">
+              <div class="col-5 col-xs-12 q-px-sm row">
+                <ISelect
+                  :options="places"
+                  v-model="_departurePointName"
+                  :labelFn="(item) => item.name"
+                  label="Место отправления"
+                  @selected="(val) => (_departurePointName = val.name)"
+                  :required="true"
+                />
+              </div>
+              <div class="col-5 q-px-sm col-xs-12 q-my-xs-md">
+                <ISelect
+                  :options="places"
+                  v-model="_destinationName"
+                  :labelFn="(item) => item.name"
+                  label="Место назначения"
+                  @selected="(val) => (_destinationName = val.name)"
+                  :required="true"
+                />
+              </div>
+              <div class="col-2 q-px-sm row col-xs-12">
+                <div class="col row items-center justify-center">
+                  <Datepicker
+                    inputClassName="datepicker col"
+                    menuClassName="datepicker-menu border-md"
+                    v-model="_orderTime"
+                    timePicker
+                    selectText="Выбрать"
+                    cancelText="Отмена"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row items-center">
+              <div class="col-2 q-px-sm col-xs-12 q-mb-xs-md">
+                <q-input
+                  v-model="_passengerCount"
+                  type="number"
+                  :min="
+                    _weight != 0 && _length != 0 && _width != 0 && _height != 0
+                      ? 0
+                      : 1
+                  "
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Пассажиров"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-2 q-px-sm col-xs-6">
+                <q-input
+                  v-model="_weight"
+                  type="number"
+                  :min="_passengerCount == 0 ? 1 : 0"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Вес"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-2 q-px-sm col-xs-6">
+                <q-input
+                  v-model="_length"
+                  type="number"
+                  :min="_passengerCount == 0 ? 1 : 0"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Длина"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-2 q-px-sm col-xs-6 q-mt-xs-md">
+                <q-input
+                  v-model="_width"
+                  type="number"
+                  :min="_passengerCount == 0 ? 1 : 0"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Ширина"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-2 q-px-sm col-xs-6 q-mt-xs-md">
+                <q-input
+                  v-model="_height"
+                  type="number"
+                  :min="_passengerCount == 0 ? 1 : 0"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Высота"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') || 'Обязательное поле!',
+                  ]"
+                  autocomplete="off"
+                />
+              </div>
+              <q-select
+                v-if="$q.screen.xs"
+                v-model="_transport"
                 type="text"
                 square
                 outlined
-                dense
                 hide-bottom-space
                 hide-hint
-                label-color="grey"
-                label="Комментарий"
-                autocomplete="off"
-              />
-            </div>
-          </div>
-
-          <div class="row items-stretch">
-            <div class="col-4 q-px-sm">
-              <ISelect
-                :options="customers"
-                v-model="_customerFullname"
-                :labelFn="
-                  (item) =>
-                    `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
-                "
-                label="Ответственный"
-                @selected="
-                  (val) => {
-                    _customerFullname = val.fullname;
-                    _customerPhoneNumber = val.phoneNumber;
-                    _customerSubdivision = val.subdivision;
-                    setCustomerSubdivision(val.subdivision);
-                  }
-                "
-                :required="true"
-              />
-            </div>
-            <div class="col-4 q-px-sm">
-              <ISelect
-                :options="subdivisions"
-                v-model="_customerSubdivision"
-                :labelFn="(item) => item"
-                label="Подразделение"
-                @selected="(val) => {
-                _customerSubdivision = val; 
-                setCustomerSubdivision(val);
-                }"
-                :required="true"
-              />
-            </div>
-            <div class="col-4 q-px-sm">
-              <q-input
-                v-model="_customerPhoneNumber"
-                type="text"
-                square
-                outlined
                 dense
-                hide-bottom-space
-                hide-hint
                 label-color="grey"
-                label="Телефон"
-                mask="+7 (###) ### ## ##"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
+                label="Выберите транспорт"
+                :options="getByOnlyFreeFilter(false, true, [])"
+                :option-label="(item) => `${item.transportNumber} ${item.type}`"
+                :option-value="(item) => item.id"
+                clearable
                 autocomplete="off"
+                class="col-2 q-px-sm col-xs-12 q-mt-xs-md"
+              />
+              <div class="col-2 q-px-sm column justify-between q-mt-xs-md">
+                <q-checkbox
+                  v-model="_orderIsEmergency"
+                  label="Аварийная"
+                  dense
+                />
+              </div>
+            </div>
+            <div class="row q-pl-sm">
+              <q-checkbox
+                v-model="_allowContact"
+                label="Контактное лицо"
+                dense
+                v-if="_passengerCount && _passengerCount >= 1"
               />
             </div>
-          </div>
-
-          <div class="row items-stretch">
-            <div class="col-5 q-px-sm row">
-              <ISelect
-                :options="places"
-                v-model="_departurePointName"
-                :labelFn="(item) => item.name"
-                label="Место отправления"
-                @selected="(val) => (_departurePointName = val.name)"
-                :required="true"
-              />
-            </div>
-            <div class="col-5 q-px-sm">
-              <ISelect
-                :options="places"
-                v-model="_destinationName"
-                :labelFn="(item) => item.name"
-                label="Место назначения"
-                @selected="(val) => (_destinationName = val.name)"
-                :required="true"
-              />
-            </div>
-            <div class="col-2 q-px-sm row">
-              <div class="col row items-center justify-center">
-                <Datepicker
-                  inputClassName="datepicker col"
-                  menuClassName="datepicker-menu border-md"
-                  v-model="_orderTime"
-                  timePicker
-                  selectText="Выбрать"
-                  cancelText="Отмена"
+            <div
+              class="row items-stretch"
+              v-if="_allowContact && _passengerCount && _passengerCount >= 1"
+            >
+              <div class="col-8 q-px-sm col-xs-12">
+                <ISelect
+                  :options="contacts"
+                  v-model="_contactFullname"
+                  :labelFn="(item) => `${item.fullname} ${item.phoneNumber}`"
+                  label="Контактное лицо"
+                  @selected="
+                    (val) => {
+                      _contactFullname = val.fullname;
+                      _contactPhoneNumber = val.phoneNumber;
+                    }
+                  "
+                />
+              </div>
+              <div class="col-xs-12 q-my-xs-md col-4 q-px-sm">
+                <q-input
+                  v-model="_contactPhoneNumber"
+                  type="text"
+                  square
+                  outlined
+                  dense
+                  hide-bottom-space
+                  hide-hint
+                  label-color="grey"
+                  label="Телефон"
+                  mask="+7 (###) ### ## ##"
+                  autocomplete="off"
                 />
               </div>
             </div>
           </div>
-
-          <div class="row items-center">
-            <div class="col-2 q-px-sm">
-              <q-input
-                v-model="_passengerCount"
-                type="number"
-                :min="
-                  _weight != 0 && _length != 0 && _width != 0 && _height != 0
-                    ? 0
-                    : 1
-                "
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Пассажиров"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
-                autocomplete="off"
-              />
-            </div>
-            <div class="col-2 q-px-sm">
-              <q-input
-                v-model="_weight"
-                type="number"
-                :min="_passengerCount == 0 ? 1 : 0"
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Вес"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
-                autocomplete="off"
-              />
-            </div>
-            <div class="col-2 q-px-sm">
-              <q-input
-                v-model="_length"
-                type="number"
-                :min="_passengerCount == 0 ? 1 : 0"
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Длина"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
-                autocomplete="off"
-              />
-            </div>
-            <div class="col-2 q-px-sm">
-              <q-input
-                v-model="_width"
-                type="number"
-                :min="_passengerCount == 0 ? 1 : 0"
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Ширина"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
-                autocomplete="off"
-              />
-            </div>
-            <div class="col-2 q-px-sm">
-              <q-input
-                v-model="_height"
-                type="number"
-                :min="_passengerCount == 0 ? 1 : 0"
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Высота"
-                lazy-rules
-                :rules="[
-                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
-                ]"
-                autocomplete="off"
-              />
-            </div>
-            <div class="col-2 q-px-sm column justify-between">
-              <q-checkbox
-                v-model="_orderIsEmergency"
-                label="Аварийная"
-                dense
-              />
-            </div>
-          </div>
-          <div class="row q-pl-sm">
-            <q-checkbox
-              v-model="_allowContact"
-              label="Контактное лицо"
-              dense
-              v-if="_passengerCount && _passengerCount >= 1"
-            />
-          </div>
-          <div
-            class="row items-stretch"
-            v-if="_allowContact && _passengerCount && _passengerCount >= 1"
-          >
-            <div class="col-8 q-px-sm">
-              <ISelect
-                :options="contacts"
-                v-model="_contactFullname"
-                :labelFn="(item) => `${item.fullname} ${item.phoneNumber}`"
-                label="Контактное лицо"
-                @selected="
-                  (val) => {
-                    _contactFullname = val.fullname;
-                    _contactPhoneNumber = val.phoneNumber;
-                  }
-                "
-              />
-            </div>
-            <div class="col-4 q-px-sm">
-              <q-input
-                v-model="_contactPhoneNumber"
-                type="text"
-                square
-                outlined
-                dense
-                hide-bottom-space
-                hide-hint
-                label-color="grey"
-                label="Телефон"
-                mask="+7 (###) ### ## ##"
-                autocomplete="off"
-              />
-            </div>
-          </div>
-        </div>
-      </q-scroll-area>
-    </div>
-    <div class="row">
-      <q-btn
-        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
-        text-color="white"
-        label="Принять и применить изменения"
-        unelevated
-        class="border-sm shadow-white col q-mr-md"
-        color="primary"
-        @click="onApprove"
-      />
-      <q-btn
-        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
-        text-color="white"
-        label="Отклонить"
-        unelevated
-        class="border-sm shadow-white col col-shrink"
-        color="red"
-        @click="onDecline"
-      />
-      <q-btn
-        v-if="_creationMode"
-        text-color="white"
-        label="Создать"
-        unelevated
-        class="border-sm shadow-white col"
-        color="primary"
-        type="submit"
-      />
-      <q-btn
-        v-if="!_creationMode && getStatusById(order.statusId).code != 'REQUEST'"
-        text-color="white"
-        label="Изменить"
-        unelevated
-        class="border-sm shadow-white col q-mr-md"
-        color="primary"
-        type="submit"
-      />
-      <q-btn
-        v-if="!_creationMode && getStatusById(order.statusId).code != 'REQUEST'"
-        text-color="white"
-        label="Удалить"
-        unelevated
-        class="border-sm shadow-white col col-shrink"
-        color="red"
-        @click="onRemoveOrder"
-      />
-      <q-btn
-        text-color="white"
-        label="Отмена"
-        unelevated
-        class="border-sm shadow-white col col-shrink q-ml-md"
-        color="green"
-        @click="onCancel()"
-      />
-    </div>
-  </q-form>
+        </q-scroll-area>
+      </div>
+      <div class="row col col-shrink q-ma-md">
+        <q-btn
+          v-if="
+            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
+          "
+          text-color="white"
+          label="Принять и применить изменения"
+          unelevated
+          class="border-sm shadow-white col q-mr-md"
+          color="primary"
+          @click="onApprove"
+        />
+        <q-btn
+          v-if="
+            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
+          "
+          text-color="white"
+          label="Отклонить"
+          unelevated
+          class="border-sm shadow-white col col-shrink"
+          color="red"
+          @click="onDecline"
+        />
+        <q-btn
+          v-if="_creationMode"
+          text-color="white"
+          label="Создать"
+          unelevated
+          class="border-sm shadow-white col"
+          color="primary"
+          type="submit"
+        />
+        <q-btn
+          v-if="
+            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
+          "
+          text-color="white"
+          label="Изменить"
+          unelevated
+          class="border-sm shadow-white col q-mr-md"
+          color="primary"
+          type="submit"
+        />
+        <q-btn
+          v-if="
+            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
+          "
+          text-color="white"
+          label="Удалить"
+          unelevated
+          class="border-sm shadow-white col col-shrink"
+          color="red"
+          @click="onRemoveOrder"
+        />
+        <q-btn
+          text-color="white"
+          label="Отмена"
+          unelevated
+          class="border-sm shadow-white col col-shrink q-ml-md"
+          color="green"
+          @click="onCancel()"
+        />
+      </div>
+    </q-form>
+  </div>
 </template>
 
 <script>
@@ -346,6 +382,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { showNotifyResult } from "src/helpers/notification";
 export default {
   name: "OrderCreation",
+  props: ["height"],
   components: {
     Datepicker,
     ISelect,
@@ -361,12 +398,21 @@ export default {
     ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("status", ["getStatusById"]),
+    ...mapGetters("transport", ["getByOnlyFreeFilter", "getTransportById"]),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
       },
       set(newVal) {
         this.setOrderIsEmergency(newVal);
+      },
+    },
+    _transport: {
+      get() {
+        return this.getTransportById(this.selectedTransportId);
+      },
+      set(val) {
+        this.setSelectedTransportId(val?.id);
       },
     },
   },
@@ -384,7 +430,8 @@ export default {
       "setOrderIsEmergency",
       "clearOrder",
     ]),
-    ...mapMutations("order", ['setCustomerSubdivision']),
+    ...mapMutations("order", ["setCustomerSubdivision"]),
+    ...mapMutations("current", [, "setSelectedTransportId"]),
     onCancel() {
       this.$refs.form.reset();
     },
@@ -412,14 +459,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -462,14 +509,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -500,14 +547,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,

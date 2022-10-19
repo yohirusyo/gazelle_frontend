@@ -16,6 +16,8 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'report', component: () => import('pages/Report.vue') },
+      { path: 'transport', component: () => import('pages/Transport.vue') },
+      { path: 'driver', component: () => import('pages/Driver.vue') },
       { path: 'admin', component: () => import('pages/Admin.vue') }
     ],
     meta: {

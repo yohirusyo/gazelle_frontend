@@ -17,30 +17,27 @@
     separator="cell"
   >
     <template v-slot:body="props">
-      <q-tr
-        :props="props"
-        @click="setDriver(props.row)"
-        class="text-center"
-      >
-        <q-td
-          key="fullname"
-          :props="props"
-          class="pre"
-        >
+      <q-tr :props="props" @click="setDriver(props.row)" class="text-center">
+        <q-td key="fullname" :props="props" class="pre">
           {{ `${props.row.surname} ${props.row.name} ${props.row.middlename}` }}
         </q-td>
-        <q-td
-          key="phoneNumber"
-          :props="props"
-        >
+        <q-td key="phoneNumber" :props="props">
           {{ props.row.workingPhoneNumber }}
         </q-td>
         <q-td
           key="isOnDriverShift"
           :props="props"
-          :class="props.row.isOnDriverShift && (version != props.row.version) ? 'text-red' : ''"
+          :class="
+            props.row.isOnDriverShift && version != props.row.version
+              ? 'text-red'
+              : ''
+          "
         >
-          {{ props.row.isOnDriverShift ? `Да (Версия: ${props.row.version ?? '1.1.0 или ниже'})`: "Нет" }}
+          {{
+            props.row.isOnDriverShift
+              ? `Да (Версия: ${props.row.version ?? "1.1.0 или ниже"})`
+              : "Нет"
+          }}
         </q-td>
       </q-tr>
     </template>
@@ -48,11 +45,10 @@
 </template>
 
 <script>
-import { axios } from "src/boot/axios";
-import { mapActions, mapState, mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "DriverList",
-  props: ["col"],
+  props: ["col", "height"],
   computed: {
     ...mapState("user", ["drivers"]),
   },
@@ -60,15 +56,10 @@ export default {
     ...mapMutations("current", ["setDriver"]),
   },
   async mounted() {
-    this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-      this.col -
-      81;
-    this.version = '1.1.2'
+    this.version = "1.1.3";
   },
   data() {
     return {
-      height: 0,
       version: null,
       columns: [
         {
@@ -98,6 +89,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

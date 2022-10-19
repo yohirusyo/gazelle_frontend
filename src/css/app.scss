@@ -4,28 +4,33 @@ $radius-multiplier: 1.5;
 
 .border-xs {
   border-radius: $space-base * $radius-multiplier * 0.25;
+  overflow: hidden;
 }
 
 .border-sm {
   border-radius: $space-base * $radius-multiplier * 0.5;
+  overflow: hidden;
 }
 
 .border-md {
   border-radius: $space-base * $radius-multiplier;
+  overflow: hidden;
 }
 
 .border-bottom-md {
   border-bottom-left-radius: $space-base * $radius-multiplier;
   border-bottom-right-radius: $space-base * $radius-multiplier;
+  overflow: hidden;
 }
-
 
 .border-lg {
   border-radius: $space-base * $radius-multiplier * 1.5;
+  overflow: hidden;
 }
 
 .border-xl {
   border-radius: $space-base * $radius-multiplier * 3;
+  overflow: hidden;
 }
 
 .shadow-white {
@@ -44,7 +49,7 @@ $radius-multiplier: 1.5;
 .datepicker-menu {
   overflow: hidden !important;
   box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05) !important;
-  border-radius: $space-base * $radius-multiplier  !important;
+  border-radius: $space-base * $radius-multiplier !important;
 }
 
 .dp__selection_preview {
@@ -87,7 +92,6 @@ $radius-multiplier: 1.5;
   /* this is when the loading indicator appears */
 }
 
-
 .my-sticky-header-table thead tr th {
   position: sticky;
   z-index: 1;
@@ -100,4 +104,11 @@ $radius-multiplier: 1.5;
 .my-sticky-header-table.q-table--loading thead tr:last-child th {
   /* height of all previous header rows */
   top: 48px;
+}
+
+.q-panel.scroll {
+  flex: 10000 1 0% !important;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
 }

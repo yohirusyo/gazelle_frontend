@@ -1,82 +1,36 @@
 <template>
-  <div v-if="currentUser?.role == 'WATCHER'">
-    <TransportList :col="col" />
-  </div>
-  <div class="col column" v-else>
-    <div class="row justify-between items-center">
-      <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey row justify-between fit"
-        active-color="primary"
-        indicator-color="transparent"
-        narrow-indicator
-      >
-        <div class="row col justify-start">
-          <q-tab
-            name="main"
-            label="Транспорт"
-            no-caps
-            :ripple="false"
-          />
-          <q-tab
-            name="create"
-            :label="!transport ? 'Создание' : 'Редактирование'"
-            no-caps
-            :ripple="false"
-          />
-        </div>
-        <div class="row q-gutter-x-md">
-          <q-checkbox
-            v-model="_onlyWithDrivers"
-            label="Только с водителем"
-            dense
-          />
-          <q-checkbox
-            v-model="_onlyFree"
-            label="Только свободные"
-            dense
-          />
-        </div>
-      </q-tabs>
-    </div>
-    <q-tab-panels
-      v-model="tab"
-      animated
-      class="col"
-      keep-alive
-    >
-      <q-tab-panel
-        name="main"
-        class="col column"
-      >
-        <TransportList :col="col" />
-      </q-tab-panel>
-
-      <q-tab-panel
-        name="create"
-        class="col column"
-      >
-        <TransportCreation @done="onDone" />
-      </q-tab-panel>
-    </q-tab-panels>
-  </div>
+  <MenuItem :col="col" label="Транспорт" v-model="transport">
+    <template #main="{ height }">
+      <TransportList :col="col" v-if="!$q.screen.xs" :height="height" />
+      <TransportListMobile :col="col" v-else :height="height" />
+    </template>
+    <template #create="{ height, onDone }">
+      <TransportCreation :height="height" @done="onDone" />
+    </template>
+    <template #menu="{}">
+      <q-checkbox v-model="_onlyWithDrivers" label="Только с водителем" dense />
+      <q-checkbox v-model="_onlyFree" label="Только свободные" dense />
+    </template>
+  </MenuItem>
 </template>
 
 <script>
 import TransportList from "./TransportList.vue";
+import TransportListMobile from "./TransportListMobile.vue";
 import TransportCreation from "./TransportCreation.vue";
+import MenuItem from "src/components/base/MenuItem.vue";
 import { mapMutations, mapState } from "vuex";
 export default {
   name: "Transport",
   components: {
     TransportList,
     TransportCreation,
+    MenuItem,
+    TransportListMobile,
   },
   props: ["col"],
   computed: {
     ...mapState("current", ["transport", "onlyFree", "onlyWithDrivers"]),
-    ...mapState("current", ["currentUser"]),
     _onlyFree: {
       get() {
         return this.onlyFree;
@@ -96,25 +50,8 @@ export default {
   },
   methods: {
     ...mapMutations("current", ["setOnlyFree", "setOnlyWithDrivers"]),
-    onDone() {
-      this.tab = "main";
-    },
-  },
-  data() {
-    return {
-      tab: "main",
-    };
-  },
-  watch: {
-    transport(newTransport) {
-      if (!!newTransport) {
-        this.tab = "create";
-      }
-    },
   },
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

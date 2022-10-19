@@ -22,10 +22,7 @@
         :class="_hoveredOrder?.id == props.row.id ? 'bg-light-green-2' : ''"
         @click="setOrder(props.row)"
       >
-        <q-td
-          key="time"
-          :props="props"
-        >
+        <q-td key="time" :props="props">
           <div class="col-2 text-center column items-center">
             <span>
               {{ "№ " + props.row.id }}
@@ -40,48 +37,33 @@
           <q-tooltip>
             <span>Наименование груза: {{ props.row.name }}</span>
             <br v-if="props.row.description && props.row.description != ''" />
-            <span v-if="props.row.description && props.row.description != ''">Описание: {{ props.row.description
-            }}</span>
+            <span v-if="props.row.description && props.row.description != ''"
+              >Описание: {{ props.row.description }}</span
+            >
           </q-tooltip>
         </q-td>
-        <q-td
-          key="customer"
-          :props="props"
-          class="pre"
-        >
+        <q-td key="customer" :props="props" class="pre">
           {{ formatCustomer(getCustomerById(props.row.customerId)) }}
         </q-td>
 
-        <q-td
-          key="departurePoint"
-          :props="props"
-        >
+        <q-td key="departurePoint" :props="props">
           {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
         </q-td>
-        <q-td
-          key="destination"
-          :props="props"
-        >
+        <q-td key="destination" :props="props">
           {{ formatPlace(getPlaceById(props.row.destinationId)) }}
         </q-td>
 
-        <q-td
-          key="transportId"
-          :props="props"
-        >
+        <q-td key="transportId" :props="props">
           <div class="row justify-center" v-if="props.row.transportId">
-            <AutoNumber :number="
-              formatTransportNumber(getTransportById(props.row.transportId))
-            " />
+            <AutoNumber
+              :number="
+                formatTransportNumber(getTransportById(props.row.transportId))
+              "
+            />
           </div>
-          <div v-else>
-            Транспорт не выбран!
-          </div>
+          <div v-else>Транспорт не выбран!</div>
         </q-td>
-        <q-td
-          key="status"
-          :props="props"
-        >
+        <q-td key="status" :props="props">
           <OrderStatus :orderId="props.row.id" />
         </q-td>
       </q-tr>
@@ -102,7 +84,7 @@ import {
 import AutoNumber from "../base/AutoNumber.vue";
 export default {
   name: "OrderList",
-  props: ["col"],
+  props: ["col", "height"],
   components: {
     AutoNumber,
     OrderStatus,
@@ -137,7 +119,7 @@ export default {
   },
   data() {
     return {
-      height: 0,
+
       _hoveredOrder: null,
       columns: [
         {
@@ -194,11 +176,6 @@ export default {
     formatPlace,
     formatTransportNumber,
   },
-  async mounted() {
-    this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-      this.col -
-      (this.currentUser?.role == 'WATCHER' ? 41 :81);
-  },
+
 };
 </script>

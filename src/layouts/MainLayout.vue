@@ -1,87 +1,116 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="lHh lpR fFf">
     <q-header
       bordered
       class="bg-secondary text-white q-mx-xs border-bottom-md q-px-md"
     >
       <q-toolbar class="row justify-between">
-        <div class="text-h5">
+        <div :class="$q.screen.xs ? '' : 'text-h5'">
           Автотранспортное Управление
           <!-- {{ "< blank >" }} -->
           <q-icon name="las la-truck" />
         </div>
         <div class="row items-center">
-          <q-separator
-            spaced
-            inset
-            vertical
-            dark
-            v-if="currentUser?.role == 'ADMIN'"
-          />
           <q-btn
-            text-color="white"
-            label="Панель администратора"
-            unelevated
-            class="border-sm shadow-white col col-shrink"
-            to="/admin"
             flat
-            no-caps
-            v-if="currentUser?.role == 'ADMIN'"
-          />
-          <q-separator
-            spaced
-            inset
-            vertical
-            dark
-          />
-          <q-btn
-            text-color="white"
-            :label="`Панель ${currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'}`"
-            unelevated
-            class="border-sm shadow-white col col-shrink"
-            to="/"
-            flat
-            no-caps
-          />
-          <q-separator
-            spaced
-            inset
-            vertical
-            dark
-            v-if="currentUser?.role != 'WATCHER'"
-          />
-          <q-btn
-            text-color="white"
-            label="Просмотреть отчет"
-            unelevated
-            class="border-sm shadow-white col col-shrink"
-            to="/report"
-            flat
-            no-caps
-            v-if="currentUser?.role != 'WATCHER'"
-          />
-          <q-separator
-            spaced
-            inset
-            vertical
-            dark
-          />
-          <div class="q-mx-md">
-            {{ currentUser?.surname }}
-            {{ currentUser?.name }}
-            {{ currentUser?.middlename }}
-          </div>
-          <q-btn
-            text-color="white"
-            icon-right="las la-sign-out-alt"
-            unelevated
-            class="border-sm shadow-white col col-shrink"
-            @click="logout"
-            flat
+            @click="drawer = !drawer"
+            round
+            dense
+            icon="menu"
           />
         </div>
       </q-toolbar>
     </q-header>
+    <q-drawer
+      v-model="drawer"
+      :width="300"
+      :breakpoint="500"
+      side="right"
+      overlay
+      behavior="mobile"
+      bordered
+      class="bg-grey-3 column items-stretch"
+    >
+      <div class="q-mx-md q-mt-sm text-center">
+        {{ currentUser?.surname }}
+        {{ currentUser?.name }}
+        {{ currentUser?.middlename }}
+        <div style="font-size: 0.8rem;" class="text-grey">
+          {{getRole(currentUser?.role)}}
+        </div>
+      </div>
+
+      <q-separator
+        spaced
+        inset
+      />
+      <q-btn
+        text-color="black"
+        label="Панель администратора"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        to="/admin"
+        flat
+        no-caps
+        v-if="currentUser?.role == 'ADMIN' && !$q.screen.xs"
+      />
+
+      <q-btn
+        text-color="black"
+        :label="`Панель ${
+          currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'
+        }`"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        to="/"
+        flat
+        no-caps
+      />
+
+      <q-btn
+        text-color="black"
+        label="Транспорт"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        to="/transport"
+        flat
+        no-caps
+        v-if="$q.screen.xs"
+      />
+
+      <q-btn
+        text-color="black"
+        label="Водители"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        to="/driver"
+        flat
+        no-caps
+        v-if="currentUser?.role != 'WATCHER'"
+      />
+
+      <q-btn
+        text-color="black"
+        label="Просмотреть отчет"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        to="/report"
+        flat
+        no-caps
+        v-if="currentUser?.role != 'WATCHER' && !$q.screen.xs"
+      />
+
+      <q-btn
+        text-color="black"
+        icon-right="las la-sign-out-alt"
+        unelevated
+        class="border-sm shadow-white col col-shrink q-ma-md q-pa-sm"
+        @click="logout"
+        label="Выход"
+        no-caps
+        flat
+      />
+    </q-drawer>
     <q-page-container class="bg-accent">
       <router-view />
     </q-page-container>
@@ -90,23 +119,43 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from "vuex";
-import {
-  Loading,
-} from 'quasar'
+import { Loading } from "quasar";
 export default {
   name: "MainLayout",
   components: {},
+  data() {
+    return {
+      drawer: false,
+    };
+  },
   methods: {
     ...mapActions("auth", ["logout"]),
     ...mapMutations("auth", ["setState"]),
     ...mapActions("current", ["requestCurrentUser"]),
-    ...mapActions("transport", ["subscribeTransportSockets", "requestTransports"]),
-    ...mapActions("order", ["subscribeOrderSockets", "requestOrders", "requestNames"]),
+    ...mapActions("transport", [
+      "subscribeTransportSockets",
+      "requestTransports",
+    ]),
+    ...mapActions("order", [
+      "subscribeOrderSockets",
+      "requestOrders",
+      "requestNames",
+    ]),
     ...mapActions("contact", ["subscribeContactSockets", "requestContacts"]),
     ...mapActions("customer", ["subscribeCustomerSockets", "requestCustomers"]),
     ...mapActions("place", ["subscribePlaceSockets", "requestPlaces"]),
     ...mapActions("user", ["subscribeUserSockets", "requestDrivers"]),
     ...mapActions("status", ["requestStatuses"]),
+    getRole(role) {
+      switch (role) {
+        case 'OPERATOR':
+          return 'Диспетчер'
+        case 'ADMIN':
+          return 'Администратор'
+        case 'WATCHER':
+          return 'Наблюдатель'
+      }
+    }
   },
   computed: {
     ...mapState("current", ["currentUser"]),

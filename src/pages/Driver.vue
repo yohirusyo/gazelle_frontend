@@ -1,24 +1,12 @@
 <template>
-  <q-page class="row items-stretch" v-if="!$q.screen.xs">
-    <div class="col column">
-      <div class="col-12 row q-pa-xs">
-        <BaseCard class="col bg-white q-pa-md column">
-          <Order :col="12" />
-        </BaseCard>
-      </div>
-    
-    </div>
-    <div class="col column">
-      <div class="col-12 row q-pa-xs">
-        <BaseCard class="col bg-white q-pa-md column">
-          <Transport :col="12" />
-        </BaseCard>
-      </div>
-    </div>
+  <q-page class="row items-stretch justify-center" v-if="!$q.screen.xs">
+    <BaseCard class="col-6 bg-white q-pa-md column">
+      <Driver :col="12" />
+    </BaseCard>
   </q-page>
   <q-page class="column q-pa-xs" v-else>
     <BaseCard class="col bg-white column">
-      <Order :col="12" />
+      <Driver :col="12" />
     </BaseCard>
   </q-page>
 </template>
@@ -32,7 +20,7 @@ import Place from "src/components/place/PlaceComponent.vue";
 import YaMap from "src/components/map/YaMap.vue";
 
 export default {
-  name: "PageIndex",
+  name: "DriverPage",
   components: {
     BaseCard,
     Order,

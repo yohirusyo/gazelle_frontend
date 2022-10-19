@@ -7,7 +7,7 @@
         freeStatuses.map((s) => s.id)
       )
     "
-    :columns="columns"
+    :columns="currentUser?.role == 'WATCHER' ?  watchercolumns :columns"
     row-key="number"
     wrap-cells
     virtual-scroll
@@ -39,10 +39,53 @@ export default {
   components: {
     TransportListElement,
   },
-  props: ["col"],
+  props: ["col", "height"],
   data() {
     return {
-      height: 0,
+      watchercolumns: [
+        {
+          name: "type",
+          required: true,
+          label: "Тип ТС",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "number",
+          required: true,
+          label: "Номер ТС",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "driver",
+          required: false,
+          label: "Водитель",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "place",
+          required: true,
+          label: "Место нахождения",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "status",
+          required: true,
+          label: "Статус",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "time",
+          required: false,
+          label: "В текущем статусе",
+          align: "center",
+          sortable: false,
+        },
+      ],
       columns: [
         {
           name: "select",
@@ -109,12 +152,6 @@ export default {
         return this.statuses.filter((s) => s.isBusy == false);
       },
     },
-  },
-  async mounted() {
-    this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-      this.col -
-      (this.currentUser?.role == 'WATCHER' ? 41 : 81);
   },
 };
 </script>
