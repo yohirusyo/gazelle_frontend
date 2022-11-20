@@ -51,3 +51,18 @@ export const formatTransportNumber = (t) => {
     if (!t) return '-';
     return `${t.transportNumber}`
 }
+
+export const formatRole = (role) => {
+    switch (role) {
+        case "OPERATOR":
+            return "Диспетчер";
+        case "ADMIN":
+            return "Администратор";
+        case "WATCHER":
+            return "Наблюдатель";
+        case "DRIVER":
+            return "Водитель";
+        case "CUSTOMER":
+            return "Заказчик";
+    }
+}

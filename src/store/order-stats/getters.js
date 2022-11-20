@@ -12,25 +12,20 @@ export const driversFullnames = (state) => {
 }
 
 export const getMinDate = (state) => () => {
-    const orders = state.orderStats.map(os => os.order);
-    const dates = orders.map(o => new Date(o.orderTime))
-    const minDate = Math.min(...dates);
-    return moment(minDate).format('YYYY/MM/DD');
+    return moment(state.min).format('YYYY/MM/DD');
 }
 
 export const getMaxDate = (state) => () => {
-    const orders = state.orderStats.map(os => os.order);
-    const dates = orders.map(o => new Date(o.orderTime))
-    const minDate = Math.max(...dates);
-    return moment(minDate).format('YYYY/MM/DD');
+
+    return moment(state.max).format('YYYY/MM/DD');
 }
 
-export const getFilteredStats = (state) => (fullname, subdivision, date) => {
+export const getFilteredStats = (state) => (fullname, subdivision) => {
     return state.orderStats.filter(os => {
         if (
             ((!fullname || fullname == '') || (fullname && os.driverFullname.toLowerCase().includes(fullname.toLowerCase()))) &&
-            ((!subdivision || subdivision == '') || (subdivision && os.order.customer.subdivision.toLowerCase().includes(subdivision.toLowerCase()))) &&
-            ((!date || date == '') || (date && moment(os.order.orderTime).format('DD.MM.YYYY') == date))
+            ((!subdivision || subdivision == '') || (subdivision && os.order.customer.subdivision.toLowerCase().includes(subdivision.toLowerCase())))
+
         ) return true;
         return false;
     })

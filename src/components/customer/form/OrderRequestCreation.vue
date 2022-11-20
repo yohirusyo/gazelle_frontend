@@ -9,54 +9,57 @@
       <div class="col row">
         <q-scroll-area class="col">
           <div class="column col q-gutter-y-md">
-            <ISelect
-              :options="customers"
-              v-model="_customerFullname"
-              :labelFn="
-                (item) =>
-                  `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
-              "
-              label="Ответственный"
-              @selected="
-                (val) => {
-                  _customerFullname = val.fullname;
-                  _customerPhoneNumber = val.phoneNumber;
-                  _customerSubdivision = val.subdivision;
-                  setCustomerSubdivision(val.subdivision);
-                }
-              "
-              :required="true"
-            />
-            <ISelect
-              :options="subdivisions"
-              v-model="_customerSubdivision"
-              :labelFn="(item) => item"
-              label="Подразделение"
-              @selected="
-                (val) => {
-                  _customerSubdivision = val;
-                  setCustomerSubdivision(val);
-                }
-              "
-              :required="true"
-            />
-            <q-input
-              v-model="_customerPhoneNumber"
-              type="text"
-              square
-              outlined
-              dense
-              hide-bottom-space
-              hide-hint
-              label-color="grey"
-              label="Телефон"
-              mask="+7 (###) ### ## ##"
-              lazy-rules
-              :rules="[
-                (val) => (val !== null && val !== '') || 'Обязательное поле!',
-              ]"
-              autocomplete="off"
-            />
+            <div class="row items-center q-mb-md">
+              <div
+                class="col row items-center justify-center"
+                v-if="_creationMode || (!_creationMode && request.order.orderTime)"
+              >
+                <q-btn
+                  text-color="white"
+                  no-caps
+                  unelevated
+                  class="border-sm shadow-white"
+                  color="primary"
+                >
+                  <div class="column">
+                    <div>Назначить дату поездки</div>
+                    <div style="font-size: 0.6rem; line-height: 12px">
+                      {{
+                          moment(_selectedDate).lang("ru").format("D MMM, dddd")
+                      }}
+                    </div>
+                  </div>
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                  >
+                    <q-date
+                      v-model="_selectedDate"
+                      minimal
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Закрыть"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-btn>
+
+                <Datepicker
+                  inputClassName="datepicker col"
+                  menuClassName="datepicker-menu border-md"
+                  v-model="_orderTime"
+                  timePicker
+                  selectText="Выбрать"
+                  cancelText="Отмена"
+                />
+              </div>
+            </div>
             <ISelect
               :options="places"
               v-model="_departurePointName"
@@ -75,6 +78,7 @@
               @selected="(val) => (_destinationName = val.name)"
               :required="true"
             />
+
             <q-checkbox
               v-model="withPassengers"
               label="Поедут пассажиры"
@@ -444,10 +448,7 @@
                 </div>
               </div>
             </div>
-            <div
-              class="row justify-center"
-              v-if="_creationMode"
-            >
+            <div class="row justify-center">
               <q-btn
                 text-color="white"
                 label="Добавить место назначения"
@@ -469,38 +470,6 @@
               label="Комментарий"
               autocomplete="off"
             />
-            <div
-              class="row justify-center"
-              v-if="_creationMode || (!_creationMode && order.orderTime)"
-            >
-              <Datepicker
-                inputClassName="datepicker col "
-                menuClassName="datepicker-menu border-md"
-                v-model="_orderTime"
-                timePicker
-                selectText="Выбрать"
-                cancelText="Отмена"
-              />
-            </div>
-
-            <q-select
-              v-if="$q.screen.xs"
-              v-model="_transport"
-              type="text"
-              square
-              outlined
-              hide-bottom-space
-              hide-hint
-              dense
-              label-color="grey"
-              label="Выберите транспорт"
-              :options="getByOnlyFreeFilter(false, true, [])"
-              :option-label="(item) => `${item.transportNumber} ${item.type}`"
-              :option-value="(item) => item.id"
-              clearable
-              autocomplete="off"
-              class="col-2 q-px-sm col-xs-12 q-mt-xs-md"
-            />
             <q-checkbox
               v-model="_orderIsEmergency"
               label="Аварийная"
@@ -512,33 +481,8 @@
       </div>
       <div class="row col col-shrink">
         <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
-          "
           text-color="white"
-          label="Принять и применить изменения"
-          unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
-          @click="onApprove"
-          no-caps
-        />
-        <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
-          "
-          text-color="white"
-          label="Отклонить"
-          unelevated
-          class="border-sm shadow-white col col-shrink"
-          color="red"
-          @click="onDecline"
-          no-caps
-        />
-        <q-btn
-          v-if="_creationMode"
-          text-color="white"
-          label="Создать"
+          :label="_creationMode ? 'Создать' : 'Изменить'"
           unelevated
           class="border-sm shadow-white col"
           color="primary"
@@ -547,24 +491,12 @@
         />
         <q-btn
           v-if="
-            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
-          "
-          text-color="white"
-          label="Изменить"
-          unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
-          type="submit"
-          no-caps
-        />
-        <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
+            !_creationMode
           "
           text-color="white"
           label="Удалить"
           unelevated
-          class="border-sm shadow-white col col-shrink"
+          class="border-sm shadow-white col col-shrink  q-ml-md"
           color="red"
           @click="onRemoveOrder"
           no-caps
@@ -589,39 +521,29 @@ import Datepicker from "@vuepic/vue-datepicker";
 import ISelect from "components/base/ISelect.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { showNotifyResult } from "src/helpers/notification";
+import * as moment from "moment";
 export default {
-  name: "OrderCreation",
+  name: "OrderRequestCreation",
   props: ["height"],
   components: {
     Datepicker,
     ISelect,
   },
   computed: {
-    ...mapState("current", ["selectedTransportId", "orderIsEmergency"]),
+    ...mapState("current", ["orderIsEmergency", 'request']),
     ...mapState("order", ["names"]),
-    ...mapState("current", ["order"]),
     ...mapState("place", ["places"]),
     ...mapState("contact", ["contacts"]),
     ...mapGetters("contact", ["getContactById"]),
     ...mapState("customer", ["customers"]),
-    ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("place", ["getPlaceById"]),
-    ...mapGetters("status", ["getStatusById"]),
-    ...mapGetters("transport", ["getByOnlyFreeFilter", "getTransportById"]),
+    ...mapGetters('orderHistory', ['getRequestById']),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
       },
       set(newVal) {
         this.setOrderIsEmergency(newVal);
-      },
-    },
-    _transport: {
-      get() {
-        return this.getTransportById(this.selectedTransportId);
-      },
-      set(val) {
-        this.setSelectedTransportId(val?.id);
       },
     },
     withPassengers: {
@@ -747,83 +669,19 @@ export default {
     },
   },
   methods: {
-    ...mapActions("order", [
-      "updateOrder",
-      "removeOrder",
-      "addOrder",
-      "approveOrder",
-      "declineOrder",
-    ]),
-    ...mapMutations("current", [
-      "setTransport",
-      "setSelectedTransportId",
-      "setOrderIsEmergency",
-      "clearOrder",
-    ]),
-    ...mapMutations("order", ["setCustomerSubdivision"]),
-    ...mapMutations("current", ["setSelectedTransportId"]),
+    moment,
+    ...mapActions("order", ["addOrderRequest", "updateOrder",
+      "removeOrder",]),
+    ...mapMutations("current", ["setOrderIsEmergency", "clearOrder"]),
+    ...mapMutations('current', ['setRequest']),
     onCancel() {
       this.$refs.form.reset();
-    },
-    async onApprove() {
-      if (!this.selectedTransportId)
-        return showNotifyResult(false, "Выберите транспорт!");
-      if (!this._withPassengers && !this._withCargo)
-        return showNotifyResult(false, "Добавьте груз или пассажиров!");
-      const d = new Date();
-      d.setHours(this._orderTime.hours);
-      d.setMinutes(this._orderTime.minutes);
-      d.setSeconds(0);
-      d.setMilliseconds(0);
-      await this.approveOrder({
-        id: this.order.id,
-        orderTime: d,
-        departurePointName: this._departurePointName,
-        destinationName: this._destinationName,
-        isEmergency: this._orderIsEmergency,
-        passengerCount: this._withPassengers ? Number(this._passengerCount) : 0,
-        weight: this._withCargo ? Number(this._weight) : 0,
-        length: this._withCargo ? Number(this._length) : 0,
-        width: this._withCargo ? Number(this._width) : 0,
-        height: this._withCargo ? Number(this._height) : 0,
-        customerPhoneNumber: this._customerPhoneNumber,
-        customerFullname: this._customerFullname,
-        customerSubdivision: this._customerSubdivision,
-        contactPhoneNumber:
-          this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this._contactPhoneNumber
-            : null,
-        contactFullname:
-          this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
-            ? this._contactFullname
-            : null,
-        transportId: this.selectedTransportId ?? null,
-        name: this._name,
-        description: this._description,
-      });
-      this.$refs.form.reset();
-    },
-    async onDecline() {
-      const d = new Date();
-      d.setHours(this._orderTime.hours);
-      d.setMinutes(this._orderTime.minutes);
-      d.setSeconds(0);
-      d.setMilliseconds(0);
-      await this.declineOrder({
-        id: this.order.id,
-      });
-      this.$refs.form.reset();
+      this.setRequest(null);
     },
     async onAddOrder() {
-      if (!this.selectedTransportId)
-        return showNotifyResult(false, "Выберите транспорт!");
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
-      const d = new Date();
+      const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
       d.setSeconds(0);
@@ -836,9 +694,9 @@ export default {
         length: this._withCargo ? Number(this._length) : 0,
         width: this._withCargo ? Number(this._width) : 0,
         height: this._withCargo ? Number(this._height) : 0,
-        customerPhoneNumber: this._customerPhoneNumber,
-        customerFullname: this._customerFullname,
-        customerSubdivision: this._customerSubdivision,
+        // customerPhoneNumber: this._customerPhoneNumber,
+        // customerFullname: this._customerFullname,
+        // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
             this._passengerCount &&
@@ -856,14 +714,14 @@ export default {
         name: this.withCargo ? this._name : "Пассажиры",
       };
 
-      await this.addOrder({
+      await this.addOrderRequest({
         ...mainForm,
         orderTime: d,
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
       });
       if (this.combinedOrders.length != 0) {
-        await this.addOrder({
+        await this.addOrderRequest({
           ...mainForm,
           orderTime: null,
           departurePointName: this._destinationName,
@@ -900,7 +758,7 @@ export default {
             : "Пассажиры",
         });
         for (let i = 1; i < this.combinedOrders.length; i++) {
-          await this.addOrder({
+          await this.addOrderRequest({
             ...mainForm,
             orderTime: null,
             departurePointName: this.combinedOrders[i - 1].place,
@@ -943,25 +801,22 @@ export default {
     async onUpdateOrder() {
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
-      const d = new Date();
+      const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
       d.setSeconds(0);
       d.setMilliseconds(0);
       await this.updateOrder({
-        id: this.order.id,
-        orderTime: this.order.orderTime ? d : null,
-        departurePointName: this._departurePointName,
-        destinationName: this._destinationName,
+        id: this.request.orderId,
         isEmergency: this._orderIsEmergency,
         passengerCount: this._withPassengers ? Number(this._passengerCount) : 0,
         weight: this._withCargo ? Number(this._weight) : 0,
         length: this._withCargo ? Number(this._length) : 0,
         width: this._withCargo ? Number(this._width) : 0,
         height: this._withCargo ? Number(this._height) : 0,
-        customerPhoneNumber: this._customerPhoneNumber,
-        customerFullname: this._customerFullname,
-        customerSubdivision: this._customerSubdivision,
+        // customerPhoneNumber: this._customerPhoneNumber,
+        // customerFullname: this._customerFullname,
+        // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
             this._passengerCount &&
@@ -974,25 +829,32 @@ export default {
             this._passengerCount >= 1
             ? this._contactFullname
             : null,
-        transportId: this.selectedTransportId ?? null,
-        name: this._name,
+        transportId: this.selectedTransportId,
         description: this._description,
+        name: this.withCargo ? this._name : "Пассажиры",
+        orderTime: this.request.order.orderTime ? d : null,
+        departurePointName: this._departurePointName,
+        destinationName: this._destinationName,
       });
       this.$refs.form.reset();
     },
     async onSubmit() {
       this._creationMode ? await this.onAddOrder() : await this.onUpdateOrder();
+
     },
     async onRemoveOrder() {
       await this.removeOrder({ id: this.order.id });
       this.$refs.form.reset();
     },
+    async onRemoveOrder() {
+      await this.removeOrder({ id: this.request.orderId });
+      this.$refs.form.reset();
+    },
     resetForm() {
-      this.setSelectedTransportId(null);
-      const d = new Date();
+      this._selectedDate = new Date();
       this._orderTime = {
-        hours: d.getHours(),
-        minutes: d.getMinutes(),
+        hours: this._selectedDate.getHours(),
+        minutes: this._selectedDate.getMinutes(),
         seconds: 0,
       };
       this._departurePointName = null;
@@ -1009,69 +871,13 @@ export default {
       this._description = null;
       this._allowContact = false;
       this._name = null;
-      this._customerPhoneNumber = null;
-      this._customerFullname = null;
-      this._customerSubdivision = null;
       this._contactFullname = null;
       this._contactPhoneNumber = null;
-      this.setCustomerSubdivision(null);
       this.combinedOrders = [];
       this._withPassengers = false;
       this._withCargo = false;
-      this.clearOrder();
+      this.setRequest(null);
       this.$emit("done");
-    },
-    loadData() {
-      if (this.order) {
-        const d = new Date(this.order.orderTime);
-        this._orderTime = {
-          hours: d.getHours(),
-          minutes: d.getMinutes(),
-          seconds: 0,
-        };
-        this._departurePointName = this.getPlaceById(
-          this.order.departurePointId
-        ).name;
-        this._destinationName = this.getPlaceById(
-          this.order.destinationId
-        ).name;
-
-        this._orderIsEmergency = this.order.isEmergency;
-        this._passengerCount = this.order.passengerCount;
-        this._weight = this.order.weight;
-        this._length = this.order["length"];
-        this._width = this.order.width;
-        this._height = this.order.height;
-        this._name = this.order.name;
-        this._description = this.order.description;
-        const contact = this.getContactById(this.order?.contactId);
-        this._allowContact =
-          !!contact && !!this._passengerCount && this._passengerCount >= 1;
-        const customer = this.getCustomerById(this.order.customerId);
-        this._customerPhoneNumber = customer.phoneNumber;
-        this._customerFullname = customer.fullname;
-        this._customerSubdivision = customer.subdivision;
-        this._contactFullname = contact?.fullname;
-        this._contactPhoneNumber = contact?.phoneNumber;
-        this.setSelectedTransportId(this.order.transportId);
-        this._withPassengers = this.order.passengerCount >= 1 ? true : false;
-        this._withCargo =
-          this.order.width > 0 ||
-            this.order.height > 0 ||
-            this.order.weight > 0 ||
-            this.order.length > 0
-            ? true
-            : false;
-        this._creationMode = false;
-      } else {
-        const d = new Date();
-        this._orderTime = {
-          hours: d.getHours(),
-          minutes: d.getMinutes(),
-          seconds: 0,
-        };
-        this._creationMode = true;
-      }
     },
     onAddCombinedOrder() {
       this.combinedOrders.push({
@@ -1099,9 +905,71 @@ export default {
         name: this._name,
       };
     },
+    loadData() {
+      if (this.request) {
+        this._selectedDate = new Date(this.request.order.orderTime);
+        this._orderTime = {
+          hours: this._selectedDate.getHours(),
+          minutes: this._selectedDate.getMinutes(),
+          seconds: 0,
+        };
+        this._departurePointName = this.getPlaceById(
+          this.request.order.departurePointId
+        ).name;
+        this._destinationName = this.getPlaceById(
+          this.request.order.destinationId
+        ).name;
+        this._orderIsEmergency = this.request.order.isEmergency;
+        this._passengerCount = this.request.order.passengerCount;
+        this._weight = this.request.order.weight;
+        this._length = this.request.order["length"];
+        this._width = this.request.order.width;
+        this._height = this.request.order.height;
+        this._name = this.request.order.name;
+        this._description = this.request.order.description;
+        const contact = this.getContactById(this.request.order?.contactId);
+        this._allowContact =
+          !!contact && !!this._passengerCount && this._passengerCount >= 1;
+
+        this._contactFullname = contact?.fullname;
+        this._contactPhoneNumber = contact?.phoneNumber;
+        this._withPassengers = this.request.order.passengerCount >= 1 ? true : false;
+        this._withCargo =
+          this.request.order.width > 0 ||
+            this.request.order.height > 0 ||
+            this.request.order.weight > 0 ||
+            this.request.order.length > 0
+            ? true
+            : false;
+        this._creationMode = false;
+      } else {
+        this._selectedDate = new Date();
+        this._orderTime = {
+          hours: this._selectedDate.getHours(),
+          minutes: this._selectedDate.getMinutes(),
+          seconds: 0,
+        };
+        this._creationMode = true;
+      }
+    },
   },
   mounted() {
-    this.loadData();
+    this.$refs.form.reset();
+    if (this.$route.params.id) {
+      // console.warn('r')
+      const r = this.getRequestById(this.$route.params.id);
+      this.setRequest(r);
+      this.loadData();
+      this._creationMode = false;
+    }
+  },
+  watch: {
+    "request.orderId"() {
+      if (this.request) this.loadData();
+    },
+    request() {
+      this._creationMode = !this.request;
+    },
   },
   data() {
     return {
@@ -1114,27 +982,17 @@ export default {
       _filterContacts: null,
       _description: null,
       _allowContact: false,
-      _creationMode: true,
       _name: null,
-      _customerPhoneNumber: null,
-      _customerFullname: null,
-      _customerSubdivision: null,
       _departurePointName: null,
       _destinationName: null,
       _contactFullname: null,
       _contactPhoneNumber: null,
+      _selectedDate: null,
       combinedOrders: [],
       _withPassengers: false,
       _withCargo: false,
+      _creationMode: true,
     };
-  },
-  watch: {
-    "order.id"() {
-      if (this.order) this.loadData();
-    },
-    order() {
-      this._creationMode = !this.order;
-    },
   },
 };
 </script>

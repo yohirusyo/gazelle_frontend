@@ -63,6 +63,7 @@ export function clearSelectedTransportId(state) {
 }
 
 export function setCurrentUser(state, user) {
+  user.role = user.role ?? 'CUSTOMER';
   state.currentUser = user;
 }
 
@@ -85,4 +86,16 @@ export function setHoveredTransportId(state, hoveredTransportId) {
 
 export function setCustomer(state, customer) {
   state.customer = customer;
+}
+
+export function setUser(state, user) {
+  state.user = user;
+}
+
+export function clearUser(state) {
+  state.user = null;
+}
+
+export function setRequest(state, request) {
+  state.request = request;
 }

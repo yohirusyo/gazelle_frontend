@@ -13,6 +13,17 @@ export async function addOrder({ commit }, form) {
     });
 }
 
+export async function addOrderRequest({ commit }, form) {
+  return api
+    .post('/order/request', form)
+    .then(({ data }) => {
+      showNotifyResult(true, "Заказ успешно создан!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка создания заказа!");
+    });
+}
+
 export async function requestNames({ commit }) {
   return api
     .get(`order/names`)

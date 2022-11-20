@@ -5,7 +5,9 @@
     >
       <div class="col col-2">
         <download-excel
-          :data="orderStats"
+          :data="
+            getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
+          "
           :fields="fields"
           :name="`Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`"
         >
@@ -38,8 +40,37 @@
           @selected="(val) => (_selectedDriverFullname = val)"
         />
       </div>
-      <div class="col-3">
-        <q-input
+      <div class="col-3 row">
+        <q-btn
+          text-color="white"
+          :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
+          unelevated
+          class="border-sm shadow-white bg-green col"
+          flat
+          no-caps
+        >
+          <q-popup-proxy transition-show="scale" transition-hide="scale">
+            <q-date
+              v-model="_selectedDate"
+              mask="DD.MM.YYYY"
+              minimal
+              :options="optionsFn"
+              range
+            >
+              <div class="row items-center justify-end">
+                <q-btn
+                  v-close-popup
+                  label="Применить"
+                  color="primary"
+                  flat
+                  @click="requestOrderStats(_selectedDate)"
+                />
+                <q-btn v-close-popup label="Закрыть" color="primary" flat />
+              </div>
+            </q-date>
+          </q-popup-proxy>
+        </q-btn>
+        <!-- <q-input
           v-model="_selectedDate"
           fill-input
           label-color="grey"
@@ -51,42 +82,26 @@
           dense
         >
           <template v-slot:append>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date
-                  v-model="_selectedDate"
-                  mask="DD.MM.YYYY"
-                  minimal
-                  :options="optionsFn"
-                >
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Закрыть" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
+            <q-icon name="event" class="cursor-pointer"> </q-icon>
             <q-icon
               v-if="_selectedDate"
               name="cancel"
               @click.stop.prevent="_selectedDate = null"
               class="cursor-pointer"
             />
+            <q-icon
+              name="done"
+              @click.stop.prevent="
+                requestOrderStats(_selectedDate.from, _selectedDate.to)
+              "
+              class="cursor-pointer"
+            />
           </template>
-        </q-input>
+        </q-input> -->
       </div>
     </div>
     <q-table
-      :rows="
-        getFilteredStats(
-          _selectedDriverFullname,
-          _selectedSubdivision,
-          _selectedDate
-        )
-      "
+      :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)"
       flat
       dense
       table-header-class="bg-white"
@@ -130,8 +145,8 @@ export default {
           callback: this.regular,
         },
         Диспетчер: {
-          field: "operatorFullname",
-          callback: this.regular,
+          // field: "operatorFullname",
+          callback: this.operator,
         },
         Статус: {
           field: "order.isDeleted",
@@ -285,8 +300,8 @@ export default {
           required: true,
           label: "Диспетчер",
           align: "left",
-          field: (row) => row.operatorFullname,
-          format: this.regular,
+          field: (row) => row,
+          format: this.operator,
           sortable: true,
         },
         {
@@ -609,7 +624,10 @@ export default {
     ]),
   },
   methods: {
-    ...mapActions("orderStats", ["requestOrderStats"]),
+    ...mapActions("orderStats", [
+      "requestOrderStats",
+      "requestOrderStatsDates",
+    ]),
     moment,
     checkNull(val) {
       return val === null || val === undefined;
@@ -632,14 +650,33 @@ export default {
       if (this.checkNull(val)) return null;
       return val;
     },
+    operator(val) {
+      if (val.order.isRequest) return val.order.customer.subdivision;
+      return val.operatorFullname;
+    },
     optionsFn(date) {
       return date >= this.getMinDate() && date <= this.getMaxDate();
     },
   },
   async mounted() {
     Loading.show();
-    await this.requestOrderStats();
+    await this.requestOrderStatsDates();
+    this._selectedDate = {
+      from: moment().format("DD.MM.YYYY"),
+      to: moment().format("DD.MM.YYYY"),
+    };
+    await this.requestOrderStats(this._selectedDate);
     Loading.hide();
+  },
+  watch: {
+    _selectedDate() {
+      if (typeof this._selectedDate == "string") {
+        this._selectedDate = {
+          from: this._selectedDate,
+          to: this._selectedDate,
+        };
+      }
+    },
   },
 };
 </script>

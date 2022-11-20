@@ -19,7 +19,15 @@
     <template v-slot:body="props">
       <q-tr
         :props="props"
-        :class="_hoveredOrder?.id == props.row.id ? 'bg-light-green-2' : ''"
+        :class="
+          _hoveredOrder?.id == props.row.id
+            ? 'bg-light-green-2'
+            : props.row.isRequest && !props.row.isApproved
+            ? 'bg-blue-2'
+            : props.row.isRequest && props.row.isApproved
+            ? 'bg-blue-1'
+            : ''
+        "
         @click="setOrder(props.row)"
       >
         <q-td key="time" :props="props">
@@ -31,7 +39,11 @@
               class="q-ma-none"
               :class="props.row.isEmergency ? 'bg-red text-white' : ''"
             >
-              {{ timeFormat(props.row?.orderTime) }}
+              {{
+                props.row?.orderTime
+                  ? timeFormat(props.row?.orderTime)
+                  : "Маршрут"
+              }}
             </q-chip>
           </div>
           <q-tooltip>
@@ -119,7 +131,6 @@ export default {
   },
   data() {
     return {
-
       _hoveredOrder: null,
       columns: [
         {
@@ -176,6 +187,5 @@ export default {
     formatPlace,
     formatTransportNumber,
   },
-
 };
 </script>

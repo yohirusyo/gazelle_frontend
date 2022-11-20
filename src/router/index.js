@@ -29,8 +29,16 @@ export default route(function ({ store/* , ssrContext */ }) {
   Router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (store.getters["auth/isLoggedIn"]) {
-        next();
-        return;
+
+        const route = to.matched.find(record => record.meta.roles)
+        if (route.meta.roles.includes(store.state.current.currentUser?.role)) {
+          next();
+          return;
+        } else {
+
+          next('/authorization')
+          return;
+        }
       }
       next('/authorization')
     } else {

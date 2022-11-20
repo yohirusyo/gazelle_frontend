@@ -3,6 +3,5 @@ export default function () {
     username: null,
     password: null,
     token: localStorage.getItem("token") || null,
-    localUser: null,
   };
 }

@@ -12,5 +12,7 @@ export default function () {
     orderIsEmergency: false,
     hoveredTransportId: null,
     customer: null,
+    user: null,
+    request: null,
   };
 }

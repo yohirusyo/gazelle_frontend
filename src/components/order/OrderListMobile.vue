@@ -1,11 +1,18 @@
 <template>
   <div :style="`height: ${height}px`" style="background: transparent">
     <BaseCard
-      class="bg-white q-pa-sm column q-my-sm q-mx-sm"
+      class="q-pa-sm column q-my-sm q-mx-sm"
       v-for="order of orders"
       :key="order.id"
       radius="md"
       @click="setOrder(order)"
+      :class="
+        order.isRequest && !order.isApproved
+          ? 'bg-blue-2'
+          : order.isRequest && order.isApproved
+          ? 'bg-blue-1'
+          : 'bg-white'
+      "
     >
       <div class="row col-shrink items-center justify-start">
         <span class="col col-shrink q-mx-sm">
@@ -15,7 +22,7 @@
           class="q-ma-none col col-shrink"
           :class="order.isEmergency ? 'bg-red text-white' : ''"
         >
-          {{ timeFormat(order?.orderTime) }}
+          {{ order?.orderTime ? timeFormat(order?.orderTime) : "Маршрут" }}
         </q-chip>
         <div>
           <OrderStatus :orderId="order.id" />

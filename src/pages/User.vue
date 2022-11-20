@@ -3,14 +3,14 @@
     <div class="col column">
       <div class="col-12 row q-pa-xs justify-center">
         <BaseCard class="col col-8 bg-white q-pa-md column">
-          <Driver :col="12" />
+          <User :col="12" />
         </BaseCard>
       </div>
     </div>
   </q-page>
   <q-page class="column q-pa-xs" v-else>
     <BaseCard class="col bg-white column">
-      <Driver :col="12" />
+      <User :col="12" />
     </BaseCard>
   </q-page>
 </template>
@@ -21,10 +21,11 @@ import Order from "src/components/order/OrderComponent.vue";
 import Transport from "src/components/transport/TransportComponent.vue";
 import Driver from "src/components/driver/DriverComponent.vue";
 import Place from "src/components/place/PlaceComponent.vue";
+import User from "src/components/user/UserComponent.vue";
 import YaMap from "src/components/map/YaMap.vue";
 
 export default {
-  name: "DriverPage",
+  name: "UserPage",
   components: {
     BaseCard,
     Order,
@@ -32,6 +33,7 @@ export default {
     Driver,
     Place,
     YaMap,
+    User,
   },
 };
 </script>

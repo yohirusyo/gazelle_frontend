@@ -14,11 +14,55 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') },
-      { path: 'report', component: () => import('pages/Report.vue') },
-      { path: 'transport', component: () => import('pages/Transport.vue') },
-      { path: 'driver', component: () => import('pages/Driver.vue') },
-      { path: 'admin', component: () => import('pages/Admin.vue') }
+      {
+        path: '', component: () => import('pages/Index.vue'),
+        meta: {
+          roles: ['WATCHER', 'ADMIN', 'OPERATOR', 'CUSTOMER'],
+        },
+      },
+
+      {
+        path: 'history', component: () => import('pages/History.vue'),
+        meta: {
+          roles: ['CUSTOMER'],
+        },
+      },
+      {
+        path: 'report', component: () => import('pages/Report.vue'),
+        meta: {
+          roles: ['ADMIN', 'OPERATOR'],
+        },
+      },
+      {
+        path: 'transport', component: () => import('pages/Transport.vue'),
+        meta: {
+          roles: ['ADMIN', 'OPERATOR'],
+        },
+      },
+      {
+        path: 'driver', component: () => import('pages/Driver.vue'),
+        meta: {
+          roles: ['ADMIN', 'OPERATOR'],
+        },
+      },
+      {
+        path: 'user', component: () => import('pages/User.vue'),
+        meta: {
+          roles: ['ADMIN'],
+        },
+      },
+      {
+        path: 'admin', component: () => import('pages/Admin.vue'),
+        meta: {
+          roles: ['ADMIN'],
+        },
+      },
+      {
+        path: ':id', component: () => import('pages/Index.vue'),
+        meta: {
+          roles: ['CUSTOMER'],
+        },
+      },
     ],
     meta: {
       requiresAuth: true,
