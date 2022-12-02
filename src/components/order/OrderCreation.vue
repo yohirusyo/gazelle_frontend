@@ -559,6 +559,22 @@
         />
         <q-btn
           v-if="
+            order?.isRequest &&
+            !_creationMode && getStatusById(order.statusId).code == 'ORDERED'
+          "
+          text-color="white"
+          label="Запрос"
+          unelevated
+          class="border-sm shadow-white col q-mr-md"
+          color="primary"
+          @click="() => {
+            backToRequest(order.id);
+            resetForm();
+          }"
+          no-caps
+        />
+        <q-btn
+          v-if="
             !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
           "
           text-color="white"
@@ -748,6 +764,7 @@ export default {
   },
   methods: {
     ...mapActions("order", [
+      "backToRequest",
       "updateOrder",
       "removeOrder",
       "addOrder",
@@ -777,7 +794,7 @@ export default {
       d.setMilliseconds(0);
       await this.approveOrder({
         id: this.order.id,
-        orderTime: d,
+        orderTime: this.order.orderTime ? d : null,
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
@@ -1051,6 +1068,7 @@ export default {
         this._customerPhoneNumber = customer.phoneNumber;
         this._customerFullname = customer.fullname;
         this._customerSubdivision = customer.subdivision;
+        this.setCustomerSubdivision(this._customerSubdivision);
         this._contactFullname = contact?.fullname;
         this._contactPhoneNumber = contact?.phoneNumber;
         this.setSelectedTransportId(this.order.transportId);

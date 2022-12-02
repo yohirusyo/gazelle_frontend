@@ -27,3 +27,13 @@ export function logout({ commit }) {
   commit('current/setCurrentUser', null, { root: true })
   showNotifyResult(false, "Ошибка авторизации");
 }
+
+export async function resetPassword({ commit }, { id, isUser }) {
+  return api.patch(`auth/reset-password/${isUser ? 'user' : 'customer'}/${id}`)
+    .then(({ data }) => {
+      showNotifyResult(true, "Пароль успешно сброшен!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка сброса пароля!");
+    });
+}

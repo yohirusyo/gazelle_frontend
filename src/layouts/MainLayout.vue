@@ -11,7 +11,13 @@
           <q-icon name="las la-truck" />
         </div>
         <div class="row items-center">
-          <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+          <q-btn
+            flat
+            @click="drawer = !drawer"
+            round
+            dense
+            icon="menu"
+          />
         </div>
       </q-toolbar>
     </q-header>
@@ -34,12 +40,18 @@
         <span v-else>
           {{ currentUser?.fullname }}
         </span>
-        <div style="font-size: 0.8rem" class="text-grey">
+        <div
+          style="font-size: 0.8rem"
+          class="text-grey"
+        >
           {{ formatRole(currentUser?.role) }}
         </div>
       </div>
 
-      <q-separator spaced inset />
+      <q-separator
+        spaced
+        inset
+      />
 
       <q-btn
         text-color="black"
@@ -67,9 +79,8 @@
         text-color="black"
         :label="
           currentUser?.role != 'CUSTOMER'
-            ? `Панель ${
-                currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'
-              }`
+            ? `Панель ${currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'
+            }`
             : 'Заказ'
         "
         unelevated
@@ -195,13 +206,14 @@ export default {
     Loading.show();
     await this.requestCurrentUser();
     await this.requestTransports();
+    await this.requestContacts();
+    await this.requestCustomers();
     await this.requestPlaces();
     await this.requestOrders();
     await this.requestDrivers();
     await this.requestNonDrivers();
     await this.requestStatuses();
-    await this.requestContacts();
-    await this.requestCustomers();
+
     await this.requestNames();
     Loading.hide();
   },

@@ -1,17 +1,20 @@
 <template>
+
   <q-tr
     @click="setTransport(transport)"
     class="text-center"
   >
     <q-td
       key="select "
-      class="col-1 text-center" v-if="currentUser?.role != 'WATCHER'"
+      class="col-1 text-center"
+      v-if="currentUser?.role != 'WATCHER'"
     >
       <q-checkbox
         v-model="_selected"
         :disable="!_isNotDisabled"
         dense
       />
+
     </q-td>
 
     <q-td key="type">{{ transport?.type }}</q-td>
@@ -29,6 +32,7 @@
       class="pre"
     >
       {{ formatDriver(getDriverById(transport?.driverId)) }}
+
     </q-td>
     <q-td key="place">
       {{ formatPlace(getPlaceById(transport?.placeId)) }}
@@ -89,11 +93,16 @@ export default {
       }
     },
     _isNotDisabled() {
+      console.warn(this.order, this.customerSubdivision, this.transport?.lastCustomerSubdivision)
       if (this.transport?.driverId == null) return false;
+      console.warn(2)
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
+      console.warn(3)
       if (this.orderIsEmergency) return true;
+      console.warn(4)
       if (this._isFreeMoreThan15Minutes) return true;
+      console.warn(5)
       return false;
     },
 

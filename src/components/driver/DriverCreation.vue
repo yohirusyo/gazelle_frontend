@@ -120,6 +120,7 @@
           class="border-sm shadow-white col"
           color="primary"
           type="submit"
+          no-caps
         />
         <q-btn
           v-if="!_creationMode"
@@ -129,6 +130,17 @@
           class="border-sm shadow-white col q-mr-md"
           color="primary"
           type="submit"
+          no-caps
+        />
+        <q-btn
+          v-if="!_creationMode"
+          text-color="white"
+          label="Сбросить пароль"
+          unelevated
+          class="border-sm shadow-white col q-mr-md"
+          color="primary"
+          @click="resetPassword({id: driver.id, isUser: true})"
+          no-caps
         />
         <q-btn
           v-if="!_creationMode"
@@ -138,6 +150,7 @@
           class="border-sm shadow-white col col-shrink"
           color="red"
           @click="onRemoveDriver"
+          no-caps
         />
         <q-btn
           text-color="white"
@@ -146,6 +159,7 @@
           class="border-sm shadow-white col col-shrink q-ml-md"
           color="green"
           @click="onCancel()"
+          no-caps
         />
       </div>
     </q-form>
@@ -163,6 +177,7 @@ export default {
   props: ['height'],
   methods: {
     ...mapActions("user", ["updateDriver", "removeDriver", "addDriver"]),
+    ...mapActions('auth',['resetPassword']),
     ...mapMutations("current", ["clearCoords", "clearDriver"]),
     async onAddDriver() {
       await this.addDriver({

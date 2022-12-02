@@ -82,6 +82,17 @@ export async function removeOrder({ commit }, { id }) {
     });
 }
 
+export async function backToRequest({ commit }, id) {
+  return api
+    .patch(`order/back-to-request/${id}`)
+    .then((_) => {
+      showNotifyResult(true, "Заявка успешно переведена в запрос!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка перевода заявки в запрос!");
+    });
+}
+
 export async function subscribeOrderSockets({ commit }) {
   socketio.on('order_update', order => commit("update", order))
   socketio.on('order_create', order => commit("add", order))
