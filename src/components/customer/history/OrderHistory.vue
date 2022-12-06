@@ -17,9 +17,13 @@
         @click="editElement(item)"
       >
         <div class="text-bold q-mx-md">
-          {{ (currentUser.id == item.order.customerId ? 'Ваш з' : 'З') + (item.order.orderTime
-              ? `аказ №${item.order.id}, в ${moment(item.order.orderTime).format("HH:mm")}`
-              : `аказ №${item.order.id}, время заказа не назначено`)
+          {{ (currentUser.id == item.order.customerId ? 'Ваш з' : `(${getCustomerById(item.order.customerId)?.fullname})
+                    З`) + `аказ
+                    №${item.order.id}, ` +
+          
+              (item.order.orderTime
+                ? `в ${moment(item.order.orderTime).format("HH:mm")}`
+                : `время заказа не назначено`)
           }}
 
         </div>
@@ -133,7 +137,8 @@ export default {
   computed: {
     ...mapGetters("orderHistory", ["getSortedHistory"]),
     ...mapGetters("place", ["getPlaceById"]),
-    ...mapState('current', ['currentUser'])
+    ...mapState('current', ['currentUser']),
+    ...mapGetters('customer', ['getCustomerById'])
   },
   data() {
     return {
