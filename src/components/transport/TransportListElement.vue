@@ -93,16 +93,11 @@ export default {
       }
     },
     _isNotDisabled() {
-      console.warn(this.order, this.customerSubdivision, this.transport?.lastCustomerSubdivision)
       if (this.transport?.driverId == null) return false;
-      console.warn(2)
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
-      console.warn(3)
       if (this.orderIsEmergency) return true;
-      console.warn(4)
       if (this._isFreeMoreThan15Minutes) return true;
-      console.warn(5)
       return false;
     },
 
