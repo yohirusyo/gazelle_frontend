@@ -1,10 +1,9 @@
 <template>
-  <div :style="`height: ${height}px`" style="background: transparent">
-    <BaseCard
-      class="bg-white q-pa-sm column q-my-sm q-mx-sm"
+  <div :style="`height: 100%`" class="q-gutter-y-sm">
+    <div
+      class="column border-sm bg-white"
       v-for="driver of drivers"
       :key="driver.id"
-      radius="md"
       @click="setDriver(driver)"
     >
       <div class="col column">
@@ -30,7 +29,7 @@
           }}
         </div>
       </div>
-    </BaseCard>
+    </div>
   </div>
 </template>
 

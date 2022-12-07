@@ -123,3 +123,8 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+
+.q-table__middle.q-virtual-scroll.q-virtual-scroll--vertical.scroll::-webkit-scrollbar {
+  display: none !important;
+}

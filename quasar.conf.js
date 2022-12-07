@@ -59,7 +59,7 @@ module.exports = configure(function (ctx) {
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
       env: {
-        API: ctx.dev ? '95.213.216.231:3125' /* 'localhost:3125' */ : '95.213.216.231:3125'
+        API: ctx.dev ? /* '95.213.216.231:3125' */ 'localhost:3125' : '95.213.216.231:3125'
       },
       // https://quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain

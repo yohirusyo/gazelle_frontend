@@ -8,15 +8,28 @@
         </BaseCard>
       </div>
     </div>
-    <div class="col-6 column">
-      <div class="col-12 row q-pa-xs">
+    <div class="col-6 column" v-if="currentUser?.role != 'CUSTOMER'">
+      <div class="col-6 row q-pa-xs">
         <BaseCard class="col bg-white q-pa-md column">
-          <Transport v-if="currentUser?.role != 'CUSTOMER'" :col="12" />
-          <OrderHistory :col="12" v-else />
+          <Transport :col="6" />
+        </BaseCard>
+      </div>
+      <div class="col-6 row q-pa-xs">
+        <BaseCard class="col bg-white q-pa-md column">
+          <YaMap :col="6" />
         </BaseCard>
       </div>
     </div>
+    <div class="col-6 column" v-else>
+      <div class="col-12 row q-pa-xs">
+        <BaseCard class="col bg-white q-pa-md column">
+          <OrderHistory :col="12" />
+        </BaseCard>
+      </div>
+    </div>
+    
   </q-page>
+  
   <q-page class="column q-pa-xs" v-else>
     <BaseCard class="col bg-white column">
       <Order :col="12" v-if="currentUser?.role != 'CUSTOMER'" />

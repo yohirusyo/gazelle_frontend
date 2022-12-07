@@ -1,5 +1,5 @@
 <template>
-  <div :style="`height: ${height}px`" style="background: transparent">
+  <div :style="`height: 100%`" class="q-gutter-y-sm">
     <TransportListElementMobile
       v-for="transport of getByOnlyFreeFilter(
         onlyFree,

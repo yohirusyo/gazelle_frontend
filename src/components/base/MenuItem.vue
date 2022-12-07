@@ -1,71 +1,64 @@
 <template>
-  <div v-if="currentUser?.role == 'WATCHER'">
-    <slot
-      name="main"
-      :height="height"
-    />
-  </div>
-  <div
-    class="col column full-height"
-    v-else
-  >
-    <q-tabs
-      v-model="tab"
-      dense
-      class="text-grey row justify-between full-width q-pa-sm col col-shrink"
-      active-color="primary"
-      indicator-color="transparent"
-      narrow-indicator
-    >
-      <div class="row col justify-start">
+  <div class="col row full-height">
+    <div class="col col-shrink" :class="$q.screen.xs ? 'q-mr-sm' : 'q-mr-md'">
+      <q-tabs
+        v-model="tab"
+        dense
+        class="text-grey full-height"
+        :class="$q.screen.xs ? 'q-pt-sm q-pl-sm' : ''"
+        active-color="primary"
+        indicator-color="transparent"
+        narrow-indicator
+        vertical
+        ref="tabs"
+      >
         <q-tab
           name="main"
-          :label="label"
+          icon="list"
           no-caps
           :ripple="false"
           style="border-radius: 8px"
-        />
+        >
+          <q-tooltip>
+            {{ label }}
+          </q-tooltip>
+        </q-tab>
         <q-tab
           name="create"
-          :label="!modelValue ? 'Создание' : 'Редактирование'"
+          icon="edit"
           no-caps
           :ripple="false"
           style="border-radius: 8px"
-        />
-      </div>
-      <div
-        class="col row q-gutter-x-md"
-        :class="$q.screen.xs ? 'justify-start' : 'justify-end'"
-      >
-        <slot name="menu" />
-      </div>
-    </q-tabs>
+          v-if="currentUser?.role != 'WATCHER'"
+        >
+          <q-tooltip>
+            {{ modelValue ? "Редактирование" : "Создание" }}
+          </q-tooltip>
+        </q-tab>
+        <slot name="menu" v-if="currentUser?.role != 'WATCHER'" />
+      </q-tabs>
+    </div>
 
     <q-tab-panels
       v-model="tab"
       animated
-      class="col column"
+      class="col column menu-scroll-area"
+      :class="$q.screen.xs ? 'q-pa-sm ' : ''"
       keep-alive
+      :style="`height: ${height}px; ${
+        !$q.screen.xs
+          ? 'border: 2px solid rgba(173, 216, 230, 0.1);'
+          : '  background: rgba(173, 216, 230, 0.1)'
+      }`"
+      transition-prev="jump-up"
+      transition-next="jump-up"
     >
-      <q-tab-panel
-        name="main"
-        class="col column"
-      >
-        <slot
-          name="main"
-          :height="height"
-        />
+      <q-tab-panel name="main" class="col column menu-scroll-area_inner">
+        <slot name="main" :height="height" />
       </q-tab-panel>
 
-      <q-tab-panel
-        name="create"
-        class="col column"
-      >
-        <slot
-          name="create"
-          :height="height"
-          :onDone="onDone"
-        />
+      <q-tab-panel name="create" class="col column">
+        <slot name="create" :height="height" :onDone="onDone" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -86,17 +79,13 @@ export default {
     };
   },
   methods: {
-
     async onDone() {
       this.tab = "main";
     },
   },
   async mounted() {
-    this.height =
-      (document.getElementsByClassName("q-page")[0]?.clientHeight / 12) *
-      this.col -
-      (this.currentUser?.role == "WATCHER" ? 41 : 81) +
-      (this.$q.screen.xs ? 12 : -12);
+    console.warn(this.$refs.tabs);
+    this.height = this.$refs.tabs.$el.clientHeight - 2;
   },
   watch: {
     modelValue(newModelValue) {
@@ -108,6 +97,16 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.menu-scroll-area {
+  // border-radius: 8px;
+  box-sizing: border-box;
 
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.menu-scroll-area_inner {
+  box-sizing: border-box;
+}
 </style>

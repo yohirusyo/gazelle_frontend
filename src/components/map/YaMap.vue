@@ -1,48 +1,57 @@
 <template>
-  <div class="col column">
-    <div class="row justify-between items-center">
-      <div class="text-h5 text-center">Карта</div>
-    </div>
-    <q-separator spaced />
-    <div class="col column">
-      <yandex-map
+
+
+  <!-- <yandex-map
         :coords="initialCoords"
         class="col"
         :settings="settings"
         :zoom="16"
         @click="setCoordsFromMap"
-      >
-        <ymap-marker
-          :marker-id="p.id + '-place'"
-          :coords="[p.latitude, p.longitude]"
-          :icon="getPlaceIcon(p.name)"
-          v-for="(p, index) of places.filter(p => p.latitude && p.longitude)"
-          :key="index"
-          @click.prevent="setPlace(p)"
-          :options="place && p.id == place.id ? { preset: 'islands#redStretchyIcon' } : {}"
-        />
-        <ymap-marker
-          :marker-id="t.id + '-transport'"
-          :coords="[t.latitude, t.longitude]"
-          v-for="(t, index) of getByOnlyFreeFilter(false, true, freeStatuses.map((s) => s.id)).filter(p => p.latitude && p.longitude)"
-          :key="index"
-          :icon="getTransportContentLayout(t)"
-        />
-        <ymap-marker
-          marker-id="now"
-          :coords="coords"
-          v-if="coords"
-          @click="clearCoords"
-        />
-      </yandex-map>
-    </div>
-  </div>
+      > -->
+  <yandex-map
+    :coords="initialCoords"
+    class="fit"
+    :settings="settings"
+    :zoom="13"
+  >
+    <ymap-marker
+      :marker-id="p.id + '-place'"
+      :coords="[p.latitude, p.longitude]"
+      :icon="getPlaceIcon(p.name)"
+      v-for="(p, index) of places.filter((p) => p.latitude && p.longitude)"
+      :key="index"
+      @click.prevent="setPlace(p)"
+      :options="
+        place && p.id == place.id
+          ? { preset: 'islands#redStretchyIcon' }
+          : {}
+      "
+    />
+    <ymap-marker
+      :marker-id="t.id + '-transport'"
+      :coords="[t.latitude, t.longitude]"
+      v-for="(t, index) of getByOnlyFreeFilter(
+        false,
+        true,
+        freeStatuses.map((s) => s.id)
+      ).filter((p) => p.latitude && p.longitude)"
+      :key="index"
+      :icon="getTransportContentLayout(t)"
+    />
+    <ymap-marker
+      marker-id="now"
+      :coords="coords"
+      v-if="coords"
+      @click="clearCoords"
+    />
+  </yandex-map>
+
 </template>
 
 <script>
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { yandexMap, ymapMarker } from "vue-yandex-maps";
-import { formatDriverMobileFullname } from 'src/helpers/formatters'
+import { formatDriverMobileFullname } from "src/helpers/formatters";
 export default {
   name: "YaMap",
   components: {
@@ -108,16 +117,19 @@ export default {
       const _parsedNumber = this.parseNumber(t.transportNumber);
 
       return {
-        layout: 'default#imageWithContent',
+        layout: "default#imageWithContent",
         content: t.transportNumber,
-        imageHref: 'https://image.flaticon.com/icons/png/512/33/33447.png',
-        imageSize: [0, 0],
-        imageOffset: [0, 0],
-        contentOffset: [0, 10],
-        contentLayout: `<div style="width: max-content; display: flex;     flex-direction: column; align-items: start;">
-          <i style="paddind-bottom: 2px;" class="la-2x las la-truck-moving"></i>
-          <div style="margin-left: 4px;">${this.formatDriverMobileFullname(this.getDriverById(t.driverId))}</div>
-          <div style="margin: 4px;">${t.type} <span style="color: white; border-radius: 8px; padding: 2px; background: ${this.freeStatuses.map(s => s.id).includes(t.statusId) ? 'green' : 'red'}">${this.getStatusById(t.statusId)?.description}</span></div>
+        imageHref: "https://image.flaticon.com/icons/png/512/33/33447.png",
+        // imageSize: [0, 0],
+        // imageOffset: [0, 0],
+        // contentOffset: [0, 0],
+        contentLayout: `<div style="position: relative;">
+        <div style="position: absolute; top: 50%; left: 50%; width: max-content; display: flex; align-items: flex-end; transform: scale(0.5) translate(-50%, -50%);">
+          <i style="paddind-bottom: 2px; margin-right: 4px; color: ${this.freeStatuses.map((s) => s.id).includes(t.statusId)
+            ? "green"
+            : "red"
+          }" class="la-2x las la-truck-moving"></i>
+          
           <div style="    display: flex;
     flex-wrap: wrap; "><div style="background-color: black;
               border-radius: 6px;
@@ -179,9 +191,11 @@ export default {
   margin-left: 2px;" src="flag-of-russia.png" />
         </div>
       </div>
-    </div></div></div>`
-      }
-    }
+    </div></div></div>
+        
+        </div>`,
+      };
+    },
     // addMarker(e) {
     //   if (e.originalEvent) {
     //     this.$q.dialog({
@@ -197,60 +211,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.main-number {
-  background-color: black;
-  border-radius: 6px;
-  padding: 2px;
-  font-size: 1.6rem;
-  font-family: RoadNumbers2;
-  gap: 2px;
-  line-height: 12px;
-  position: relative;
-}
 
-.half-number {
-  background-color: white;
-  border-radius: 4px;
-  padding-top: 4px;
-  padding-left: 4px;
-  padding-right: 6px;
-}
-
-.half-number-left {
-  padding-left: 8px;
-  padding-right: 6px;
-  letter-spacing: 2px;
-}
-
-.rus {
-  color: black !important;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.6rem;
-}
-
-.reg {
-  font-size: 1.4rem;
-  transform: translateY(-45%);
-}
-
-.flag {
-  width: 10px;
-  object-fit: contain;
-  margin-left: 2px;
-  //   border: 1px solid black;
-}
-
-.dot {
-  position: absolute;
-  top: 0;
-}
-
-.right {
-  right: 3px;
-}
-
-.left {
-  left: 3px;
-}
 </style>
-

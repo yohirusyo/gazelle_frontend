@@ -1,10 +1,9 @@
 <template>
-  <div :style="`height: ${height}px`" style="background: transparent">
-    <BaseCard
-      class="q-pa-sm column q-my-sm q-mx-sm"
+ <div :style="`height: 100%`" class="q-gutter-y-sm">
+   <div
+      class="column border-sm"
       v-for="order of orders"
       :key="order.id"
-      radius="md"
       @click="setOrder(order)"
       :class="
         order.isRequest && !order.isApproved
@@ -68,7 +67,7 @@
           {{ formatPlace(getPlaceById(order.destinationId)) }}
         </div>
       </div>
-    </BaseCard>
+    </div>
   </div>
 </template>
 

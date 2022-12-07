@@ -6,7 +6,7 @@
     virtual-scroll
     :rows-per-page-options="[0]"
     hide-bottom
-    :style="`height: ${height}px`"
+    style="height: 100%"
     ref="scroll"
     wrap-cells
     flat

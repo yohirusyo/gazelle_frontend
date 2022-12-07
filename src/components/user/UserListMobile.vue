@@ -1,10 +1,9 @@
 <template>
-  <div :style="`height: ${height}px`" style="background: transparent">
-    <BaseCard
-      class="bg-white q-pa-sm column q-my-sm q-mx-sm"
+   <div :style="`height: 100%`" class="q-gutter-y-sm">
+    <div
+      class="column border-sm bg-white"
       v-for="user of users"
       :key="user.id"
-      radius="md"
       @click="setUser(user)"
     >
       <div class="col column">
@@ -18,7 +17,7 @@
           {{ formatRole(user.role) }}
         </div>
       </div>
-    </BaseCard>
+    </div>
   </div>
 </template>
 

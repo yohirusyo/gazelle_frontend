@@ -1,9 +1,5 @@
 <template>
-  <BaseCard
-    class="bg-white q-pa-sm row q-my-sm q-mx-sm"
-    radius="md"
-    @click="setTransport(transport)"
-  >
+  <div class="row border-sm bg-white" @click="setTransport(transport)">
     <div class="col column">
       <div class="q-ma-sm">
         <div class="row justify-between">
@@ -33,7 +29,7 @@
         {{ duration }}
       </q-chip>
     </div>
-  </BaseCard>
+  </div>
 </template>
 
 <script>

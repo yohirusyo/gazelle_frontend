@@ -8,8 +8,14 @@
       <TransportCreation :height="height" @done="onDone" />
     </template>
     <template #menu="{}">
-      <q-checkbox v-model="_onlyWithDrivers" label="Только с водителем" dense />
-      <q-checkbox v-model="_onlyFree" label="Только свободные" dense />
+      <div class="column items-center justify-center q-x-auto">
+        <q-checkbox class="col q-my-sm" v-model="_onlyWithDrivers">
+          <q-tooltip> Только с водителем </q-tooltip>
+        </q-checkbox>
+        <q-checkbox class="col" v-model="_onlyFree">
+          <q-tooltip> Только свободные </q-tooltip>
+        </q-checkbox>
+      </div>
     </template>
   </MenuItem>
 </template>
