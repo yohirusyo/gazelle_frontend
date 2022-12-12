@@ -93,6 +93,11 @@ export async function backToRequest({ commit }, id) {
     });
 }
 
+export async function swapPriority({ commit }, { firstId, secondId }) {
+  return api
+    .patch(`order/swap-priority/${firstId}/${secondId}`)
+}
+
 export async function subscribeOrderSockets({ commit }) {
   socketio.on('order_update', order => commit("update", order))
   socketio.on('order_create', order => commit("add", order))

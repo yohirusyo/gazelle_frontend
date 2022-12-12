@@ -19,7 +19,10 @@
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <q-icon name="las la-filter" size="1.5em">
+        <q-icon
+          name="las la-filter"
+          size="1.5em"
+        >
           <q-menu persistent>
             <q-list style="min-width: 100px">
               <q-item
@@ -30,9 +33,9 @@
                 @click="
                   _selectedSubdivisions.includes(s)
                     ? _selectedSubdivisions.splice(
-                        _selectedSubdivisions.indexOf(s),
-                        1
-                      )
+                      _selectedSubdivisions.indexOf(s),
+                      1
+                    )
                     : _selectedSubdivisions.push(s)
                 "
                 :key="s"
@@ -51,14 +54,17 @@
           _hoveredOrder?.id == props.row.id
             ? 'bg-light-green-2'
             : props.row.isRequest && !props.row.isApproved
-            ? 'bg-blue-2'
-            : props.row.isRequest && props.row.isApproved
-            ? 'bg-blue-1'
-            : ''
+              ? 'bg-blue-2'
+              : props.row.isRequest && props.row.isApproved
+                ? 'bg-blue-1'
+                : ''
         "
         @click="setOrder(props.row)"
       >
-        <q-td key="time" :props="props">
+        <q-td
+          key="time"
+          :props="props"
+        >
           <div class="col-2 text-center column items-center">
             <span>
               {{ "№ " + props.row.id }}
@@ -68,43 +74,96 @@
               :class="props.row.isEmergency ? 'bg-red text-white' : ''"
             >
               {{
-                props.row?.orderTime
-                  ? timeFormat(props.row?.orderTime)
-                  : "Маршрут"
+                  props.row?.orderTime
+                    ? timeFormat(props.row?.orderTime)
+                    : "Маршрут"
               }}
             </q-chip>
           </div>
           <q-tooltip>
             <span>Наименование груза: {{ props.row.name }}</span>
             <br v-if="props.row.description && props.row.description != ''" />
-            <span v-if="props.row.description && props.row.description != ''"
-              >Описание: {{ props.row.description }}</span
-            >
+            <span v-if="props.row.description && props.row.description != ''">Описание: {{ props.row.description
+            }}</span>
           </q-tooltip>
         </q-td>
-        <q-td key="customer" :props="props" class="pre">
+        <q-td
+          key="customer"
+          :props="props"
+          class="pre"
+        >
           {{ formatCustomer(getCustomerById(props.row.customerId)) }}
         </q-td>
 
-        <q-td key="departurePoint" :props="props">
+        <q-td
+          key="departurePoint"
+          :props="props"
+        >
           {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
         </q-td>
-        <q-td key="destination" :props="props">
+        <q-td
+          key="destination"
+          :props="props"
+        >
           {{ formatPlace(getPlaceById(props.row.destinationId)) }}
         </q-td>
 
-        <q-td key="transportId" :props="props">
-          <div class="row justify-center" v-if="props.row.transportId">
-            <AutoNumber
-              :number="
-                formatTransportNumber(getTransportById(props.row.transportId))
-              "
-            />
+        <q-td
+          key="transportId"
+          :props="props"
+        >
+          <div
+            class="row justify-center"
+            v-if="props.row.transportId"
+          >
+            <AutoNumber :number="
+              formatTransportNumber(getTransportById(props.row.transportId))
+            " />
           </div>
           <div v-else>Транспорт не выбран!</div>
         </q-td>
-        <q-td key="status" :props="props">
+        <q-td
+          key="status"
+          :props="props"
+        >
           <OrderStatus :orderId="props.row.id" />
+        </q-td>
+        <q-td
+          key="priority"
+          :props="props"
+        >
+        
+          <div
+            class="column items-center justify-center"
+            :class="swapped == props.row.id ? 'bg-yellow-4' : ''"
+          >
+            <q-btn
+              dense
+              flat
+              @click.prevent.stop="swapPriority({ firstId: findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row).id, secondId: props.row.id })"
+              icon="las la-chevron-up"
+              v-if="findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)"
+              @mouseover="swapped = findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)?.id"
+              @mouseleave="swapped = null"
+            >
+              <q-tooltip>
+                Поднять приоритет
+              </q-tooltip>
+            </q-btn>
+            <q-btn
+              dense
+              flat
+              @click.prevent.stop="swapPriority({ firstId: findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row).id, secondId: props.row.id })"
+              icon="las la-chevron-down"
+              v-if="findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)"
+              @mouseover="swapped = findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)?.id"
+              @mouseleave="swapped = null"
+            >
+              <q-tooltip>
+                Опустить приоритет
+              </q-tooltip>
+            </q-btn>
+          </div>
         </q-td>
       </q-tr>
     </template>
@@ -112,7 +171,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from "vuex";
+import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 import OrderStatus from "./OrderStatus.vue";
 import {
   timeFormat,
@@ -122,6 +181,7 @@ import {
   formatTransportNumber,
 } from "src/helpers/formatters";
 import AutoNumber from "../base/AutoNumber.vue";
+import order from "src/store/order";
 export default {
   name: "OrderList",
   props: ["col", "height"],
@@ -138,6 +198,7 @@ export default {
     ...mapGetters("transport", ["getTransportById"]),
     ...mapState("current", ["hoveredTransportId"]),
     ...mapState("current", ["currentUser"]),
+    ...mapGetters('status', ['getStatusById'])
   },
   mounted() {
     this._selectedSubdivisions = this.subdivisions;
@@ -172,6 +233,7 @@ export default {
     return {
       _hoveredOrder: null,
       _selectedSubdivisions: [],
+      swapped: null,
       columns: [
         {
           name: "time",
@@ -216,16 +278,40 @@ export default {
           align: "center",
           sortable: false,
         },
+        {
+          name: "priority",
+          required: false,
+          label: "",
+          align: "center",
+          sortable: false,
+        },
       ],
     };
   },
   methods: {
     ...mapMutations("current", ["setOrder"]),
+    ...mapActions('order', ['swapPriority']),
     timeFormat,
     formatContact,
     formatCustomer,
     formatPlace,
     formatTransportNumber,
+    findNextOrder(orders, order) {
+      if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(order?.statusId)?.code)) return null;
+      if (order?.isRequest && !order?.isApproved) return null;
+      return orders?.findLast(o => {
+        if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(o?.statusId)?.code) || (o?.isRequest && !o?.isApproved)) return false
+        return o?.priority <= order?.priority && o?.id != order?.id
+      })
+    },
+    findPrevOrder(orders, order) {
+      if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(order?.statusId)?.code)) return null;
+      if (order?.isRequest && !order?.isApproved) return null;
+      return orders?.find(o => {
+        if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(o?.statusId)?.code) || (o?.isRequest && !o?.isApproved)) return false
+        return o?.priority >= order?.priority && o?.id != order?.id
+      })
+    }
   },
 };
 </script>

@@ -1,14 +1,30 @@
 <template>
-  <q-layout view="lHh lpR fFf" >
-    <q-header bordered class="bg-secondary text-white">
+  <q-layout view="lHh lpR fFf">
+    <q-header
+      bordered
+      class="bg-white text-black"
+    >
       <q-toolbar class="row justify-between">
         <div :class="$q.screen.xs ? '' : 'text-h5'">
-          Автотранспортное Управление
+          <div class="row items-center">
+            <q-avatar>
+              <img src="favicon.ico">
+            </q-avatar>
+            <div class="q-pl-md">
+              Автотранспортное Управление
+            </div>
+          </div>
           <!-- {{ "< blank >" }} -->
-          <q-icon name="las la-truck" />
+          <!-- <q-icon name="las la-truck" /> -->
         </div>
         <div class="row items-center">
-          <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+          <q-btn
+            flat
+            @click="drawer = !drawer"
+            round
+            dense
+            icon="menu"
+          />
         </div>
       </q-toolbar>
     </q-header>
@@ -31,12 +47,18 @@
         <span v-else>
           {{ currentUser?.fullname }}
         </span>
-        <div style="font-size: 0.8rem" class="text-grey">
+        <div
+          style="font-size: 0.8rem"
+          class="text-grey"
+        >
           {{ formatRole(currentUser?.role) }}
         </div>
       </div>
 
-      <q-separator spaced inset />
+      <q-separator
+        spaced
+        inset
+      />
 
       <q-btn
         text-color="black"
@@ -64,9 +86,8 @@
         text-color="black"
         :label="
           currentUser?.role != 'CUSTOMER'
-            ? `Панель ${
-                currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'
-              }`
+            ? `Панель ${currentUser?.role == 'WATCHER' ? 'просмотра' : 'диспетчера'
+            }`
             : 'Заказ'
         "
         unelevated

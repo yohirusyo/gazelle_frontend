@@ -1,8 +1,17 @@
 function sort(state) {
   state.orders.sort((a, b) => {
-    return a.isRequest && !a.isApproved ? -1 : (
-      b.isRequest && !b.isApproved ? 1 : a.id - b.id
-    )
+    if (a.isRequest && !a.isApproved && b.isRequest && !b.isApproved) {
+      return a.priority - b.priority;
+    } else if (a.isRequest && a.isApproved && b.isRequest && !b.isApproved) {
+      return 1;
+    } else if (b.isRequest && b.isApproved && a.isRequest && !a.isApproved) {
+      return -1;
+    } else if (a.isRequest && !a.isApproved && !b.isRequest) {
+      return -1
+    } else if (b.isRequest && !b.isApproved && !a.isRequest) {
+      return 1;
+    }
+    return a.priority - b.priority
   }).filter(order => !order.isDone && !order.isDeleted)
 }
 
