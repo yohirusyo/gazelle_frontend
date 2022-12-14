@@ -2,7 +2,7 @@
   <q-page class="row items-stretch" v-if="!$q.screen.xs">
     Пока не готово (
   </q-page>
-  <q-page class="column q-pa-xs" v-else>
+  <q-page class="column" v-else>
     <OrderHistory :col="12" />
   </q-page>
 </template>

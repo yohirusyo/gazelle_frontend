@@ -19,7 +19,7 @@ export const formatCustomerMobileFullname = (c) => {
 
 export const formatCustomerMobileSubdivision = (c) => {
     if (!c) return '-';
-    return `( ${c.subdivision} )`;
+    return `${c.subdivision}`;
 }
 
 export const formatCustomerMobilePhoneNumber = (c) => {

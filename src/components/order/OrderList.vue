@@ -70,7 +70,7 @@
               {{ "№ " + props.row.id }}
             </span>
             <q-chip
-              class="q-ma-none"
+              class="q-mx-none q-mt-none "
               :class="props.row.isEmergency ? 'bg-red text-white' : ''"
             >
               {{
@@ -92,7 +92,11 @@
           :props="props"
           class="pre"
         >
-          {{ formatCustomer(getCustomerById(props.row.customerId)) }}
+          {{ formatCustomerMobileSubdivision(getCustomerById(props.row.customerId)) }}
+          <q-tooltip>
+            {{ formatCustomerMobileFullname(getCustomerById(props.row.customerId)) }}
+            {{ formatCustomerMobilePhoneNumber(getCustomerById(props.row.customerId)) }}
+          </q-tooltip>
         </q-td>
 
         <q-td
@@ -132,7 +136,7 @@
           key="priority"
           :props="props"
         >
-        
+
           <div
             class="column items-center justify-center"
             :class="swapped == props.row.id ? 'bg-yellow-4' : ''"
@@ -177,6 +181,9 @@ import {
   timeFormat,
   formatContact,
   formatCustomer,
+  formatCustomerMobileSubdivision,
+  formatCustomerMobileFullname,
+  formatCustomerMobilePhoneNumber,
   formatPlace,
   formatTransportNumber,
 } from "src/helpers/formatters";
@@ -296,6 +303,9 @@ export default {
     formatCustomer,
     formatPlace,
     formatTransportNumber,
+    formatCustomerMobileSubdivision,
+    formatCustomerMobileFullname,
+    formatCustomerMobilePhoneNumber,
     findNextOrder(orders, order) {
       if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(order?.statusId)?.code)) return null;
       if (order?.isRequest && !order?.isApproved) return null;

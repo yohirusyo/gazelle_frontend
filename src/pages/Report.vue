@@ -1,55 +1,57 @@
 <template>
-  <q-page style="overflow-y: hidden">
-    <div
-      class="row q-mx-lg q-mb-sm q-mt-md items-center q-gutter-x-md justify-between"
-    >
-      <div class="col col-2">
+  <q-page>
+    <div class="column fit">
+      <div
+        class="col col-shrink  justify-center items-stretch  q-pa-sm"
+        :class="!$q.screen.xs ? 'q-gutter-x-md row' : 'q-gutter-y-md column'"
+      >
         <download-excel
           :data="
             getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
           "
           :fields="fields"
           :name="`Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`"
+          class="col row"
         >
           <q-btn
             text-color="white"
             label="Экспорт в excel"
             icon="las la-file-excel"
             unelevated
-            class="border-sm shadow-white bg-green"
+            class="col bg-white text-black border-none"
             flat
             no-caps
           />
         </download-excel>
-      </div>
-      <div class="col-3">
         <ISelect
           :options="statsSubidivisions"
           v-model="_selectedSubdivision"
           :labelFn="(item) => item"
           label="Подразделение"
           @selected="(val) => (_selectedSubdivision = val)"
+          class="col  text-black border-none"
         />
-      </div>
-      <div class="col-3">
         <ISelect
           :options="driversFullnames"
           v-model="_selectedDriverFullname"
           :labelFn="(item) => item"
           label="Ф.И.О. водителя"
           @selected="(val) => (_selectedDriverFullname = val)"
+          class="col text-black border-none"
+          flat
         />
-      </div>
-      <div class="col-3 row">
         <q-btn
           text-color="white"
           :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
           unelevated
-          class="border-sm shadow-white bg-green col"
+          class="col bg-white text-black border-none"
           flat
           no-caps
         >
-          <q-popup-proxy transition-show="scale" transition-hide="scale">
+          <q-popup-proxy
+            transition-show="scale"
+            transition-hide="scale"
+          >
             <q-date
               v-model="_selectedDate"
               mask="DD.MM.YYYY"
@@ -65,57 +67,45 @@
                   flat
                   @click="requestOrderStats(_selectedDate)"
                 />
-                <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                <q-btn
+                  v-close-popup
+                  label="Закрыть"
+                  color="primary"
+                  flat
+                />
               </div>
             </q-date>
           </q-popup-proxy>
         </q-btn>
-        <!-- <q-input
-          v-model="_selectedDate"
-          fill-input
-          label-color="grey"
-          label="Дата"
-          square
-          outlined
-          hide-bottom-space
-          hide-hint
+      </div>
+      <div
+        class="col"
+        ref="table"
+      >
+        <q-table
+          :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)"
+          flat
           dense
+          table-header-class="bg-white"
+          square
+          separator="cell"
+          :columns="columns"
+          hide-bottom
+          class="my-sticky-header-table"
+          virtual-scroll
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :style="`height: ${height}px; width: ${width}px`"
+          row-key="id"
+          v-model:selected="_selectedRow"
+          selection="single"
         >
-          <template v-slot:append>
-            <q-icon name="event" class="cursor-pointer"> </q-icon>
-            <q-icon
-              v-if="_selectedDate"
-              name="cancel"
-              @click.stop.prevent="_selectedDate = null"
-              class="cursor-pointer"
-            />
-            <q-icon
-              name="done"
-              @click.stop.prevent="
-                requestOrderStats(_selectedDate.from, _selectedDate.to)
-              "
-              class="cursor-pointer"
-            />
-          </template>
-        </q-input> -->
+        </q-table>
       </div>
     </div>
-    <q-table
-      :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)"
-      flat
-      dense
-      table-header-class="bg-white"
-      square
-      separator="cell"
-      :columns="columns"
-      row-key="name"
-      hide-bottom
-      class="q-mx-lg q-my-sm my-sticky-header-table"
-      virtual-scroll
-      v-model:pagination="pagination"
-      :rows-per-page-options="[0]"
-      style="height: 85vh"
-    />
+
+
+
   </q-page>
 </template>
 
@@ -136,6 +126,9 @@ export default {
       _selectedDriverFullname: null,
       _filterSubdivision: null,
       _filterDriverFullname: null,
+      _selectedRow: [],
+      height: 0,
+      width: 0,
       pagination: {
         rowsPerPage: 0,
       },
@@ -660,6 +653,9 @@ export default {
   },
   async mounted() {
     Loading.show();
+    console.warn(this.$refs)
+    this.height = this.$refs.table.clientHeight;
+    this.width = this.$refs.table.clientWidth;
     await this.requestOrderStatsDates();
     this._selectedDate = {
       from: moment().format("DD.MM.YYYY"),
@@ -680,3 +676,28 @@ export default {
   },
 };
 </script>
+
+<style>
+thead tr:first-child th:first-child {
+  background-color: white !important;
+}
+
+th:first-child {
+  top: 0;
+  z-index: 100 !important;
+}
+
+td:first-child {
+  z-index: 99 !important;
+}
+
+th:first-child,
+td:first-child {
+  position: sticky !important;
+  left: 0;
+
+  background-color: white !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  /* border */
+}
+</style>

@@ -2,6 +2,10 @@
 
 $radius-multiplier: 1.5;
 
+.border-none {
+  border-radius: 0;
+}
+
 .border-xs {
   border-radius: $space-base * $radius-multiplier * 0.25;
   overflow: hidden;
@@ -49,7 +53,7 @@ $radius-multiplier: 1.5;
 .datepicker-menu {
   overflow: hidden !important;
   box-shadow: inset 0 8px 25px 0 rgba(0, 0, 0, 0.05) !important;
-  border-radius: $space-base * $radius-multiplier !important;
+  border-radius: $space-base * $radius-multiplier  !important;
 }
 
 .dp__selection_preview {
@@ -124,7 +128,38 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-
-.q-table__middle.q-virtual-scroll.q-virtual-scroll--vertical.scroll::-webkit-scrollbar {
-  display: none !important;
+.menu-scroll-area .q-table__middle.q-virtual-scroll.q-virtual-scroll--vertical.scroll::-webkit-scrollbar {
+  display: none;
 }
+
+.menu-scroll-area .q-table td:last-child {
+  padding-right: 0;
+}
+
+.menu-scroll-area .q-table--dense .q-table th:first-child,
+.menu-scroll-area .q-table--dense .q-table td:first-child {
+  padding-left: 0;
+}
+
+.menu-scroll-area .q-table--dense .q-table th,
+.menu-scroll-area .q-table--dense .q-table td {
+  padding: 0;
+}
+
+// .q-table__middle.q-virtual-scroll.q-virtual-scroll--vertical.scroll::-webkit-scrollbar {
+//   display: none;
+// }
+
+// .q-table td:last-child {
+//   padding-right: 0;
+// }
+
+// .q-table--dense .q-table th:first-child,
+// .q-table--dense .q-table td:first-child {
+//   padding-left: 0;
+// }
+
+// .q-table--dense .q-table th,
+// .q-table--dense .q-table td {
+//   padding: 0;
+// }

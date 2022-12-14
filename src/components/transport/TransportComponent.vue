@@ -9,10 +9,10 @@
     </template>
     <template #menu="{}">
       <div class="column items-center justify-center q-x-auto">
-        <q-checkbox class="col q-my-sm" v-model="_onlyWithDrivers">
+        <q-checkbox class="col q-my-sm" v-model="_onlyWithDrivers" size="xs">
           <q-tooltip> Только с водителем </q-tooltip>
         </q-checkbox>
-        <q-checkbox class="col" v-model="_onlyFree">
+        <q-checkbox class="col" v-model="_onlyFree" size="xs">
           <q-tooltip> Только свободные </q-tooltip>
         </q-checkbox>
       </div>

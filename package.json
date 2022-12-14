@@ -1,9 +1,9 @@
 {
-  "name": "user-service-client",
+  "name": "atu-mmk",
   "version": "0.0.1",
-  "description": "user service client",
+  "description": "Автотранспортное управление",
   "productName": "Автотранспортное Управление",
-  "author": "kolba181754 <kolba.yy@usc-service.ru>",
+  "author": "Кольба Юрий",
   "private": true,
   "scripts": {
     "test": "echo \"No test specified\" && exit 0"

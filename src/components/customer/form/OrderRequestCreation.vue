@@ -956,7 +956,6 @@ export default {
   mounted() {
     this.$refs.form.reset();
     if (this.$route.params.id) {
-      // console.warn('r')
       const r = this.getRequestById(this.$route.params.id);
       this.setRequest(r);
       this.loadData();

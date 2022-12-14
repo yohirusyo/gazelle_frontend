@@ -14,7 +14,7 @@ export const subdivisions = (state, getters, rootState) => {
 export const filteredOrders = (state, getters, rootState, rootGetters) => ({ subdivisions }) => {
     const busyStatuses = ['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'];
     return state.orders.filter(o => {
-        const sub = rootState.customer.customers.find(c => c.id == o.customerId).subdivision;
+        const sub = rootState.customer.customers.find(c => c.id == o.customerId)?.subdivision;
         if (subdivisions && !subdivisions.includes(sub)) return false;
         return true;
     }).sort((a, b) => {

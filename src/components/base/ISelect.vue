@@ -23,6 +23,7 @@
     class="fit"
     dense
     autocomplete="off"
+    :flat="flat"
   >
     <template v-slot:option="{ index, opt, itemProps, itemEvents }">
       <q-item
@@ -49,7 +50,7 @@
 <script>
 export default {
   name: "ISelect",
-  props: ["modelValue", "options", "labelFn", "label", "required"],
+  props: ["modelValue", "options", "labelFn", "label", "required", "flat"],
   data() {
     return {
       filter: "",

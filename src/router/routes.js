@@ -40,6 +40,12 @@ const routes = [
         },
       },
       {
+        path: 'map', component: () => import('pages/Map.vue'),
+        meta: {
+          roles: ['ADMIN', 'OPERATOR'],
+        },
+      },
+      {
         path: 'driver', component: () => import('pages/Driver.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],

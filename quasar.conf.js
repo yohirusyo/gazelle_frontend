@@ -40,7 +40,7 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: "hash", // available values: 'hash', 'history'
+      vueRouterMode: "history", // available values: 'hash', 'history'
 
       // transpile: false,
       // publicPath: '/atu-mmk',
@@ -54,7 +54,18 @@ module.exports = configure(function (ctx) {
       // preloadChunks: true,
       // showProgress: false,
       // gzip: true,
-      // analyze: true,
+      analyze: false,
+      gzip: true,
+      minify: true,
+      sourceMap: true,
+      uglifyOptions: {
+        compress: {
+          drop_console: true,
+          unused: true,
+          properties: true,
+          warnings: true,
+        }
+      },
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
@@ -136,7 +147,7 @@ module.exports = configure(function (ctx) {
       manifest: {
         name: `Авторанспортное Управление`,
         short_name: `АТУ`,
-        description: `gazelle`,
+        description: `Автотранспортное управление`,
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",
@@ -199,7 +210,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: "user-service-client",
+        appId: "Автотранспортное управление",
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
