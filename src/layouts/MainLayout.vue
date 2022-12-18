@@ -1,9 +1,6 @@
 <template>
   <q-layout view="lHh lpR fFf">
-    <q-header
-      bordered
-      class="bg-white text-black"
-    >
+    <q-header bordered class="bg-white text-black">
       <q-toolbar class="row justify-between full-height q-pa-none">
         <div
           class="column items-center justify-center"
@@ -20,13 +17,12 @@
             <img src="favicon.ico" />
           </q-avatar>
         </div>
-        <div
-          v-if="!$q.screen.xs"
-          class="col text-h5"
-        >
+        <div v-if="!$q.screen.xs" class="col text-h5">
           <div class="q-pl-md">Автотранспортное Управление</div>
         </div>
-        <div class="q-pr-sm text-center col col-shrink column justify-center items-end">
+        <div
+          class="q-pr-sm text-center col col-shrink column justify-center items-end"
+        >
           <span v-if="currentUser?.role != 'CUSTOMER'">
             {{ currentUser?.surname }}
             {{ currentUser?.name }}
@@ -35,10 +31,7 @@
           <span v-else>
             {{ currentUser?.fullname }}
           </span>
-          <div
-            style="font-size: 0.8rem"
-            class="text-grey"
-          >
+          <div style="font-size: 0.8rem" class="text-grey">
             {{ formatRole(currentUser?.role) }}
           </div>
         </div>
@@ -71,20 +64,16 @@
             <q-tooltip> Пользователи </q-tooltip>
           </q-btn>
 
-          <q-btn
-            icon="las la-list"
-            to="/"
-            flat
-            dense
-          >
+          <q-btn icon="las la-list" to="/" flat dense>
             <q-tooltip>
               {{
-                  currentUser?.role != "CUSTOMER"
-                    ? `Панель ${currentUser?.role == "WATCHER"
-                      ? "просмотра"
-                      : "диспетчера"
+                currentUser?.role != "CUSTOMER"
+                  ? `Панель ${
+                      currentUser?.role == "WATCHER"
+                        ? "просмотра"
+                        : "диспетчера"
                     }`
-                    : "Заказ"
+                  : "Заказ"
               }}
             </q-tooltip>
           </q-btn>
@@ -148,12 +137,7 @@
           </q-btn>
         </div>
 
-        <q-btn
-          icon="las la-sign-out-alt"
-          @click="logout"
-          dense
-          flat
-        />
+        <q-btn icon="las la-sign-out-alt" @click="logout" dense flat />
       </div>
       <router-view class="col" />
     </q-page-container>
@@ -208,17 +192,19 @@ export default {
     this.subscribeUserSockets();
   },
   async mounted() {
-    Loading.show();
-    await this.requestCurrentUser();
-    await this.requestTransports();
-    await this.requestPlaces();
-    await this.requestOrders();
-    await this.requestDrivers();
-    await this.requestNonDrivers();
-    await this.requestStatuses();
-    await this.requestContacts();
-    await this.requestCustomers();
-    await this.requestNames();
+    Loading.show({ message: "Загрузка актуальной информации" });
+    await Promise.all([
+      this.requestCurrentUser(),
+      this.requestTransports(),
+      this.requestPlaces(),
+      this.requestOrders(),
+      this.requestDrivers(),
+      this.requestNonDrivers(),
+      this.requestStatuses(),
+      this.requestContacts(),
+      this.requestCustomers(),
+      this.requestNames(),
+    ]);
     Loading.hide();
   },
 };

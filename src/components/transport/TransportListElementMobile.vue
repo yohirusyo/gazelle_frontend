@@ -1,5 +1,5 @@
 <template>
-  <div class="row border-sm bg-white" @click="setTransport(transport)">
+  <div class="row  bg-white" @click="setTransport(transport)">
     <div class="col column">
       <div class="q-ma-sm">
         <div class="row justify-between">

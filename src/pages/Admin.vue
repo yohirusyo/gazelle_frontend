@@ -1,13 +1,6 @@
 <template>
   <q-page class="row items-stretch">
     <div class="col column">
-      <div class="col-12 row q-pa-xs">
-        <BaseCard class="col bg-white q-pa-md column">
-          <YaMap :col="6" />
-        </BaseCard>
-      </div>
-    </div>
-    <div class="col column">
       <div class="col-6 row q-pa-xs">
         <BaseCard class="col bg-white q-pa-md column">
           <Customer :col="6" />

@@ -3,7 +3,7 @@ function sort(state) {
     if (a.driverId == null && b.driverId == null) return a.id - b.id;
     if (a.driverId == null) return 1;
     if (b.driverId == null) return - 1;
-    return `${a.driver.surname} ${a.driver.name} ${a.driver.middlename}`.localeCompare(`${b.driver.surname} ${b.driver.name} ${b.driver.middlename}`);
+    return `${a.driver?.surname} ${a.driver?.name} ${a.driver?.middlename}`.localeCompare(`${b.driver?.surname} ${b.driver?.name} ${b.driver?.middlename}`);
   })
 }
 

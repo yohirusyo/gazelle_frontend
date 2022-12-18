@@ -12,20 +12,22 @@
             <div class="row items-center q-mb-md">
               <div
                 class="col row items-center justify-center"
-                v-if="_creationMode || (!_creationMode && request.order.orderTime)"
+                v-if="
+                  _creationMode || (!_creationMode && request.order.orderTime)
+                "
               >
                 <q-btn
                   text-color="white"
                   no-caps
                   unelevated
-                  class="border-sm shadow-white"
+                  class="border-none bg-blue-4"
                   color="primary"
                 >
                   <div class="column">
                     <div>Назначить дату поездки</div>
                     <div style="font-size: 0.6rem; line-height: 12px">
                       {{
-                          moment(_selectedDate).lang("ru").format("D MMM, dddd")
+                        moment(_selectedDate).lang("ru").format("D MMM, dddd")
                       }}
                     </div>
                   </div>
@@ -34,10 +36,7 @@
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date
-                      v-model="_selectedDate"
-                      minimal
-                    >
+                    <q-date v-model="_selectedDate" minimal>
                       <div class="row items-center justify-end">
                         <q-btn
                           v-close-popup
@@ -112,12 +111,14 @@
               dense
             />
 
-            <div v-if="
-              withPassengers &&
-              allowContact &&
-              passengerCount &&
-              passengerCount >= 1
-            ">
+            <div
+              v-if="
+                withPassengers &&
+                allowContact &&
+                passengerCount &&
+                passengerCount >= 1
+              "
+            >
               <ISelect
                 :options="contacts"
                 v-model="contactFullname"
@@ -146,16 +147,9 @@
               />
             </div>
 
-            <q-checkbox
-              v-model="withCargo"
-              label="Груз"
-              dense
-            />
+            <q-checkbox v-model="withCargo" label="Груз" dense />
 
-            <div
-              class="column items-stretch"
-              v-if="withCargo"
-            >
+            <div class="column items-stretch" v-if="withCargo">
               <div class="row q-gutter-x-md">
                 <ISelect
                   :options="names"
@@ -283,9 +277,9 @@
                 type="number"
                 :min="
                   combinedOrder.weight != 0 &&
-                    combinedOrder.length != 0 &&
-                    combinedOrder.width != 0 &&
-                    combinedOrder.height != 0
+                  combinedOrder.length != 0 &&
+                  combinedOrder.width != 0 &&
+                  combinedOrder.height != 0
                     ? 0
                     : 1
                 "
@@ -313,12 +307,14 @@
                 dense
               />
 
-              <div v-if="
-                combinedOrder.withPassengers &&
-                combinedOrder.allowContact &&
-                combinedOrder.passengerCount &&
-                combinedOrder.passengerCount >= 1
-              ">
+              <div
+                v-if="
+                  combinedOrder.withPassengers &&
+                  combinedOrder.allowContact &&
+                  combinedOrder.passengerCount &&
+                  combinedOrder.passengerCount >= 1
+                "
+              >
                 <ISelect
                   :options="contacts"
                   v-model="combinedOrder.contactFullname"
@@ -353,10 +349,7 @@
                 dense
               />
 
-              <div
-                class="column items-stretch"
-                v-if="combinedOrder.withCargo"
-              >
+              <div class="column items-stretch" v-if="combinedOrder.withCargo">
                 <div class="row q-gutter-x-md">
                   <ISelect
                     :options="names"
@@ -453,9 +446,10 @@
                 text-color="white"
                 label="Добавить место назначения"
                 unelevated
-                class="border-sm shadow-white q-mr-md"
+                class="border-none bg-blue-4"
                 color="primary"
                 @click="onAddCombinedOrder"
+                dense
               />
             </div>
             <q-input
@@ -479,36 +473,34 @@
           </div>
         </q-scroll-area>
       </div>
-      <div class="row col col-shrink">
+      <div class="row col col-shrink q-gutter-x-md">
         <q-btn
           text-color="white"
           :label="_creationMode ? 'Создать' : 'Изменить'"
           unelevated
-          class="border-sm shadow-white col"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
           no-caps
+          dense
         />
         <q-btn
-          v-if="
-            !_creationMode
-          "
+          v-if="!_creationMode"
           text-color="white"
           label="Удалить"
           unelevated
-          class="border-sm shadow-white col col-shrink  q-ml-md"
-          color="red"
+          class="border-none bg-red col"
           @click="onRemoveOrder"
           no-caps
+          dense
         />
         <q-btn
           text-color="white"
           label="Отмена"
           unelevated
-          class="border-sm shadow-white col col-shrink q-ml-md"
-          color="green"
+          class="border-none bg-red col"
           @click="onCancel()"
           no-caps
+          dense
         />
       </div>
     </q-form>
@@ -530,14 +522,14 @@ export default {
     ISelect,
   },
   computed: {
-    ...mapState("current", ["orderIsEmergency", 'request']),
+    ...mapState("current", ["orderIsEmergency", "request"]),
     ...mapState("order", ["names"]),
     ...mapState("place", ["places"]),
     ...mapState("contact", ["contacts"]),
     ...mapGetters("contact", ["getContactById"]),
     ...mapState("customer", ["customers"]),
     ...mapGetters("place", ["getPlaceById"]),
-    ...mapGetters('orderHistory', ['getRequestById']),
+    ...mapGetters("orderHistory", ["getRequestById"]),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
@@ -670,10 +662,9 @@ export default {
   },
   methods: {
     moment,
-    ...mapActions("order", ["addOrderRequest", "updateOrder",
-      "removeOrder",]),
+    ...mapActions("order", ["addOrderRequest", "updateOrder", "removeOrder"]),
     ...mapMutations("current", ["setOrderIsEmergency", "clearOrder"]),
-    ...mapMutations('current', ['setRequest']),
+    ...mapMutations("current", ["setRequest"]),
     onCancel() {
       this.$refs.form.reset();
       this.setRequest(null);
@@ -699,14 +690,14 @@ export default {
         // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -743,14 +734,14 @@ export default {
             : 0,
           contactPhoneNumber:
             this.combinedOrders[0].allowContact &&
-              this.combinedOrders[0].passengerCount &&
-              this.combinedOrders[0].passengerCount >= 1
+            this.combinedOrders[0].passengerCount &&
+            this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactPhoneNumber
               : null,
           contactFullname:
             this.combinedOrders[0].allowContact &&
-              this.combinedOrders[0].passengerCount &&
-              this.combinedOrders[0].passengerCount >= 1
+            this.combinedOrders[0].passengerCount &&
+            this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactFullname
               : null,
           name: this.combinedOrders[0].withCargo
@@ -780,14 +771,14 @@ export default {
               : 0,
             contactPhoneNumber:
               this.combinedOrders[i].allowContact &&
-                this.combinedOrders[i].passengerCount &&
-                this.combinedOrders[i].passengerCount >= 1
+              this.combinedOrders[i].passengerCount &&
+              this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactPhoneNumber
                 : null,
             contactFullname:
               this.combinedOrders[i].allowContact &&
-                this.combinedOrders[i].passengerCount &&
-                this.combinedOrders[i].passengerCount >= 1
+              this.combinedOrders[i].passengerCount &&
+              this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactFullname
                 : null,
             name: this.combinedOrders[i].withCargo
@@ -819,14 +810,14 @@ export default {
         // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -840,7 +831,6 @@ export default {
     },
     async onSubmit() {
       this._creationMode ? await this.onAddOrder() : await this.onUpdateOrder();
-
     },
     async onRemoveOrder() {
       await this.removeOrder({ id: this.order.id });
@@ -933,12 +923,13 @@ export default {
 
         this._contactFullname = contact?.fullname;
         this._contactPhoneNumber = contact?.phoneNumber;
-        this._withPassengers = this.request.order.passengerCount >= 1 ? true : false;
+        this._withPassengers =
+          this.request.order.passengerCount >= 1 ? true : false;
         this._withCargo =
           this.request.order.width > 0 ||
-            this.request.order.height > 0 ||
-            this.request.order.weight > 0 ||
-            this.request.order.length > 0
+          this.request.order.height > 0 ||
+          this.request.order.weight > 0 ||
+          this.request.order.length > 0
             ? true
             : false;
         this._creationMode = false;

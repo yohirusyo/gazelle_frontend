@@ -108,12 +108,14 @@
               dense
             />
 
-            <div v-if="
-              withPassengers &&
-              allowContact &&
-              passengerCount &&
-              passengerCount >= 1
-            ">
+            <div
+              v-if="
+                withPassengers &&
+                allowContact &&
+                passengerCount &&
+                passengerCount >= 1
+              "
+            >
               <ISelect
                 :options="contacts"
                 v-model="contactFullname"
@@ -142,16 +144,9 @@
               />
             </div>
 
-            <q-checkbox
-              v-model="withCargo"
-              label="Груз"
-              dense
-            />
+            <q-checkbox v-model="withCargo" label="Груз" dense />
 
-            <div
-              class="column items-stretch"
-              v-if="withCargo"
-            >
+            <div class="column items-stretch" v-if="withCargo">
               <div class="row q-gutter-x-md">
                 <ISelect
                   :options="names"
@@ -279,9 +274,9 @@
                 type="number"
                 :min="
                   combinedOrder.weight != 0 &&
-                    combinedOrder.length != 0 &&
-                    combinedOrder.width != 0 &&
-                    combinedOrder.height != 0
+                  combinedOrder.length != 0 &&
+                  combinedOrder.width != 0 &&
+                  combinedOrder.height != 0
                     ? 0
                     : 1
                 "
@@ -309,12 +304,14 @@
                 dense
               />
 
-              <div v-if="
-                combinedOrder.withPassengers &&
-                combinedOrder.allowContact &&
-                combinedOrder.passengerCount &&
-                combinedOrder.passengerCount >= 1
-              ">
+              <div
+                v-if="
+                  combinedOrder.withPassengers &&
+                  combinedOrder.allowContact &&
+                  combinedOrder.passengerCount &&
+                  combinedOrder.passengerCount >= 1
+                "
+              >
                 <ISelect
                   :options="contacts"
                   v-model="combinedOrder.contactFullname"
@@ -349,10 +346,7 @@
                 dense
               />
 
-              <div
-                class="column items-stretch"
-                v-if="combinedOrder.withCargo"
-              >
+              <div class="column items-stretch" v-if="combinedOrder.withCargo">
                 <div class="row q-gutter-x-md">
                   <ISelect
                     :options="names"
@@ -444,17 +438,14 @@
                 </div>
               </div>
             </div>
-            <div
-              class="row justify-center"
-              v-if="_creationMode"
-            >
+            <div class="row justify-center" v-if="_creationMode">
               <q-btn
                 text-color="white"
                 label="Добавить место назначения"
                 unelevated
-                class="border-sm shadow-white q-mr-md"
-                color="primary"
+                class="border-none bg-blue-4 col"
                 @click="onAddCombinedOrder"
+                dense
               />
             </div>
             <q-input
@@ -499,7 +490,7 @@
               :option-value="(item) => item.id"
               clearable
               autocomplete="off"
-              class="col-2 q-px-sm col-xs-12 q-mt-xs-md"
+              class="col-2"
             />
             <q-checkbox
               v-model="_orderIsEmergency"
@@ -510,19 +501,45 @@
           </div>
         </q-scroll-area>
       </div>
-      <div class="row col col-shrink">
+      <div
+        class="row col col-shrink q-pb-md"
+        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
+      >
         <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
-          "
           text-color="white"
           label="Принять и применить изменения"
           unelevated
-          class="border-sm shadow-white col q-mr-md"
+          class="border-none bg-blue-4 col"
           color="primary"
           @click="onApprove"
           no-caps
+          dense
         />
+      </div>
+      <div
+        class="row col col-shrink q-pb-md"
+        v-if="
+          order?.isRequest &&
+          !_creationMode &&
+          getStatusById(order.statusId).code == 'ORDERED'
+        "
+      >
+        <q-btn
+          text-color="white"
+          label="Вернуть в запрос"
+          unelevated
+          class="border-none bg-blue-4 col"
+          @click="
+            () => {
+              backToRequest(order.id);
+              resetForm();
+            }
+          "
+          no-caps
+          dense
+        />
+      </div>
+      <div class="row col col-shrink q-gutter-x-md">
         <q-btn
           v-if="
             !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
@@ -530,20 +547,20 @@
           text-color="white"
           label="Отклонить"
           unelevated
-          class="border-sm shadow-white col col-shrink"
-          color="red"
+          class="border-none bg-red col"
           @click="onDecline"
           no-caps
+          dense
         />
         <q-btn
           v-if="_creationMode"
           text-color="white"
           label="Создать"
           unelevated
-          class="border-sm shadow-white col"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
           no-caps
+          dense
         />
         <q-btn
           v-if="
@@ -552,27 +569,12 @@
           text-color="white"
           label="Изменить"
           unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
           no-caps
+          dense
         />
-        <q-btn
-          v-if="
-            order?.isRequest &&
-            !_creationMode && getStatusById(order.statusId).code == 'ORDERED'
-          "
-          text-color="white"
-          label="Запрос"
-          unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
-          @click="() => {
-            backToRequest(order.id);
-            resetForm();
-          }"
-          no-caps
-        />
+
         <q-btn
           v-if="
             !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
@@ -580,19 +582,19 @@
           text-color="white"
           label="Удалить"
           unelevated
-          class="border-sm shadow-white col col-shrink"
-          color="red"
+          class="border-none bg-red col"
           @click="onRemoveOrder"
           no-caps
+          dense
         />
         <q-btn
           text-color="white"
           label="Отмена"
           unelevated
-          class="border-sm shadow-white col col-shrink q-ml-md"
-          color="green"
+          class="border-none bg-green col"
           @click="onCancel()"
           no-caps
+          dense
         />
       </div>
     </q-form>
@@ -808,14 +810,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -858,14 +860,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -902,14 +904,14 @@ export default {
             : 0,
           contactPhoneNumber:
             this.combinedOrders[0].allowContact &&
-              this.combinedOrders[0].passengerCount &&
-              this.combinedOrders[0].passengerCount >= 1
+            this.combinedOrders[0].passengerCount &&
+            this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactPhoneNumber
               : null,
           contactFullname:
             this.combinedOrders[0].allowContact &&
-              this.combinedOrders[0].passengerCount &&
-              this.combinedOrders[0].passengerCount >= 1
+            this.combinedOrders[0].passengerCount &&
+            this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactFullname
               : null,
           name: this.combinedOrders[0].withCargo
@@ -939,14 +941,14 @@ export default {
               : 0,
             contactPhoneNumber:
               this.combinedOrders[i].allowContact &&
-                this.combinedOrders[i].passengerCount &&
-                this.combinedOrders[i].passengerCount >= 1
+              this.combinedOrders[i].passengerCount &&
+              this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactPhoneNumber
                 : null,
             contactFullname:
               this.combinedOrders[i].allowContact &&
-                this.combinedOrders[i].passengerCount &&
-                this.combinedOrders[i].passengerCount >= 1
+              this.combinedOrders[i].passengerCount &&
+              this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactFullname
                 : null,
             name: this.combinedOrders[i].withCargo
@@ -981,14 +983,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-            this._passengerCount &&
-            this._passengerCount >= 1
+          this._passengerCount &&
+          this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -1075,9 +1077,9 @@ export default {
         this._withPassengers = this.order.passengerCount >= 1 ? true : false;
         this._withCargo =
           this.order.width > 0 ||
-            this.order.height > 0 ||
-            this.order.weight > 0 ||
-            this.order.length > 0
+          this.order.height > 0 ||
+          this.order.weight > 0 ||
+          this.order.length > 0
             ? true
             : false;
         this._creationMode = false;

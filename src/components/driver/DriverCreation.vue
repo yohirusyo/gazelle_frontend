@@ -111,55 +111,57 @@
           </div>
         </q-scroll-area>
       </div>
-      <div class="row">
+      <div class="row q-pb-md" v-if="!_creationMode">
+          <q-btn
+          text-color="white"
+          label="Сбросить пароль"
+          unelevated
+          class="border-none bg-blue-4 col"
+          @click="resetPassword({ id: driver.id, isUser: true })"
+          no-caps
+          dense
+        />
+      </div>
+      <div class="row q-gutter-x-md">
         <q-btn
           v-if="_creationMode"
           text-color="white"
           label="Создать"
           unelevated
-          class="border-sm shadow-white col"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
           no-caps
+          dense
         />
         <q-btn
           v-if="!_creationMode"
           text-color="white"
           label="Изменить"
           unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
           no-caps
+          dense
         />
-        <q-btn
-          v-if="!_creationMode"
-          text-color="white"
-          label="Сбросить пароль"
-          unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
-          @click="resetPassword({id: driver.id, isUser: true})"
-          no-caps
-        />
+      
         <q-btn
           v-if="!_creationMode"
           text-color="white"
           label="Удалить"
           unelevated
-          class="border-sm shadow-white col col-shrink"
-          color="red"
+          class="border-none bg-red col"
           @click="onRemoveDriver"
           no-caps
+          dense
         />
         <q-btn
           text-color="white"
           label="Отмена"
           unelevated
-          class="border-sm shadow-white col col-shrink q-ml-md"
-          color="green"
+          class="border-none bg-green col"
           @click="onCancel()"
           no-caps
+          dense
         />
       </div>
     </q-form>
@@ -174,10 +176,10 @@ export default {
   computed: {
     ...mapState("current", ["coords", "driver"]),
   },
-  props: ['height'],
+  props: ["height"],
   methods: {
     ...mapActions("user", ["updateDriver", "removeDriver", "addDriver"]),
-    ...mapActions('auth',['resetPassword']),
+    ...mapActions("auth", ["resetPassword"]),
     ...mapMutations("current", ["clearCoords", "clearDriver"]),
     async onAddDriver() {
       await this.addDriver({

@@ -81,6 +81,7 @@
       <div
         class="col"
         ref="table"
+        id="table"
       >
         <q-table
           :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)"
@@ -98,7 +99,7 @@
           :style="`height: ${height}px; width: ${width}px`"
           row-key="id"
           v-model:selected="_selectedRow"
-          selection="single"
+          selection="multiple"
         >
         </q-table>
       </div>
@@ -653,7 +654,6 @@ export default {
   },
   async mounted() {
     Loading.show();
-    console.warn(this.$refs)
     this.height = this.$refs.table.clientHeight;
     this.width = this.$refs.table.clientWidth;
     await this.requestOrderStatsDates();
@@ -678,21 +678,21 @@ export default {
 </script>
 
 <style>
-thead tr:first-child th:first-child {
+#table thead tr:first-child th:first-child {
   background-color: white !important;
 }
 
-th:first-child {
+#table th:first-child {
   top: 0;
   z-index: 100 !important;
 }
 
-td:first-child {
+#table td:first-child {
   z-index: 99 !important;
 }
 
-th:first-child,
-td:first-child {
+#table th:first-child,
+#table td:first-child {
   position: sticky !important;
   left: 0;
 

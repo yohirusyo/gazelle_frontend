@@ -150,41 +150,45 @@
           </div>
         </q-scroll-area>
       </div>
-      <div class="row">
+      <div class="row q-gutter-x-md">
         <q-btn
           v-if="_creationMode"
           text-color="white"
           label="Создать"
           unelevated
-          class="border-sm shadow-white col"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
+          dense
+          no-caps
         />
         <q-btn
           v-if="!_creationMode"
           text-color="white"
           label="Изменить"
           unelevated
-          class="border-sm shadow-white col q-mr-md"
-          color="primary"
+          class="border-none bg-blue-4 col"
           type="submit"
+          dense
+          no-caps
         />
         <q-btn
           v-if="!_creationMode"
           text-color="white"
           label="Удалить"
           unelevated
-          class="border-sm shadow-white col col-shrink"
-          color="red"
+          class="border-none bg-red col"
           @click="onRemoveUser"
+          dense
+          no-caps
         />
         <q-btn
           text-color="white"
           label="Отмена"
           unelevated
-          class="border-sm shadow-white col col-shrink q-ml-md"
-          color="green"
+          class="border-none bg-green col"
           @click="onCancel()"
+          dense
+          no-caps
         />
       </div>
     </q-form>

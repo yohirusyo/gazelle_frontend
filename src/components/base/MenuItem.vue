@@ -39,45 +39,30 @@
             {{ modelValue ? "Редактирование" : "Создание" }}
           </q-tooltip>
         </q-tab>
-        <slot
-          name="menu"
-          v-if="currentUser?.role != 'WATCHER'"
-        />
+        <slot name="menu" v-if="currentUser?.role != 'WATCHER'" />
       </q-tabs>
     </div>
 
     <q-tab-panels
       v-model="tab"
       animated
-      class="col column menu-scroll-area"
-      :class="$q.screen.xs ? 'q-pa-sm ' : ''"
+      class="col column"
+      :class="$q.screen.xs ? '' : 'menu-scroll-area '"
       keep-alive
-      :style="`height: ${height}px; ${!$q.screen.xs
-      ? 'border: 1px solid rgba(0, 0, 0, 0.12);'
-      : '  background: rgba(173, 216, 230, 0.1)'
+      :style="`height: ${height}px; ${
+        !$q.screen.xs
+          ? 'border: 1px solid rgba(0, 0, 0, 0.12);'
+          : '  background: rgba(173, 216, 230, 0.1)'
       }`"
       transition-prev="jump-up"
       transition-next="jump-up"
     >
-      <q-tab-panel
-        name="main"
-        class="col column menu-scroll-area_inner"
-      >
-        <slot
-          name="main"
-          :height="height"
-        />
+      <q-tab-panel name="main" class="col column menu-scroll-area_inner">
+        <slot name="main" :height="height" />
       </q-tab-panel>
 
-      <q-tab-panel
-        name="create"
-        class="col column"
-      >
-        <slot
-          name="create"
-          :height="height"
-          :onDone="onDone"
-        />
+      <q-tab-panel name="create" class="col column">
+        <slot name="create" :height="height" :onDone="onDone" />
       </q-tab-panel>
     </q-tab-panels>
     <div
@@ -120,10 +105,7 @@
             {{ modelValue ? "Редактирование" : "Создание" }}
           </q-tooltip>
         </q-tab>
-        <slot
-          name="menu"
-          v-if="currentUser?.role != 'WATCHER'"
-        />
+        <slot name="menu" v-if="currentUser?.role != 'WATCHER'" />
       </q-tabs>
     </div>
   </div>

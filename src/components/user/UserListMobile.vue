@@ -1,7 +1,7 @@
 <template>
    <div :style="`height: 100%`" class="q-gutter-y-sm">
     <div
-      class="column border-sm bg-white"
+      class="column  bg-white"
       v-for="user of users"
       :key="user.id"
       @click="setUser(user)"

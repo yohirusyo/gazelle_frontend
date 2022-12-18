@@ -27,7 +27,7 @@
       class="col-6 column"
       v-else
     >
-      <div class="col bg-white q-pa-md column">
+      <div class="col bg-white column">
         <OrderHistory :col="12" />
       </div>
     </div>

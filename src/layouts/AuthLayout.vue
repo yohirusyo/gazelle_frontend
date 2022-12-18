@@ -4,10 +4,13 @@
       <BaseCard
         v-bind:style="$q.screen.lt.sm ? { width: '80%' } : { width: '30%' }"
         class="bg-white q-px-lg q-pb-lg"
-        v-if="!loading"
       >
         <div class="row items-end justify-center q-py-xl">
-          <div class="text-h6 col-shrink">Добрый день{{ isCustomer ? ", заказчик!" : (isOperator ? ", диспетчер!" : "!") }}</div>
+          <div class="text-h6 col-shrink">
+            Добрый день{{
+              isCustomer ? ", заказчик!" : isOperator ? ", диспетчер!" : "!"
+            }}
+          </div>
         </div>
 
         <q-form
@@ -30,9 +33,7 @@
             lazy-rules
             name="login"
             :options="operators"
-            :option-label="
-              (item) => `${item.login}`
-            "
+            :option-label="(item) => `${item.login}`"
             v-if="isOperator"
           />
           <q-input
@@ -150,7 +151,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import BaseCard from "components/base/Card.vue";
 import { Loading } from "quasar";
 export default {
@@ -160,7 +161,6 @@ export default {
       isPwd: true,
       isCustomer: false,
       isOperator: false,
-      loading: true,
       login: null,
       password: null,
       selectedOperator: null,
@@ -171,16 +171,19 @@ export default {
   },
   async mounted() {
     Loading.show({ message: "Проверка авторизации" });
-    if (
-      localStorage.getItem("token") != null &&
-      localStorage.getItem("token") != ""
-    ) {
+    try {
       await this.requestCurrentUser();
-      return this.$router.push({ path: "/" });
+      if (
+        localStorage.getItem("token") != null &&
+        localStorage.getItem("token") != "" &&
+        this.isLoggedIn == true
+      ) {
+        return this.$router.push({ path: "/" });
+      }
+    } catch (error) {
+      await this.requestOperators();
     }
-    await this.requestOperators();
     Loading.hide();
-    this.loading = false;
   },
   methods: {
     ...mapActions("auth", ["Signin"]),
@@ -208,6 +211,7 @@ export default {
   },
   computed: {
     ...mapState("user", ["operators"]),
+    ...mapGetters("auth", ["isLoggedIn"]),
   },
 };
 </script>

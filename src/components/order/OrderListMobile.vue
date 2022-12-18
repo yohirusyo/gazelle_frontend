@@ -1,69 +1,71 @@
 <template>
- <div :style="`height: 100%`" class="q-gutter-y-sm">
-   <div
-      class="column border-sm"
+  <div :style="`height: 100%`" class="q-gutter-y-sm">
+    <div
+      class="column"
       v-for="order of orders"
       :key="order.id"
       @click="setOrder(order)"
       :class="
         order.isRequest && !order.isApproved
-          ? 'bg-blue-2'
+          ? 'bg-blue-2 '
           : order.isRequest && order.isApproved
-          ? 'bg-blue-1'
-          : 'bg-white'
+          ? 'bg-blue-1 '
+          : 'bg-white '
       "
     >
-      <div class="row col-shrink items-center justify-start">
-        <span class="col col-shrink q-mx-sm">
-          {{ "№ " + order.id }}
-        </span>
-        <q-chip
-          class="q-ma-none col col-shrink"
-          :class="order.isEmergency ? 'bg-red text-white' : ''"
-        >
+      <div class="row justify-evenly">
+        <q-chip>
+          {{ order.id }}
+        </q-chip>
+        <q-chip :class="order.isEmergency ? 'bg-red text-white' : ''">
           {{ order?.orderTime ? timeFormat(order?.orderTime) : "Маршрут" }}
         </q-chip>
-        <div>
-          <OrderStatus :orderId="order.id" />
-        </div>
       </div>
-      <div class="q-ma-sm">
-        <div class="row" v-if="order.transportId">
-          <AutoNumber
-            :number="formatTransportNumber(getTransportById(order.transportId))"
-          />
-        </div>
-        <div v-else>Транспорт не выбран!</div>
+
+      <div class="row justify-center">
+        <AutoNumber
+          v-if="order.transportId"
+          :number="formatTransportNumber(getTransportById(order.transportId))"
+        />
+        <div class="q-pa-xs" v-else>Транспорт не выбран!</div>
       </div>
-      <div class="row q-mx-sm">
-        <div class="q-mr-sm">
-          {{ order.name }}
-        </div>
-        <div v-if="order.description" class="text-grey">
-          {{ order.description }}
-        </div>
+
+      <div class="row justify-center">
+        <OrderStatus :orderId="order.id" />
       </div>
-      <div class="row q-mx-sm">
-        <div class="q-mr-sm">
+
+      <div class="column items-center">
+        <div class="row">
           {{ formatCustomerMobileFullname(getCustomerById(order.customerId)) }}
-        </div>
-        <div class="q-mr-sm">
+
           {{
             formatCustomerMobileSubdivision(getCustomerById(order.customerId))
           }}
         </div>
-        <div>
+        <div class="row text-grey items-center">
+          <q-icon name="phone" />
           {{
             formatCustomerMobilePhoneNumber(getCustomerById(order.customerId))
           }}
         </div>
       </div>
-      <div class="row q-mx-sm q-pb-sm items-center">
-        <div class="q-mr-sm">
-          {{ formatPlace(getPlaceById(order.departurePointId)) }}
+
+      <div class="column justify-center items-center">
+        <div class="row">
+          {{ order.name }}
         </div>
-        <q-icon name="las la-long-arrow-alt-right" class="q-mr-sm"></q-icon>
-        <div>
+        <div class="row text-grey">
+          {{ order.description ? order.description : "" }}
+        </div>
+      </div>
+
+      <div class="column justify-center items-center">
+        <div class="row items-center">
+          {{ formatPlace(getPlaceById(order.departurePointId)) }}
+          <q-icon name="arrow_right_alt" />
+        </div>
+        <div class="row items-center">
+          <q-icon name="arrow_right_alt" />
           {{ formatPlace(getPlaceById(order.destinationId)) }}
         </div>
       </div>
