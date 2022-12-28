@@ -58,7 +58,20 @@
             class="text-green q-mx-md"
           >
             <div class="row items-center q-gutter-x-md justify-between">
-              <span> Заказ выполняется </span>
+              <span>
+                Заказ выполняется
+                <q-btn
+                  color="black"
+                  label="Маршрут"
+                  v-if="item.order.coordinatesHistory.length != 0"
+                  dense
+                  flat
+                  no-caps
+                  unelevated
+                  class="border-none"
+                  @click="openMap(item.order, true)"
+                />
+              </span>
               <OrderStatus :orderId="item.order.id" />
             </div>
 
@@ -90,6 +103,26 @@
             class="text-grey q-mx-md"
           >
             Заказ выполнен
+            {{
+              item.order.routeLength != null && item.order.routeLength != 0
+                ? `${(item.order.routeLength / 1000).toFixed(1)}км`
+                : ""
+            }}
+            <q-btn
+              color="black"
+              label="Маршрут"
+              v-if="
+                item.order.coordinatesHistory.length != 0 &&
+                item.order.routeLength != null &&
+                item.order.routeLength != 0
+              "
+              dense
+              flat
+              no-caps
+              unelevated
+              class="border-none"
+              @click="openMap(item.order)"
+            />
             <div
               class="row text-black items-center q-gutter-x-md justify-between"
             >
@@ -129,11 +162,11 @@ import {
   formatDriverMobileFullname,
   formatDriverMobilePhoneNumber,
 } from "src/helpers/formatters";
-
+import MapOrder from "components/report/Map.vue";
 import BaseCard from "src/components/base/Card.vue";
+import { Dialog } from "quasar";
 export default {
   name: "OrderHistory",
-  props: ["col", "height"],
   components: {
     OrderStatus,
     BaseCard,
@@ -161,7 +194,15 @@ export default {
       "subscribeHistorySockets",
     ]),
     ...mapMutations("current", ["setRequest"]),
-
+    async openMap(order, notDone) {
+      Dialog.create({
+        component: MapOrder,
+        componentProps: {
+          order,
+          notDone,
+        },
+      });
+    },
     timeFormat,
     formatContact,
     formatCustomerMobileFullname,

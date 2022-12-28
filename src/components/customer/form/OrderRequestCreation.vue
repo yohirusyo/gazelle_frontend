@@ -482,6 +482,8 @@
           type="submit"
           no-caps
           dense
+          :loading="_addLoading"
+          :disable="_addLoading"
         />
         <q-btn
           v-if="!_creationMode"
@@ -672,6 +674,7 @@ export default {
     async onAddOrder() {
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
+      this._addLoading = true;
       const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
@@ -703,9 +706,10 @@ export default {
         transportId: this.selectedTransportId,
         description: this._description,
         name: this.withCargo ? this._name : "Пассажиры",
+        isParent: this.combinedOrders.length != 0,
       };
 
-      await this.addOrderRequest({
+      const parent = await this.addOrderRequest({
         ...mainForm,
         orderTime: d,
         departurePointName: this._departurePointName,
@@ -747,6 +751,7 @@ export default {
           name: this.combinedOrders[0].withCargo
             ? this.combinedOrders[0].name
             : "Пассажиры",
+          parentOrder: parent.id,
         });
         for (let i = 1; i < this.combinedOrders.length; i++) {
           await this.addOrderRequest({
@@ -784,9 +789,11 @@ export default {
             name: this.combinedOrders[i].withCargo
               ? this.combinedOrders[i].name
               : "Пассажиры",
+            parentOrder: parent.id,
           });
         }
       }
+      this._addLoading = false;
       this.$refs.form.reset();
     },
     async onUpdateOrder() {
@@ -982,6 +989,7 @@ export default {
       _withPassengers: false,
       _withCargo: false,
       _creationMode: true,
+      _addLoading: false,
     };
   },
 };

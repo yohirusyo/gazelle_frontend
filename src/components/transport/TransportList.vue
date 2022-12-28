@@ -7,7 +7,7 @@
         freeStatuses.map((s) => s.id)
       )
     "
-    :columns="currentUser?.role == 'WATCHER' ?  watchercolumns :columns"
+    :columns="currentUser?.role == 'WATCHER' ? watchercolumns : columns"
     row-key="number"
     wrap-cells
     virtual-scroll
@@ -21,12 +21,10 @@
     table-header-class="bg-white"
     square
     separator="cell"
+
   >
     <template v-slot:body="props">
-      <TransportListElement
-        :id="props.row.id"
-        :freeStatuses="freeStatuses"
-      />
+      <TransportListElement :id="props.row.id" :freeStatuses="freeStatuses" />
     </template>
   </q-table>
 </template>
@@ -34,12 +32,14 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import TransportListElement from "./TransportListElement.vue";
+
 export default {
   name: "TransportList",
   components: {
     TransportListElement,
   },
   props: ["col", "height"],
+  
   data() {
     return {
       watchercolumns: [
@@ -156,6 +156,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

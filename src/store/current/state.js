@@ -14,5 +14,6 @@ export default function () {
     customer: null,
     user: null,
     request: null,
+    swapped: null,
   };
 }

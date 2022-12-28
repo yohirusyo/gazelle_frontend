@@ -133,7 +133,27 @@
               currentUser?.role != 'CUSTOMER'
             "
           >
-            <q-tooltip> Отчёт </q-tooltip>
+            <q-tooltip> Отчёт по заказам </q-tooltip>
+          </q-btn>
+
+          <q-btn
+            icon="las la-book"
+            to="/report-shifts"
+            flat
+            dense
+            v-if="currentUser?.role == 'ADMIN'"
+          >
+            <q-tooltip> Отчёт по водителям </q-tooltip>
+          </q-btn>
+
+          <q-btn
+            icon="las la-book"
+            to="/report-operator-shifts"
+            flat
+            dense
+            v-if="currentUser?.role == 'ADMIN'"
+          >
+            <q-tooltip> Отчёт по диспетчерам </q-tooltip>
           </q-btn>
         </div>
 

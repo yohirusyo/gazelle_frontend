@@ -35,6 +35,20 @@ const routes = [
         },
       },
       {
+        path: 'report-shifts', component: () => import('pages/ShiftReport.vue'),
+        meta: {
+          roles: ['ADMIN', 'OPERATOR'],
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'report-operator-shifts', component: () => import('pages/OperatorShiftReport.vue'),
+        meta: {
+          roles: ['ADMIN'],
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'transport', component: () => import('pages/Transport.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],

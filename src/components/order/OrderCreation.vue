@@ -461,9 +461,16 @@
               autocomplete="off"
             />
             <div
-              class="row justify-center"
+              class="row justify-center items-center q-gutter-x-md"
               v-if="_creationMode || (!_creationMode && order.orderTime)"
             >
+              <div
+                v-if="!_creationMode"
+                class="bg-blue-4 text-white q-py-sm q-px-md"
+              >
+                {{ moment(_orderTime).format("DD.MM.YYYY") }}
+              </div>
+
               <Datepicker
                 inputClassName="datepicker col "
                 menuClassName="datepicker-menu border-md"
@@ -561,6 +568,8 @@
           type="submit"
           no-caps
           dense
+          :loading="_addLoading"
+          :disable="_addLoading"
         />
         <q-btn
           v-if="
@@ -607,6 +616,7 @@ import Datepicker from "@vuepic/vue-datepicker";
 import ISelect from "components/base/ISelect.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { showNotifyResult } from "src/helpers/notification";
+import * as moment from "moment";
 export default {
   name: "OrderCreation",
   props: ["height"],
@@ -842,6 +852,7 @@ export default {
         return showNotifyResult(false, "Выберите транспорт!");
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
+      this._addLoading = true;
       const d = new Date();
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
@@ -873,9 +884,10 @@ export default {
         transportId: this.selectedTransportId,
         description: this._description,
         name: this.withCargo ? this._name : "Пассажиры",
+        isParent: this.combinedOrders.length != 0,
       };
 
-      await this.addOrder({
+      const parent = await this.addOrder({
         ...mainForm,
         orderTime: d,
         departurePointName: this._departurePointName,
@@ -917,6 +929,7 @@ export default {
           name: this.combinedOrders[0].withCargo
             ? this.combinedOrders[0].name
             : "Пассажиры",
+          parentOrder: parent.id,
         });
         for (let i = 1; i < this.combinedOrders.length; i++) {
           await this.addOrder({
@@ -954,9 +967,11 @@ export default {
             name: this.combinedOrders[i].withCargo
               ? this.combinedOrders[i].name
               : "Пассажиры",
+            parentOrder: parent.id,
           });
         }
       }
+      this._addLoading = false;
       this.$refs.form.reset();
     },
     async onUpdateOrder() {
@@ -1119,6 +1134,7 @@ export default {
         name: this._name,
       };
     },
+    moment,
   },
   mounted() {
     this.loadData();
@@ -1146,6 +1162,7 @@ export default {
       combinedOrders: [],
       _withPassengers: false,
       _withCargo: false,
+      _addLoading: false,
     };
   },
   watch: {

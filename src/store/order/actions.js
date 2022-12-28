@@ -7,10 +7,15 @@ export async function addOrder({ commit }, form) {
     .post(`order`, form)
     .then(({ data }) => {
       showNotifyResult(true, "Заказ успешно создан!");
+      return data;
     })
     .catch((err) => {
       showNotifyResult(false, "Ошибка создания заказа!");
     });
+}
+
+export function rerender({ commit }) {
+  commit('rerender');
 }
 
 export async function addOrderRequest({ commit }, form) {
@@ -18,6 +23,7 @@ export async function addOrderRequest({ commit }, form) {
     .post('/order/request', form)
     .then(({ data }) => {
       showNotifyResult(true, "Заказ успешно создан!");
+      return data;
     })
     .catch((err) => {
       showNotifyResult(false, "Ошибка создания заказа!");

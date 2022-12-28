@@ -12,6 +12,7 @@ import customer from "./customer";
 import contact from "./contact";
 import orderStats from "./order-stats";
 import orderHistory from './order-history';
+import userStats from './user-stats';
 
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
@@ -26,7 +27,8 @@ export default store(function (/* { ssrContext } */) {
       customer,
       contact,
       orderStats,
-      orderHistory
+      orderHistory,
+      userStats
     },
 
     // enable strict mode (adds overhead!)

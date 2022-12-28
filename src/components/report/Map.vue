@@ -1,58 +1,87 @@
 <template>
-  <!-- <yandex-map
+  <q-dialog ref="dialog" @hide="onDialogHide" full-height full-width>
+    <div class="q-pa-md bg-white">
+      <yandex-map
         :coords="initialCoords"
-        class="col"
+        class="fit"
         :settings="settings"
-        :zoom="16"
-        @click="setCoordsFromMap"
-      > -->
-  <yandex-map
-    :coords="initialCoords"
-    class="fit"
-    :settings="settings"
-    :zoom="13"
-  >
-    <ymap-marker
-      :marker-id="p.id + '-place'"
-      :coords="[p.latitude, p.longitude]"
-      :icon="getPlaceIcon(p.name)"
-      v-for="(p, index) of places.filter((p) => p.latitude && p.longitude)"
-      :key="index"
-      @click.prevent="setPlace(p)"
-      :options="
-        place && p.id == place.id ? { preset: 'islands#redStretchyIcon' } : {}
-      "
-    />
-    <ymap-marker
-      :marker-id="t.id + '-transport'"
-      :coords="[t.latitude, t.longitude]"
-      v-for="(t, index) of getByOnlyFreeFilter(
-        false,
-        true,
-        freeStatuses.map((s) => s.id)
-      ).filter((p) => p.latitude && p.longitude)"
-      :key="index"
-      :icon="getTransportContentLayout(t)"
-      :hint-content="
-        moment(t.coordinatesChangedAt).format('HH:mm:ss DD.MM.YYYY')
-      "
-    />
-    <ymap-marker
-      marker-id="now"
-      :coords="coords"
-      v-if="coords"
-      @click="clearCoords"
-    />
-  </yandex-map>
+        :zoom="13"
+        ref="map"
+        @map-was-initialized="kek"
+        @click.stop
+      >
+        <ymap-marker
+          marker-id="start"
+          :coords="coordinates[0]"
+          :icon="{ content: getPlaceById(_order.departurePointId).name }"
+        />
+        <ymap-marker
+          marker-id="end"
+          :coords="coordinates[coordinates.length - 1]"
+          :icon="{ content: getPlaceById(_order.destinationId).name }"
+          v-if="notDone == false || notDone == null"
+        />
+        <ymap-marker
+          :marker-id="getTransportById(_order.transportId)?.id + '-transport'"
+          :coords="[
+            getTransportById(_order.transportId)?.latitude,
+            getTransportById(_order.transportId)?.longitude,
+          ]"
+          :icon="
+            getTransportContentLayout(getTransportById(_order.transportId))
+          "
+          v-if="getTransportById(_order.transportId) && notDone == true"
+        />
+      </yandex-map>
+    </div>
+  </q-dialog>
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { yandexMap, ymapMarker } from "vue-yandex-maps";
-import { formatDriverMobileFullname } from "src/helpers/formatters";
-import * as moment from "moment";
+import { yandexMap, ymapMarker, loadYmap } from "vue-yandex-maps";
+import { mapGetters, mapState } from "vuex";
 export default {
-  name: "YaMap",
+  name: "MapOrder",
+  props: {
+    order: {
+      type: Object,
+      required: true,
+    },
+    notDone: {
+      type: Boolean,
+      required: false,
+    },
+  },
+  computed: {
+    ...mapGetters("place", ["getPlaceById"]),
+    ...mapGetters("transport", ["getTransportById"]),
+    ...mapState("status", ["statuses"]),
+    ...mapGetters("order", ["getOrderById"]),
+    freeStatuses: {
+      get() {
+        return this.statuses.filter((s) => s.isBusy == false);
+      },
+    },
+    _order: {
+      get() {
+        return this.getOrderById(this.order.id) == null
+          ? this.order
+          : this.getOrderById(this.order.id);
+      },
+    },
+    coordinates: {
+      get() {
+        return this._order.coordinatesHistory
+          .map((h) => JSON.parse(h))
+          .sort(
+            (a, b) =>
+              new Date(a.coordinatesChangedAt) -
+              new Date(b.coordinatesChangedAt)
+          )
+          .map((h) => [h.latitude, h.longitude]);
+      },
+    },
+  },
   components: {
     yandexMap,
     ymapMarker,
@@ -69,34 +98,41 @@ export default {
       initialCoords: [53.415471, 59.053397],
     };
   },
-  computed: {
-    ...mapState("place", ["places"]),
-    ...mapGetters("transport", ["getByOnlyFreeFilter"]),
-    ...mapState("current", ["coords", "place"]),
-    ...mapState("status", ["statuses"]),
-    ...mapGetters("user", ["getDriverById"]),
-    ...mapGetters("status", ["getStatusById"]),
-    freeStatuses: {
-      get() {
-        return this.statuses.filter((s) => s.isBusy == false);
-      },
-    },
-  },
   methods: {
-    ...mapMutations("current", ["setCoords", "setPlace", "clearCoords"]),
-    formatDriverMobileFullname,
-    moment,
-    getPlaceIcon(name) {
-      return {
-        content: name,
-        contentLayout:
-          '<div style="background: red; width: 50px; color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>',
-      };
+    onDialogHide() {
+      this.hide();
     },
-    setCoordsFromMap(e) {
-      if (e.originalEvent) {
-        this.setCoords(e.get("coords"));
-      }
+    hide() {
+      this.$refs.dialog.hide();
+    },
+    show() {
+      this.$refs.dialog.show();
+    },
+    onCancelClick() {
+      this.onCancel();
+      this.hide();
+    },
+    onOkClick() {
+      this.onOk();
+      this.hide();
+    },
+    async kek(ll) {
+      this.mapInstance = ll;
+      await loadYmap(this.settings);
+      var polyline = new ymaps.Polyline(
+        this.coordinates,
+        {
+          hintContent:
+            this._order.routeLength != null && this._order.routeLength != 0
+              ? `${(this._order.routeLength / 1000).toFixed(1)}км`
+              : "Расстояние будет доступно после поездки",
+        },
+        {
+          strokeColor: "#1E98FF",
+          strokeWidth: 2,
+        }
+      );
+      this.mapInstance.geoObjects.add(polyline);
     },
     parseNumber(number) {
       if (
@@ -119,15 +155,11 @@ export default {
       return {
         layout: "default#imageWithContent",
         content: t.transportNumber,
-        imageHref: "https://image.flaticon.com/icons/png/512/33/33447.png",
+        imageHref: "",
         // imageSize: [0, 0],
         // imageOffset: [0, 0],
         // contentOffset: [0, 0],
-        contentLayout: `<div style="position: relative; ${
-          new Date() - new Date(t.coordinatesChangedAt) > 300000
-            ? "opacity: 0.5;"
-            : ""
-        }">
+        contentLayout: `<div style="position: relative;">
         <div style="position: absolute; top: 50%; left: 50%; width: max-content; display: flex; align-items: flex-end; transform: scale(0.5) translate(-50%, -50%);">
           <i style="paddind-bottom: 2px; margin-right: 4px; color: ${
             this.freeStatuses.map((s) => s.id).includes(t.statusId)
@@ -197,21 +229,12 @@ export default {
         </div>
       </div>
     </div></div></div>
+        
         </div>`,
       };
     },
-    // addMarker(e) {
-    //   if (e.originalEvent) {
-    //     this.$q.dialog({
-    //       component: PlaceCreationDialog,
-    //       componentProps: {
-    //         coords: e.get("coords"),
-    //       },
-    //     });
-    //   }
-    // },
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style></style>

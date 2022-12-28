@@ -99,3 +99,7 @@ export function clearUser(state) {
 export function setRequest(state, request) {
   state.request = request;
 }
+
+export function setSwapped(state, swapped) {
+  state.swapped = swapped;
+}

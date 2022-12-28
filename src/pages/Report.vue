@@ -1,9 +1,10 @@
 <template>
-  <q-page>
-    <div class="column fit">
+  <q-page class="row" ref="page">
+    <div class="col column">
       <div
-        class="col col-shrink  justify-center items-stretch  q-pa-sm"
+        class="col col-shrink justify-center items-stretch q-ma-sm"
         :class="!$q.screen.xs ? 'q-gutter-x-md row' : 'q-gutter-y-md column'"
+        ref="header"
       >
         <download-excel
           :data="
@@ -11,7 +12,7 @@
           "
           :fields="fields"
           :name="`Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`"
-          class="col row"
+          class="col row q-ma-none"
         >
           <q-btn
             text-color="white"
@@ -29,7 +30,7 @@
           :labelFn="(item) => item"
           label="Подразделение"
           @selected="(val) => (_selectedSubdivision = val)"
-          class="col  text-black border-none"
+          class="col text-black border-none"
         />
         <ISelect
           :options="driversFullnames"
@@ -48,10 +49,7 @@
           flat
           no-caps
         >
-          <q-popup-proxy
-            transition-show="scale"
-            transition-hide="scale"
-          >
+          <q-popup-proxy transition-show="scale" transition-hide="scale">
             <q-date
               v-model="_selectedDate"
               mask="DD.MM.YYYY"
@@ -67,12 +65,7 @@
                   flat
                   @click="requestOrderStats(_selectedDate)"
                 />
-                <q-btn
-                  v-close-popup
-                  label="Закрыть"
-                  color="primary"
-                  flat
-                />
+                <q-btn v-close-popup label="Закрыть" color="primary" flat />
               </div>
             </q-date>
           </q-popup-proxy>
@@ -82,9 +75,12 @@
         class="col"
         ref="table"
         id="table"
+        :style="`height: ${height}px; width: ${width}px`"
       >
         <q-table
-          :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)"
+          :rows="
+            getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
+          "
           flat
           dense
           table-header-class="bg-white"
@@ -96,25 +92,42 @@
           virtual-scroll
           v-model:pagination="pagination"
           :rows-per-page-options="[0]"
-          :style="`height: ${height}px; width: ${width}px`"
           row-key="id"
           v-model:selected="_selectedRow"
           selection="multiple"
+          style="height: 100%"
         >
+          <template v-slot:body-cell-map="props">
+            <q-td :props="props" class="map-td">
+              <q-btn
+                color="black"
+                label="Маршрут"
+                v-if="
+                  props.row.order.coordinatesHistory.length != 0 &&
+                  props.row.order.routeLength != null &&
+                  props.row.order.routeLength != 0
+                "
+                dense
+                flat
+                no-caps
+                unelevated
+                class="border-none"
+                @click="openMap(props.row.order)"
+              />
+            </q-td>
+          </template>
         </q-table>
       </div>
     </div>
-
-
-
   </q-page>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import * as moment from "moment";
-import { Loading } from "quasar";
+import { Loading, Dialog } from "quasar";
 import ISelect from "components/base/ISelect.vue";
+import MapOrder from "components/report/Map.vue";
 export default {
   name: "Report",
   components: {
@@ -137,6 +150,13 @@ export default {
         "Номер заказа": {
           field: "orderId",
           callback: this.regular,
+        },
+        Расстояние: {
+          field: "order.routeLength",
+          callback: (val) =>
+            val != null && val != 0
+              ? `${(val / 1000).toFixed(1)}`.replace(".", ",")
+              : "-",
         },
         Диспетчер: {
           // field: "operatorFullname",
@@ -287,6 +307,26 @@ export default {
           align: "left",
           field: (row) => row.orderId,
           format: this.regular,
+          sortable: true,
+        },
+        {
+          name: "map",
+          required: true,
+          label: "Маршрут",
+          align: "center",
+          sortable: false,
+          field: (row) => row,
+        },
+
+        {
+          name: "routeLength",
+          required: false,
+          label: "Расстояние",
+          align: "right",
+          field: (row) =>
+            row.order.routeLength != null && row.order.routeLength != 0
+              ? `${(row.order.routeLength / 1000).toFixed(1)}км`
+              : null,
           sortable: true,
         },
         {
@@ -623,6 +663,14 @@ export default {
       "requestOrderStatsDates",
     ]),
     moment,
+    async openMap(order) {
+      Dialog.create({
+        component: MapOrder,
+        componentProps: {
+          order,
+        },
+      });
+    },
     checkNull(val) {
       return val === null || val === undefined;
     },
@@ -654,8 +702,11 @@ export default {
   },
   async mounted() {
     Loading.show();
-    this.height = this.$refs.table.clientHeight;
-    this.width = this.$refs.table.clientWidth;
+
+    this.height =
+      // parseInt(this.$refs.page.$el.style.minHeight) -
+      this.$refs.page.$el.clientHeight - this.$refs.header.clientHeight - 17;
+    this.width = this.$refs.page.$el.clientWidth;
     await this.requestOrderStatsDates();
     this._selectedDate = {
       from: moment().format("DD.MM.YYYY"),
@@ -699,5 +750,8 @@ export default {
   background-color: white !important;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
   /* border */
+}
+.map-td {
+  padding: 0 !important;
 }
 </style>

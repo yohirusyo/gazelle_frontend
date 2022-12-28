@@ -1,6 +1,6 @@
 <template>
   <q-table
-    :rows="filteredOrders({ subdivisions: _selectedSubdivisions })"
+    :rows="_orderList"
     :columns="columns"
     row-key="time"
     wrap-cells
@@ -15,14 +15,12 @@
     table-header-class="bg-white"
     square
     separator="cell"
+    id="order-list"
   >
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <q-icon
-          name="las la-filter"
-          size="1.5em"
-        >
+        <q-icon name="las la-filter" size="1.5em">
           <q-menu persistent>
             <q-list style="min-width: 100px">
               <q-item
@@ -33,9 +31,9 @@
                 @click="
                   _selectedSubdivisions.includes(s)
                     ? _selectedSubdivisions.splice(
-                      _selectedSubdivisions.indexOf(s),
-                      1
-                    )
+                        _selectedSubdivisions.indexOf(s),
+                        1
+                      )
                     : _selectedSubdivisions.push(s)
                 "
                 :key="s"
@@ -54,120 +52,80 @@
           _hoveredOrder?.id == props.row.id
             ? 'bg-light-green-2'
             : props.row.isRequest && !props.row.isApproved
-              ? 'bg-blue-2'
-              : props.row.isRequest && props.row.isApproved
-                ? 'bg-blue-1'
-                : ''
+            ? 'bg-blue-2'
+            : props.row.isRequest && props.row.isApproved
+            ? 'bg-blue-1'
+            : ''
         "
         @click="setOrder(props.row)"
+        :id="'order-list-item-' + props.row.id"
       >
-        <q-td
-          key="time"
-          :props="props"
-        >
+        <q-td key="time" :props="props">
           <div class="col-2 text-center column items-center">
             <span>
               {{ "№ " + props.row.id }}
             </span>
             <q-chip
-              class="q-mx-none q-mt-none "
+              class="q-mx-none q-mt-none"
               :class="props.row.isEmergency ? 'bg-red text-white' : ''"
             >
               {{
-                  props.row?.orderTime
-                    ? timeFormat(props.row?.orderTime)
-                    : "Маршрут"
+                props.row?.orderTime
+                  ? timeFormat(props.row?.orderTime)
+                  : "Маршрут"
               }}
             </q-chip>
           </div>
           <q-tooltip>
             <span>Наименование груза: {{ props.row.name }}</span>
             <br v-if="props.row.description && props.row.description != ''" />
-            <span v-if="props.row.description && props.row.description != ''">Описание: {{ props.row.description
-            }}</span>
+            <span v-if="props.row.description && props.row.description != ''"
+              >Описание: {{ props.row.description }}</span
+            >
           </q-tooltip>
         </q-td>
-        <q-td
-          key="customer"
-          :props="props"
-          class="pre"
-        >
-          {{ formatCustomerMobileSubdivision(getCustomerById(props.row.customerId)) }}
+        <q-td key="customer" :props="props" class="pre">
+          {{
+            formatCustomerMobileSubdivision(
+              getCustomerById(props.row.customerId)
+            )
+          }}
           <q-tooltip>
-            {{ formatCustomerMobileFullname(getCustomerById(props.row.customerId)) }}
-            {{ formatCustomerMobilePhoneNumber(getCustomerById(props.row.customerId)) }}
+            {{
+              formatCustomerMobileFullname(
+                getCustomerById(props.row.customerId)
+              )
+            }}
+            {{
+              formatCustomerMobilePhoneNumber(
+                getCustomerById(props.row.customerId)
+              )
+            }}
           </q-tooltip>
         </q-td>
 
-        <q-td
-          key="departurePoint"
-          :props="props"
-        >
+        <q-td key="departurePoint" :props="props">
           {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
         </q-td>
-        <q-td
-          key="destination"
-          :props="props"
-        >
+        <q-td key="destination" :props="props">
           {{ formatPlace(getPlaceById(props.row.destinationId)) }}
         </q-td>
 
-        <q-td
-          key="transportId"
-          :props="props"
-        >
-          <div
-            class="row justify-center"
-            v-if="props.row.transportId"
-          >
-            <AutoNumber :number="
-              formatTransportNumber(getTransportById(props.row.transportId))
-            " />
+        <q-td key="transportId" :props="props">
+          <div class="row justify-center" v-if="props.row.transportId">
+            <AutoNumber
+              :number="
+                formatTransportNumber(getTransportById(props.row.transportId))
+              "
+            />
           </div>
           <div v-else>Транспорт не выбран!</div>
         </q-td>
-        <q-td
-          key="status"
-          :props="props"
-        >
+        <q-td key="status" :props="props">
           <OrderStatus :orderId="props.row.id" />
         </q-td>
-        <q-td
-          key="priority"
-          :props="props"
-        >
-
-          <div
-            class="column items-center justify-center"
-            :class="swapped == props.row.id ? 'bg-yellow-4' : ''"
-          >
-            <q-btn
-              dense
-              flat
-              @click.prevent.stop="swapPriority({ firstId: findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row).id, secondId: props.row.id })"
-              icon="las la-chevron-up"
-              v-if="findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)"
-              @mouseover="swapped = findNextOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)?.id"
-              @mouseleave="swapped = null"
-            >
-              <q-tooltip>
-                Поднять приоритет
-              </q-tooltip>
-            </q-btn>
-            <q-btn
-              dense
-              flat
-              @click.prevent.stop="swapPriority({ firstId: findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row).id, secondId: props.row.id })"
-              icon="las la-chevron-down"
-              v-if="findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)"
-              @mouseover="swapped = findPrevOrder(filteredOrders({ subdivisions: _selectedSubdivisions }), props.row)?.id"
-              @mouseleave="swapped = null"
-            >
-              <q-tooltip>
-                Опустить приоритет
-              </q-tooltip>
-            </q-btn>
-          </div>
+        <q-td key="priority" :props="props">
+          <OrderPriority :orderId="props.row.id" />
         </q-td>
       </q-tr>
     </template>
@@ -188,13 +146,15 @@ import {
   formatTransportNumber,
 } from "src/helpers/formatters";
 import AutoNumber from "../base/AutoNumber.vue";
-import order from "src/store/order";
+import OrderPriority from "./OrderPriority.vue";
+import Sortable from "sortablejs";
 export default {
   name: "OrderList",
   props: ["col", "height"],
   components: {
     AutoNumber,
     OrderStatus,
+    OrderPriority,
   },
   computed: {
     ...mapState("order", ["orders"]),
@@ -205,11 +165,32 @@ export default {
     ...mapGetters("transport", ["getTransportById"]),
     ...mapState("current", ["hoveredTransportId"]),
     ...mapState("current", ["currentUser"]),
-    ...mapGetters('status', ['getStatusById'])
+    ...mapGetters("status", ["getStatusById"]),
+    _orderList: {
+      get() {
+        return this.filteredOrders({
+          subdivisions: this._selectedSubdivisions,
+        });
+      },
+    },
   },
   mounted() {
     this._selectedSubdivisions = this.subdivisions;
+    const element = document.querySelector(
+      "#order-list .q-virtual-scroll__content"
+    );
+    const self = this;
+    const sortable = Sortable.create(element, {
+      async onEnd(event) {
+        await self.swapPriority({
+          firstId: self._orderList[event.newIndex].id,
+          secondId: self._orderList[event.oldIndex].id,
+        });
+      },
+      filter: ".ignore-elements",
+    });
   },
+
   watch: {
     subdivisions(newSubdivisions) {
       for (let s of newSubdivisions) {
@@ -222,22 +203,33 @@ export default {
       if (this.hoveredTransportId == null) {
         this._hoveredOrder = null;
       } else {
+        const busyStatuses = [
+          "ACCEPTED",
+          "ENTRY_TO_CUSTOMER",
+          "ENTRY_TO_DESTINATION",
+          "EXIT_TO_DESTINATION",
+        ];
         const fOrders = this.orders.filter(
           (order) => order.transportId == this.hoveredTransportId
         );
         if (fOrders.length == 0) return (this._hoveredOrder = null);
-        this._hoveredOrder = fOrders.reduce(function (prev, current) {
-          return prev.createdAt < current?.createdAt ? prev : current;
+        this._hoveredOrder = fOrders.reduce((prev, current) => {
+          if (busyStatuses.includes(this.getStatusById(prev.statusId).code))
+            return prev;
+          if (busyStatuses.includes(this.getStatusById(current.statusId).code))
+            return current;
+          return prev.priority < current?.priority ? prev : current;
         }, fOrders[0]);
-        const scrollTo = this.orders.findIndex(
-          (o) => o.id == this._hoveredOrder.id
-        );
+        const scrollTo = this.filteredOrders({
+          subdivisions: this._selectedSubdivisions,
+        }).findIndex((o) => o.id == this._hoveredOrder.id);
         this.$refs.scroll.scrollTo(scrollTo);
       }
     },
   },
   data() {
     return {
+      _rerenderCounter: 0,
       _hoveredOrder: null,
       _selectedSubdivisions: [],
       swapped: null,
@@ -297,7 +289,8 @@ export default {
   },
   methods: {
     ...mapMutations("current", ["setOrder"]),
-    ...mapActions('order', ['swapPriority']),
+    ...mapActions("order", ["rerender"]),
+    ...mapActions("order", ["swapPriority"]),
     timeFormat,
     formatContact,
     formatCustomer,
@@ -306,22 +299,6 @@ export default {
     formatCustomerMobileSubdivision,
     formatCustomerMobileFullname,
     formatCustomerMobilePhoneNumber,
-    findNextOrder(orders, order) {
-      if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(order?.statusId)?.code)) return null;
-      if (order?.isRequest && !order?.isApproved) return null;
-      return orders?.findLast(o => {
-        if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(o?.statusId)?.code) || (o?.isRequest && !o?.isApproved)) return false
-        return o?.priority <= order?.priority && o?.id != order?.id
-      })
-    },
-    findPrevOrder(orders, order) {
-      if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(order?.statusId)?.code)) return null;
-      if (order?.isRequest && !order?.isApproved) return null;
-      return orders?.find(o => {
-        if (['ACCEPTED', 'ENTRY_TO_CUSTOMER', 'ENTRY_TO_DESTINATION', 'EXIT_TO_DESTINATION'].includes(this.getStatusById(o?.statusId)?.code) || (o?.isRequest && !o?.isApproved)) return false
-        return o?.priority >= order?.priority && o?.id != order?.id
-      })
-    }
   },
 };
 </script>
