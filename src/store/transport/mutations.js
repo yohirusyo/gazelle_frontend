@@ -10,15 +10,15 @@ function sort(state) {
 
 export function add(state, transport) {
   const index = state.transports.findIndex((t) => t.id == transport.id);
-  if (index == -1)
+  if (index == -1) {
     state.transports.push(transport);
-  sort(state)
+    sort(state)
+  }
 }
 
 export function set(state, transports) {
   state.transports = transports;
   sort(state)
-
 }
 
 export function update(state, transport) {
@@ -30,5 +30,4 @@ export function update(state, transport) {
 
 export function remove(state, id) {
   state.transports = state.transports.filter((transport) => transport.id != id);
-  sort(state)
 }

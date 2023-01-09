@@ -17,9 +17,10 @@ function sort(state) {
 
 export function add(state, order) {
   const index = state.orders.findIndex((o) => o.id == order.id);
-  if (index == -1)
+  if (index == -1) {
     state.orders.push(order);
-  sort(state)
+    sort(state)
+  }
 }
 
 export function set(state, orders) {
@@ -33,8 +34,9 @@ export function rerender(state) {
 
 export function update(state, order) {
   const index = state.orders.findIndex((o) => o.id == order.id);
+  const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
   state.orders[index] = order;
-  sort(state)
+  if (changedPriopity) sort(state)
 }
 
 export function remove(state, id) {

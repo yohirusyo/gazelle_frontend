@@ -2,7 +2,7 @@
   <q-table
     :rows="_orderList"
     :columns="columns"
-    row-key="time"
+    row-key="id"
     wrap-cells
     virtual-scroll
     :rows-per-page-options="[0]"
@@ -20,7 +20,10 @@
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <q-icon name="las la-filter" size="1.5em">
+        <q-icon
+          name="las la-filter"
+          size="1.5em"
+        >
           <q-menu persistent>
             <q-list style="min-width: 100px">
               <q-item
@@ -31,9 +34,9 @@
                 @click="
                   _selectedSubdivisions.includes(s)
                     ? _selectedSubdivisions.splice(
-                        _selectedSubdivisions.indexOf(s),
-                        1
-                      )
+                      _selectedSubdivisions.indexOf(s),
+                      1
+                    )
                     : _selectedSubdivisions.push(s)
                 "
                 :key="s"
@@ -52,79 +55,113 @@
           _hoveredOrder?.id == props.row.id
             ? 'bg-light-green-2'
             : props.row.isRequest && !props.row.isApproved
-            ? 'bg-blue-2'
-            : props.row.isRequest && props.row.isApproved
-            ? 'bg-blue-1'
-            : ''
+              ? 'bg-blue-2'
+              : props.row.isRequest && props.row.isApproved
+                ? 'bg-blue-1'
+                : ''
         "
         @click="setOrder(props.row)"
         :id="'order-list-item-' + props.row.id"
       >
-        <q-td key="time" :props="props">
+        <q-td
+          key="time"
+          :props="props"
+        >
           <div class="col-2 text-center column items-center">
             <span>
               {{ "№ " + props.row.id }}
             </span>
             <q-chip
-              class="q-mx-none q-mt-none"
+              class="q-mx-none q-mt-none "
               :class="props.row.isEmergency ? 'bg-red text-white' : ''"
             >
-              {{
+              <div> {{
                 props.row?.orderTime
                   ? timeFormat(props.row?.orderTime)
                   : "Маршрут"
               }}
+              </div>
+
+            </q-chip>
+            <q-chip
+              class="q-mx-none q-mt-none "
+              style="font-size: 0.75rem"
+              v-if="timeFormatOrder(props.row?.orderTime)"
+            >
+              <div>
+                {{ timeFormatOrder(props.row?.orderTime) }}
+              </div>
             </q-chip>
           </div>
           <q-tooltip>
             <span>Наименование груза: {{ props.row.name }}</span>
             <br v-if="props.row.description && props.row.description != ''" />
-            <span v-if="props.row.description && props.row.description != ''"
-              >Описание: {{ props.row.description }}</span
-            >
+            <span v-if="props.row.description && props.row.description != ''">Описание: {{
+              props.row.description
+            }}</span>
           </q-tooltip>
         </q-td>
-        <q-td key="customer" :props="props" class="pre">
+        <q-td
+          key="customer"
+          :props="props"
+          class="pre"
+        >
           {{
-            formatCustomerMobileSubdivision(
-              getCustomerById(props.row.customerId)
-            )
+  formatCustomerMobileSubdivision(
+    getCustomerById(props.row.customerId)
+)
           }}
           <q-tooltip>
             {{
-              formatCustomerMobileFullname(
-                getCustomerById(props.row.customerId)
-              )
+  formatCustomerMobileFullname(
+    getCustomerById(props.row.customerId)
+)
             }}
             {{
-              formatCustomerMobilePhoneNumber(
-                getCustomerById(props.row.customerId)
-              )
+  formatCustomerMobilePhoneNumber(
+    getCustomerById(props.row.customerId)
+)
             }}
           </q-tooltip>
         </q-td>
 
-        <q-td key="departurePoint" :props="props">
+        <q-td
+          key="departurePoint"
+          :props="props"
+        >
           {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
         </q-td>
-        <q-td key="destination" :props="props">
+        <q-td
+          key="destination"
+          :props="props"
+        >
           {{ formatPlace(getPlaceById(props.row.destinationId)) }}
         </q-td>
 
-        <q-td key="transportId" :props="props">
-          <div class="row justify-center" v-if="props.row.transportId">
-            <AutoNumber
-              :number="
-                formatTransportNumber(getTransportById(props.row.transportId))
-              "
-            />
+        <q-td
+          key="transportId"
+          :props="props"
+        >
+          <div
+            class="row justify-center"
+            v-if="props.row.transportId"
+          >
+            <AutoNumber :number="
+              formatTransportNumber(getTransportById(props.row.transportId))
+            " />
           </div>
           <div v-else>Транспорт не выбран!</div>
         </q-td>
-        <q-td key="status" :props="props">
+        <q-td
+          key="status"
+          :props="props"
+        >
           <OrderStatus :orderId="props.row.id" />
         </q-td>
-        <q-td key="priority" :props="props">
+        <q-td
+          key="priority"
+          :props="props"
+        >
           <OrderPriority :orderId="props.row.id" />
         </q-td>
       </q-tr>
@@ -137,6 +174,7 @@ import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 import OrderStatus from "./OrderStatus.vue";
 import {
   timeFormat,
+  timeFormatOrder,
   formatContact,
   formatCustomer,
   formatCustomerMobileSubdivision,
@@ -170,7 +208,7 @@ export default {
       get() {
         return this.filteredOrders({
           subdivisions: this._selectedSubdivisions,
-        });
+        }).filter(o => new Date(o.orderTime) < this._timerActives);
       },
     },
   },
@@ -189,6 +227,9 @@ export default {
       },
       filter: ".ignore-elements",
     });
+    this.updateActivesInterval();
+    console.warn(this._timerActives);
+    setInterval(this.updateActivesInterval, 60000)
   },
 
   watch: {
@@ -220,9 +261,7 @@ export default {
             return current;
           return prev.priority < current?.priority ? prev : current;
         }, fOrders[0]);
-        const scrollTo = this.filteredOrders({
-          subdivisions: this._selectedSubdivisions,
-        }).findIndex((o) => o.id == this._hoveredOrder.id);
+        const scrollTo = this._orderList.findIndex((o) => o.id == this._hoveredOrder.id);
         this.$refs.scroll.scrollTo(scrollTo);
       }
     },
@@ -233,6 +272,7 @@ export default {
       _hoveredOrder: null,
       _selectedSubdivisions: [],
       swapped: null,
+      _timerActives: null,
       columns: [
         {
           name: "time",
@@ -292,6 +332,7 @@ export default {
     ...mapActions("order", ["rerender"]),
     ...mapActions("order", ["swapPriority"]),
     timeFormat,
+    timeFormatOrder,
     formatContact,
     formatCustomer,
     formatPlace,
@@ -299,6 +340,9 @@ export default {
     formatCustomerMobileSubdivision,
     formatCustomerMobileFullname,
     formatCustomerMobilePhoneNumber,
+    updateActivesInterval() {
+      this._timerActives = Date.now() + 7200000;
+    }
   },
 };
 </script>

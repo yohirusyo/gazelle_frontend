@@ -93,7 +93,6 @@ export default {
       }
     },
     _isNotDisabled() {
-      if (this.transport?.driverId == null) return false;
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
       if (this.orderIsEmergency) return true;

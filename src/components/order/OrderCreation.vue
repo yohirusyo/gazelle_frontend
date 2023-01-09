@@ -108,14 +108,12 @@
               dense
             />
 
-            <div
-              v-if="
-                withPassengers &&
-                allowContact &&
-                passengerCount &&
-                passengerCount >= 1
-              "
-            >
+            <div v-if="
+              withPassengers &&
+              allowContact &&
+              passengerCount &&
+              passengerCount >= 1
+            ">
               <ISelect
                 :options="contacts"
                 v-model="contactFullname"
@@ -144,9 +142,16 @@
               />
             </div>
 
-            <q-checkbox v-model="withCargo" label="Груз" dense />
+            <q-checkbox
+              v-model="withCargo"
+              label="Груз"
+              dense
+            />
 
-            <div class="column items-stretch" v-if="withCargo">
+            <div
+              class="column items-stretch"
+              v-if="withCargo"
+            >
               <div class="row q-gutter-x-md">
                 <ISelect
                   :options="names"
@@ -274,9 +279,9 @@
                 type="number"
                 :min="
                   combinedOrder.weight != 0 &&
-                  combinedOrder.length != 0 &&
-                  combinedOrder.width != 0 &&
-                  combinedOrder.height != 0
+                    combinedOrder.length != 0 &&
+                    combinedOrder.width != 0 &&
+                    combinedOrder.height != 0
                     ? 0
                     : 1
                 "
@@ -304,14 +309,12 @@
                 dense
               />
 
-              <div
-                v-if="
-                  combinedOrder.withPassengers &&
-                  combinedOrder.allowContact &&
-                  combinedOrder.passengerCount &&
-                  combinedOrder.passengerCount >= 1
-                "
-              >
+              <div v-if="
+                combinedOrder.withPassengers &&
+                combinedOrder.allowContact &&
+                combinedOrder.passengerCount &&
+                combinedOrder.passengerCount >= 1
+              ">
                 <ISelect
                   :options="contacts"
                   v-model="combinedOrder.contactFullname"
@@ -346,7 +349,10 @@
                 dense
               />
 
-              <div class="column items-stretch" v-if="combinedOrder.withCargo">
+              <div
+                class="column items-stretch"
+                v-if="combinedOrder.withCargo"
+              >
                 <div class="row q-gutter-x-md">
                   <ISelect
                     :options="names"
@@ -438,7 +444,10 @@
                 </div>
               </div>
             </div>
-            <div class="row justify-center" v-if="_creationMode">
+            <div
+              class="row justify-center"
+              v-if="_creationMode"
+            >
               <q-btn
                 text-color="white"
                 label="Добавить место назначения"
@@ -464,12 +473,48 @@
               class="row justify-center items-center q-gutter-x-md"
               v-if="_creationMode || (!_creationMode && order.orderTime)"
             >
-              <div
+              <!-- <div
                 v-if="!_creationMode"
                 class="bg-blue-4 text-white q-py-sm q-px-md"
               >
                 {{ moment(_orderTime).format("DD.MM.YYYY") }}
-              </div>
+              </div> -->
+
+              <q-btn
+                text-color="white"
+                no-caps
+                unelevated
+                class="border-none bg-blue-4"
+                color="primary"
+              >
+                <div class="column">
+                  <div>Назначить дату поездки</div>
+                  <div style="font-size: 0.6rem; line-height: 12px">
+                    {{
+                      moment(_selectedDate).lang("ru").format("D MMM, dddd")
+                    }}
+                  </div>
+                </div>
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date
+                    v-model="_selectedDate"
+                    minimal
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn
+                        v-close-popup
+                        label="Закрыть"
+                        color="primary"
+                        flat
+                      />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-btn>
 
               <Datepicker
                 inputClassName="datepicker col "
@@ -799,7 +844,7 @@ export default {
         return showNotifyResult(false, "Выберите транспорт!");
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
-      const d = new Date();
+      const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
       d.setSeconds(0);
@@ -820,14 +865,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -853,7 +898,7 @@ export default {
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
       this._addLoading = true;
-      const d = new Date();
+      const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
       d.setSeconds(0);
@@ -871,14 +916,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -916,14 +961,14 @@ export default {
             : 0,
           contactPhoneNumber:
             this.combinedOrders[0].allowContact &&
-            this.combinedOrders[0].passengerCount &&
-            this.combinedOrders[0].passengerCount >= 1
+              this.combinedOrders[0].passengerCount &&
+              this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactPhoneNumber
               : null,
           contactFullname:
             this.combinedOrders[0].allowContact &&
-            this.combinedOrders[0].passengerCount &&
-            this.combinedOrders[0].passengerCount >= 1
+              this.combinedOrders[0].passengerCount &&
+              this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactFullname
               : null,
           name: this.combinedOrders[0].withCargo
@@ -954,14 +999,14 @@ export default {
               : 0,
             contactPhoneNumber:
               this.combinedOrders[i].allowContact &&
-              this.combinedOrders[i].passengerCount &&
-              this.combinedOrders[i].passengerCount >= 1
+                this.combinedOrders[i].passengerCount &&
+                this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactPhoneNumber
                 : null,
             contactFullname:
               this.combinedOrders[i].allowContact &&
-              this.combinedOrders[i].passengerCount &&
-              this.combinedOrders[i].passengerCount >= 1
+                this.combinedOrders[i].passengerCount &&
+                this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactFullname
                 : null,
             name: this.combinedOrders[i].withCargo
@@ -977,7 +1022,7 @@ export default {
     async onUpdateOrder() {
       if (!this._withPassengers && !this._withCargo)
         return showNotifyResult(false, "Добавьте груз или пассажиров!");
-      const d = new Date();
+      const d = new Date(this._selectedDate);
       d.setHours(this._orderTime.hours);
       d.setMinutes(this._orderTime.minutes);
       d.setSeconds(0);
@@ -998,14 +1043,14 @@ export default {
         customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId ?? null,
@@ -1023,10 +1068,10 @@ export default {
     },
     resetForm() {
       this.setSelectedTransportId(null);
-      const d = new Date();
+      this._selectedDate = new Date();
       this._orderTime = {
-        hours: d.getHours(),
-        minutes: d.getMinutes(),
+        hours: this._selectedDate.getHours(),
+        minutes: this._selectedDate.getMinutes(),
         seconds: 0,
       };
       this._departurePointName = null;
@@ -1057,10 +1102,10 @@ export default {
     },
     loadData() {
       if (this.order) {
-        const d = new Date(this.order.orderTime);
+        this._selectedDate = new Date(this.order.orderTime);
         this._orderTime = {
-          hours: d.getHours(),
-          minutes: d.getMinutes(),
+          hours: this._selectedDate.getHours(),
+          minutes: this._selectedDate.getMinutes(),
           seconds: 0,
         };
         this._departurePointName = this.getPlaceById(
@@ -1092,17 +1137,17 @@ export default {
         this._withPassengers = this.order.passengerCount >= 1 ? true : false;
         this._withCargo =
           this.order.width > 0 ||
-          this.order.height > 0 ||
-          this.order.weight > 0 ||
-          this.order.length > 0
+            this.order.height > 0 ||
+            this.order.weight > 0 ||
+            this.order.length > 0
             ? true
             : false;
         this._creationMode = false;
       } else {
-        const d = new Date();
+        this._selectedDate = new Date();
         this._orderTime = {
-          hours: d.getHours(),
-          minutes: d.getMinutes(),
+          hours: this._selectedDate.getHours(),
+          minutes: this._selectedDate.getMinutes(),
           seconds: 0,
         };
         this._creationMode = true;
@@ -1159,6 +1204,7 @@ export default {
       _destinationName: null,
       _contactFullname: null,
       _contactPhoneNumber: null,
+      _selectedDate: null,
       combinedOrders: [],
       _withPassengers: false,
       _withCargo: false,

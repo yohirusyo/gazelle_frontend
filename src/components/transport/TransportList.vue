@@ -8,7 +8,7 @@
       )
     "
     :columns="currentUser?.role == 'WATCHER' ? watchercolumns : columns"
-    row-key="number"
+    row-key="id"
     wrap-cells
     virtual-scroll
     :rows-per-page-options="[0]"

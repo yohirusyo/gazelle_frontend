@@ -1,6 +1,15 @@
 import { date } from "quasar";
+import * as moment from 'moment';
 
 export const timeFormat = (d) => date.formatDate(d, "HH:mm")
+
+export const timeFormatOrder = (d) => {
+    if (!d) return
+    const now = moment();
+    const dd = moment(d);
+    if (!now.isSame(dd, 'date'))
+        return dd.format('DD.MM.YYYY')
+}
 
 export const formatContact = (c) => {
     if (!c) return '-';
