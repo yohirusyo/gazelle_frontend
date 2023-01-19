@@ -1,18 +1,19 @@
 import * as moment from 'moment';
 
-export const getSortedHistory = (state) => () => {
+export const getSortedHistory = (state) => (onlyMy) => {
+    const stateHistory = onlyMy ? state.history.filter(o => o.order.customerId == onlyMy) : state.history
     const newHistory = [];
-    for (let index = state.history.length - 1; index >= 0; index--) {
-        if (index == state.history.length - 1) {
+    for (let index = stateHistory.length - 1; index >= 0; index--) {
+        if (index == stateHistory.length - 1) {
             newHistory.push({
-                ...state.history[index],
+                ...stateHistory[index],
                 head: true,
             })
 
         } else {
             newHistory.push({
-                ...state.history[index],
-                head: !!moment(state.history[index].order.createdAt).format('YYYYMMDD').localeCompare(moment(state.history[index + 1].order.createdAt).format('YYYYMMDD')),
+                ...stateHistory[index],
+                head: !!moment(stateHistory[index].order.createdAt).format('YYYYMMDD').localeCompare(moment(stateHistory[index + 1].order.createdAt).format('YYYYMMDD')),
             })
 
         }

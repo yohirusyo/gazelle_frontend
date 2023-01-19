@@ -36,7 +36,10 @@
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date v-model="_selectedDate" minimal>
+                    <q-date
+                      v-model="_selectedDate"
+                      minimal
+                    >
                       <div class="row items-center justify-end">
                         <q-btn
                           v-close-popup
@@ -111,14 +114,12 @@
               dense
             />
 
-            <div
-              v-if="
-                withPassengers &&
-                allowContact &&
-                passengerCount &&
-                passengerCount >= 1
-              "
-            >
+            <div v-if="
+              withPassengers &&
+              allowContact &&
+              passengerCount &&
+              passengerCount >= 1
+            ">
               <ISelect
                 :options="contacts"
                 v-model="contactFullname"
@@ -147,9 +148,16 @@
               />
             </div>
 
-            <q-checkbox v-model="withCargo" label="Груз" dense />
+            <q-checkbox
+              v-model="withCargo"
+              label="Груз"
+              dense
+            />
 
-            <div class="column items-stretch" v-if="withCargo">
+            <div
+              class="column items-stretch"
+              v-if="withCargo"
+            >
               <div class="row q-gutter-x-md">
                 <ISelect
                   :options="names"
@@ -277,9 +285,9 @@
                 type="number"
                 :min="
                   combinedOrder.weight != 0 &&
-                  combinedOrder.length != 0 &&
-                  combinedOrder.width != 0 &&
-                  combinedOrder.height != 0
+                    combinedOrder.length != 0 &&
+                    combinedOrder.width != 0 &&
+                    combinedOrder.height != 0
                     ? 0
                     : 1
                 "
@@ -307,14 +315,12 @@
                 dense
               />
 
-              <div
-                v-if="
-                  combinedOrder.withPassengers &&
-                  combinedOrder.allowContact &&
-                  combinedOrder.passengerCount &&
-                  combinedOrder.passengerCount >= 1
-                "
-              >
+              <div v-if="
+                combinedOrder.withPassengers &&
+                combinedOrder.allowContact &&
+                combinedOrder.passengerCount &&
+                combinedOrder.passengerCount >= 1
+              ">
                 <ISelect
                   :options="contacts"
                   v-model="combinedOrder.contactFullname"
@@ -349,7 +355,10 @@
                 dense
               />
 
-              <div class="column items-stretch" v-if="combinedOrder.withCargo">
+              <div
+                class="column items-stretch"
+                v-if="combinedOrder.withCargo"
+              >
                 <div class="row q-gutter-x-md">
                   <ISelect
                     :options="names"
@@ -693,20 +702,20 @@ export default {
         // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
         description: this._description,
         name: this.withCargo ? this._name : "Пассажиры",
-        isParent: this.combinedOrders.length != 0,
+
       };
 
       const parent = await this.addOrderRequest({
@@ -714,6 +723,7 @@ export default {
         orderTime: d,
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
+        isParent: this.combinedOrders.length != 0,
       });
       if (this.combinedOrders.length != 0) {
         await this.addOrderRequest({
@@ -738,20 +748,21 @@ export default {
             : 0,
           contactPhoneNumber:
             this.combinedOrders[0].allowContact &&
-            this.combinedOrders[0].passengerCount &&
-            this.combinedOrders[0].passengerCount >= 1
+              this.combinedOrders[0].passengerCount &&
+              this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactPhoneNumber
               : null,
           contactFullname:
             this.combinedOrders[0].allowContact &&
-            this.combinedOrders[0].passengerCount &&
-            this.combinedOrders[0].passengerCount >= 1
+              this.combinedOrders[0].passengerCount &&
+              this.combinedOrders[0].passengerCount >= 1
               ? this.combinedOrders[0].contactFullname
               : null,
           name: this.combinedOrders[0].withCargo
             ? this.combinedOrders[0].name
             : "Пассажиры",
           parentOrder: parent.id,
+          isParent: false
         });
         for (let i = 1; i < this.combinedOrders.length; i++) {
           await this.addOrderRequest({
@@ -776,20 +787,21 @@ export default {
               : 0,
             contactPhoneNumber:
               this.combinedOrders[i].allowContact &&
-              this.combinedOrders[i].passengerCount &&
-              this.combinedOrders[i].passengerCount >= 1
+                this.combinedOrders[i].passengerCount &&
+                this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactPhoneNumber
                 : null,
             contactFullname:
               this.combinedOrders[i].allowContact &&
-              this.combinedOrders[i].passengerCount &&
-              this.combinedOrders[i].passengerCount >= 1
+                this.combinedOrders[i].passengerCount &&
+                this.combinedOrders[i].passengerCount >= 1
                 ? this.combinedOrders[i].contactFullname
                 : null,
             name: this.combinedOrders[i].withCargo
               ? this.combinedOrders[i].name
               : "Пассажиры",
             parentOrder: parent.id,
+            isParent: false
           });
         }
       }
@@ -817,14 +829,14 @@ export default {
         // customerSubdivision: this._customerSubdivision,
         contactPhoneNumber:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactPhoneNumber
             : null,
         contactFullname:
           this._allowContact &&
-          this._passengerCount &&
-          this._passengerCount >= 1
+            this._passengerCount &&
+            this._passengerCount >= 1
             ? this._contactFullname
             : null,
         transportId: this.selectedTransportId,
@@ -934,9 +946,9 @@ export default {
           this.request.order.passengerCount >= 1 ? true : false;
         this._withCargo =
           this.request.order.width > 0 ||
-          this.request.order.height > 0 ||
-          this.request.order.weight > 0 ||
-          this.request.order.length > 0
+            this.request.order.height > 0 ||
+            this.request.order.weight > 0 ||
+            this.request.order.length > 0
             ? true
             : false;
         this._creationMode = false;

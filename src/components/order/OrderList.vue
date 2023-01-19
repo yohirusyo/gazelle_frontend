@@ -206,9 +206,23 @@ export default {
     ...mapGetters("status", ["getStatusById"]),
     _orderList: {
       get() {
-        return this.filteredOrders({
+        const filtered = this.filteredOrders({
           subdivisions: this._selectedSubdivisions,
-        }).filter(o => new Date(o.orderTime) < this._timerActives);
+        })
+        return filtered/* .filter(o => {
+          if (!o.orderTime) {
+            console.warn({parent: o.parentOrder, id: o.id})
+            const parent = filtered.find(or => or.id == o.parentOrder);
+            if (!parent) return true;
+            else {
+              console.warn(parent.orderTime, parent.id, o.id)
+              return new Date(parent.orderTime) < this._timerActives
+            }
+          } else {
+            // return new Date(o.orderTime) < this._timerActives;
+            return true;
+          }
+        }) */;
       },
     },
   },
@@ -228,7 +242,6 @@ export default {
       filter: ".ignore-elements",
     });
     this.updateActivesInterval();
-    console.warn(this._timerActives);
     setInterval(this.updateActivesInterval, 60000)
   },
 

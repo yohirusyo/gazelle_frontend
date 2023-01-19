@@ -147,6 +147,15 @@ export default {
         this._isFreeMoreThan15Minutes = false;
       }
     },
+    updateDuration() {
+      const start = moment(this.transport?.statusChangedAt);
+      const diff = moment().diff(start);
+      if (moment.duration(diff).asDays() >= 1) {
+        this.duration = moment.utc(diff).format("DDд. HH:mm");
+      } else {
+        this.duration = moment.utc(diff).format("HH:mm");
+      }
+    }
   },
   data() {
     return {
@@ -158,20 +167,15 @@ export default {
   },
   mounted() {
     this.updateStatus();
+    this.updateDuration();
     setInterval(() => {
       if (
         this.oldStatus != this.transport?.statusId &&
         this.transport.statusId != null
       )
         this.updateStatus();
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
-      if (moment.duration(diff).asDays() >= 1) {
-        this.duration = moment.utc(diff).format("DDд. HH:mm:ss");
-      } else {
-        this.duration = moment.utc(diff).format("HH:mm:ss");
-      }
-    }, 1000);
+      this.updateDuration();
+    }, 1000 * 60);
   },
 };
 </script>

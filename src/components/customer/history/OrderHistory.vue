@@ -1,8 +1,11 @@
 <template>
-  <div class="col bg-accent" ref="history">
+  <div
+    class="col bg-accent"
+    ref="history"
+  >
     <q-virtual-scroll
       :style="`height: ${height}px`"
-      :items="getSortedHistory()"
+      :items="getSortedHistory(onlyMy)"
     >
       <template v-slot="{ item }">
         <div
@@ -19,25 +22,27 @@
         >
           <div class="text-bold q-mx-md">
             {{
-              (currentUser.id == item.order.customerId
-                ? "Ваш з"
-                : `(${getCustomerById(item.order.customerId)?.fullname})
-                    З`) +
-              `аказ
-                    №${item.order.id}, ` +
-              (item.order.orderTime
-                ? `в ${moment(item.order.orderTime).format("HH:mm")}`
-                : `время заказа не назначено`)
+            (currentUser.id == item.order.customerId
+  ? "Ваш з"
+  : `(${getCustomerById(item.order.customerId)?.fullname})
+            З`) +
+  `аказ
+            №${item.order.id}, ` +
+  (item.order.orderTime
+    ? `в ${moment(item.order.orderTime).format("HH:mm")}`
+    : `время заказа не назначено`)
             }}
           </div>
           <div class="q-mx-md">
             {{
-              `${getPlaceById(item.order.departurePointId)?.name} => ${
-                getPlaceById(item.order.destinationId)?.name
-              }`
+            `${getPlaceById(item.order.departurePointId)?.name} => ${getPlaceById(item.order.destinationId)?.name
+  }`
             }}
           </div>
-          <q-separator spaced inset />
+          <q-separator
+            spaced
+            inset
+          />
           <div
             v-if="
               !item.order.isApproved &&
@@ -75,9 +80,7 @@
               <OrderStatus :orderId="item.order.id" />
             </div>
 
-            <div
-              class="row text-black items-center q-gutter-x-md justify-between"
-            >
+            <div class="row text-black items-center q-gutter-x-md justify-between">
               <AutoNumber
                 :number="item.transportNumber"
                 class="col col-shrink"
@@ -123,9 +126,7 @@
               class="border-none"
               @click="openMap(item.order)"
             />
-            <div
-              class="row text-black items-center q-gutter-x-md justify-between"
-            >
+            <div class="row text-black items-center q-gutter-x-md justify-between">
               <AutoNumber
                 :number="item.transportNumber"
                 class="col col-shrink"
@@ -143,6 +144,17 @@
         </div>
       </template>
     </q-virtual-scroll>
+    <q-page-sticky
+      position="bottom-right"
+      :offset="[18, 18]"
+    >
+      <q-btn
+        fab
+        :icon="!_isOnlyMy ? 'las la-user-alt' : 'las la-user-alt-slash'"
+        color="primary"
+        @click="_isOnlyMy = !_isOnlyMy"
+      />
+    </q-page-sticky>
   </div>
 </template>
 
@@ -177,10 +189,23 @@ export default {
     ...mapGetters("place", ["getPlaceById"]),
     ...mapState("current", ["currentUser"]),
     ...mapGetters("customer", ["getCustomerById"]),
+    _isOnlyMy: {
+      get() {
+        return !!this.onlyMy;
+      },
+      set(newVal) {
+        if (newVal) {
+          this.onlyMy = this.currentUser.id;
+        } else {
+          this.onlyMy = null;
+        }
+      }
+    }
   },
   data() {
     return {
       height: 0,
+      onlyMy: null
     };
   },
   async mounted() {
@@ -235,4 +260,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>
