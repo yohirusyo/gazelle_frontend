@@ -4,7 +4,8 @@
       getByOnlyFreeFilter(
         onlyFree,
         onlyWithDrivers,
-        freeStatuses.map((s) => s.id)
+        freeStatuses.map((s) => s.id),
+        isLocal
       )
     "
     :columns="currentUser?.role == 'WATCHER' ? watchercolumns : columns"
@@ -21,10 +22,13 @@
     table-header-class="bg-white"
     square
     separator="cell"
-
   >
     <template v-slot:body="props">
-      <TransportListElement :id="props.row.id" :freeStatuses="freeStatuses" />
+      <TransportListElement
+        :id="props.row.id"
+        :freeStatuses="freeStatuses"
+        @onSelected="onSelected"
+      />
     </template>
   </q-table>
 </template>
@@ -38,8 +42,12 @@ export default {
   components: {
     TransportListElement,
   },
-  props: ["col", "height"],
-  
+  props: ["col", "height", "selected", "isLocal"],
+  methods: {
+    onSelected(sel) {
+      this.$emit('onSelected', sel);
+    }
+  },
   data() {
     return {
       watchercolumns: [

@@ -3,40 +3,7 @@
     class="column items-center justify-center"
     :class="swapped == orderId ? 'bg-yellow-4' : ''"
   >
-    <q-btn
-      dense
-      flat
-      @click.prevent.stop="
-        swapPriority({
-          firstId: nextOrder.id,
-          secondId: orderId,
-        })
-      "
-      icon="las la-chevron-up col"
-      v-if="nextOrder"
-      @mouseover="setSwapped(nextOrder?.id)"
-      @mouseleave="setSwapped(null)"
-    >
-      <q-tooltip> Поднять приоритет </q-tooltip>
-    </q-btn>
-    <q-btn v-else dense flat icon="las la-chevron-up col" disable />
-    <q-btn
-      dense
-      flat
-      @click.prevent.stop="
-        swapPriority({
-          firstId: prevOrder.id,
-          secondId: orderId,
-        })
-      "
-      icon="las la-chevron-down col"
-      v-if="prevOrder"
-      @mouseover="setSwapped(prevOrder?.id)"
-      @mouseleave="setSwapped(null)"
-    >
-      <q-tooltip> Опустить приоритет </q-tooltip>
-    </q-btn>
-    <q-btn v-else dense flat icon="las la-chevron-down col" disable />
+
   </div>
 </template>
 
@@ -74,11 +41,11 @@ export default {
       if (!!this.prevOrder || !!this.nextOrder) {
         document
           .querySelector(`#order-list-item-${this.orderId}`)
-          .classList.remove("ignore-elements");
+          ?.classList.remove("ignore-elements");
       } else {
         document
           .querySelector(`#order-list-item-${this.orderId}`)
-          .classList.add("ignore-elements");
+          ?.classList.add("ignore-elements");
       }
     },
     findNextOrder(orders, order) {
@@ -143,4 +110,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>

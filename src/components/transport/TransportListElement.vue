@@ -1,7 +1,6 @@
 <template>
-
   <q-tr
-    @click="setTransport(transport)"
+    @click="onSelected(transport)"
     class="text-center"
   >
     <q-td
@@ -69,7 +68,7 @@ export default {
     AutoNumber,
     TransportStatus,
   },
-  props: ["id", "freeStatuses"],
+  props: ["id", "freeStatuses", "selected"],
   computed: {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
@@ -78,7 +77,7 @@ export default {
     ...mapState("current", ["currentUser"]),
     ...mapState("current", [
       "selectedTransportId",
-      "order",
+      // "order",
       "orderIsEmergency",
       "hoveredTransportId",
     ]),
@@ -119,7 +118,7 @@ export default {
   },
   methods: {
     ...mapMutations("current", [
-      "setTransport",
+      // "setTransport",
       "setSelectedTransportId",
       "setHoveredTransportId",
     ]),
@@ -155,6 +154,9 @@ export default {
       } else {
         this.duration = moment.utc(diff).format("HH:mm");
       }
+    },
+    onSelected(sel) {
+      this.$emit('onSelected', sel);
     }
   },
   data() {

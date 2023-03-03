@@ -13,6 +13,9 @@ import contact from "./contact";
 import orderStats from "./order-stats";
 import orderHistory from './order-history';
 import userStats from './user-stats';
+import management from "./management";
+import hierarchy from "./hierarchy";
+import loading from "./loading";
 
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
@@ -28,7 +31,10 @@ export default store(function (/* { ssrContext } */) {
       contact,
       orderStats,
       orderHistory,
-      userStats
+      userStats,
+      management,
+      hierarchy,
+      loading
     },
 
     // enable strict mode (adds overhead!)

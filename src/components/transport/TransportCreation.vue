@@ -70,6 +70,96 @@
               autocomplete="off"
             />
           </div>
+          <div class="column items-stretch q-mt-md">
+            <div class="row q-gutter-x-md">
+
+              <q-input
+                v-model="_weight"
+                type="number"
+                :min="0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Вес (кг)"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '') || 'Обязательное поле!',
+                ]"
+                autocomplete="off"
+                class="col"
+              />
+              <q-input
+                v-model="_length"
+                type="number"
+                :min="0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Длина (мм)"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '') || 'Обязательное поле!',
+                ]"
+                autocomplete="off"
+                class="col"
+              />
+            </div>
+            <div class="row q-mt-md q-gutter-x-md">
+              <q-input
+                v-model="_width"
+                type="number"
+                :min="0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Ширина (мм)"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '') || 'Обязательное поле!',
+                ]"
+                autocomplete="off"
+                class="col"
+              />
+              <q-input
+                v-model="_height"
+                type="number"
+                :min="0"
+                square
+                outlined
+                dense
+                hide-bottom-space
+                hide-hint
+                label-color="grey"
+                label="Высота (мм)"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '') || 'Обязательное поле!',
+                ]"
+                autocomplete="off"
+                class="col"
+              />
+
+            </div>
+            <q-checkbox
+              v-model="_isLocal"
+              label="Транспорт АТУ"
+              dense
+              class="q-pa-md"
+            />
+          </div>
         </q-scroll-area>
       </div>
       <div class="row q-gutter-x-md">
@@ -118,9 +208,9 @@ import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
 
 export default {
   name: "TransportCreation",
-  props: ["height"],
+  props: ["height", "selected"],
   computed: {
-    ...mapState("current", ["coords", "transport", "place"]),
+    ...mapState("current", ["place"]),
     ...mapState("place", ["places"]),
     ...mapState("user", ["drivers"]),
     ...mapGetters("user", ["getDriverById"]),
@@ -133,7 +223,7 @@ export default {
       "removeTransport",
       "addTransport",
     ]),
-    ...mapMutations("current", ["clearCoords", "clearTransport", "setPlace"]),
+    ...mapMutations("current", ["clearTransport", "setPlace"]),
     async onAddTransport() {
       await this.addTransport({
         type: this._type,
@@ -141,16 +231,26 @@ export default {
         placeId: this._place?.id,
         statusId: this.getStatusByCode("FREE").id,
         driverId: this._driver?.id,
+        width: Number(this._width),
+        weight: Number(this._weight),
+        length: Number(this._length),
+        height: Number(this._height),
+        isLocal: this._isLocal,
       });
       this.$refs.form.reset();
     },
     async onUpdateTransport() {
       await this.updateTransport({
-        id: this.transport.id,
+        id: this.selected.id,
         type: this._type,
         transportNumber: this._transportNumber,
         placeId: this._place?.id || null,
         driverId: this._driver?.id || null,
+        width: Number(this._width),
+        weight: Number(this._weight),
+        length: Number(this._length),
+        height: Number(this._height),
+        isLocal: this._isLocal,
       });
       this.$refs.form.reset();
     },
@@ -160,7 +260,7 @@ export default {
         : await this.onUpdateTransport();
     },
     async onRemoveTransport() {
-      await this.removeTransport({ id: this.transport.id });
+      await this.removeTransport({ id: this.selected.id });
       this.$refs.form.reset();
     },
     resetForm() {
@@ -168,22 +268,32 @@ export default {
       this._transportNumber = null;
       this._place = null;
       this._driver = null;
+      this._width = 0
+      this._weight = 0
+      this._height = 0
+      this._length = 0
+      this._isLocal = false
       this.$emit("done");
       this.clearTransport();
     },
     loadData() {
-      if (this.transport) {
-        this._type = this.transport.type;
-        this._transportNumber = this.transport.transportNumber;
-        this._place = this.getPlaceById(this.transport.placeId);
-        this._driver = this.getDriverById(this.transport.driverId);
+      if (this.selected) {
+        this._type = this.selected.type;
+        this._transportNumber = this.selected.transportNumber;
+        this._place = this.getPlaceById(this.selected.placeId);
+        this._driver = this.getDriverById(this.selected.driverId);
+        this._width = Number(this.selected.width);
+        this._weight = Number(this.selected.weight);
+        this._height = Number(this.selected.height);
+        this._length = Number(this.selected.length);
+        this._isLocal = this.selected.isLocal;
         this._creationMode = false;
       } else {
         this._creationMode = true;
       }
     },
     onCancel() {
-      this.$refs.form.reset();
+      this.resetForm();
     },
   },
   data() {
@@ -192,6 +302,11 @@ export default {
       _transportNumber: null,
       _place: null,
       _driver: null,
+      _width: 0,
+      _height: 0,
+      _weight: 0,
+      _length: 0,
+      _isLocal: false,
       _creationMode: true,
     };
   },
@@ -199,11 +314,11 @@ export default {
     this.loadData();
   },
   watch: {
-    "transport.type"() {
-      if (this.transport) this.loadData();
-    },
-    transport() {
-      this._creationMode = !this.transport;
+    "selected": {
+      handler(newVal, oldVal) {
+        this._creationMode = !newVal;
+        if (newVal != oldVal) this.loadData();
+      },
     },
   },
 };

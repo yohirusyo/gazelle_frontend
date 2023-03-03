@@ -471,14 +471,14 @@
             />
             <div
               class="row justify-center items-center q-gutter-x-md"
-              v-if="_creationMode || (!_creationMode && order.orderTime)"
+              v-if="_creationMode || (!_creationMode && selected.orderTime)"
             >
               <!-- <div
-                v-if="!_creationMode"
-                class="bg-blue-4 text-white q-py-sm q-px-md"
-              >
-                {{ moment(_orderTime).format("DD.MM.YYYY") }}
-              </div> -->
+                        v-if="!_creationMode"
+                        class="bg-blue-4 text-white q-py-sm q-px-md"
+                      >
+                        {{ moment(_orderTime).format("DD.MM.YYYY") }}
+                      </div> -->
 
               <q-btn
                 text-color="white"
@@ -553,104 +553,119 @@
           </div>
         </q-scroll-area>
       </div>
-      <div
-        class="row col col-shrink q-pb-md"
-        v-if="!_creationMode && getStatusById(order.statusId).code == 'REQUEST'"
-      >
-        <q-btn
-          text-color="white"
-          label="Принять и применить изменения"
-          unelevated
-          class="border-none bg-blue-4 col"
-          color="primary"
-          @click="onApprove"
-          no-caps
-          dense
-        />
-      </div>
-      <div
-        class="row col col-shrink q-pb-md"
-        v-if="
-          order?.isRequest &&
-          !_creationMode &&
-          getStatusById(order.statusId).code == 'ORDERED'
-        "
-      >
-        <q-btn
-          text-color="white"
-          label="Вернуть в запрос"
-          unelevated
-          class="border-none bg-blue-4 col"
-          @click="
-            () => {
-              backToRequest(order.id);
-              resetForm();
-            }
-          "
-          no-caps
-          dense
-        />
-      </div>
-      <div class="row col col-shrink q-gutter-x-md">
-        <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code == 'REQUEST'
-          "
-          text-color="white"
-          label="Отклонить"
-          unelevated
-          class="border-none bg-red col"
-          @click="onDecline"
-          no-caps
-          dense
-        />
-        <q-btn
-          v-if="_creationMode"
-          text-color="white"
-          label="Создать"
-          unelevated
-          class="border-none bg-blue-4 col"
-          type="submit"
-          no-caps
-          dense
-          :loading="_addLoading"
-          :disable="_addLoading"
-        />
-        <q-btn
-          v-if="
-            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
-          "
-          text-color="white"
-          label="Изменить"
-          unelevated
-          class="border-none bg-blue-4 col"
-          type="submit"
-          no-caps
-          dense
-        />
+      <div class="col col-shrink q-gutter-y-sm column ">
+        <div
+          class="col row  q-gutter-x-sm items-center"
+          v-if="!_creationMode && getStatusById(selected.statusId).code == 'REQUEST'"
+        >
+          <q-btn
+            text-color="white"
+            label="Принять и применить изменения"
+            unelevated
+            class="border-none bg-blue-4 col"
+            color="primary"
+            @click="onApprove"
+            no-caps
+            dense
+          />
 
-        <q-btn
+          <q-btn
+            text-color="white"
+            label="Принять весь маршрут"
+            unelevated
+            class="border-none bg-blue-4 col"
+            color="primary"
+            @click="onApproveRoute"
+            no-caps
+            dense
+            v-if="orderRoute(selected.id).length >= 1"
+          />
+        </div>
+        <div
+          class=" col row    q-gutter-x-sm items-center"
           v-if="
-            !_creationMode && getStatusById(order.statusId).code != 'REQUEST'
+            selected?.isRequest &&
+            !_creationMode &&
+            getStatusById(selected.statusId).code == 'ORDERED'
           "
-          text-color="white"
-          label="Удалить"
-          unelevated
-          class="border-none bg-red col"
-          @click="onRemoveOrder"
-          no-caps
-          dense
-        />
-        <q-btn
-          text-color="white"
-          label="Отмена"
-          unelevated
-          class="border-none bg-green col"
-          @click="onCancel()"
-          no-caps
-          dense
-        />
+        >
+          <q-btn
+            text-color="white"
+            label="Вернуть в запрос"
+            unelevated
+            class="border-none bg-blue-4 col"
+            @click="
+              () => {
+                backToRequest(selected.id);
+                resetForm();
+              }
+            "
+            no-caps
+            dense
+          />
+        </div>
+        <div class=" col row  q-gutter-x-sm items-center">
+          <q-btn
+            v-if="
+              !_creationMode && getStatusById(selected.statusId).code == 'REQUEST'
+            "
+            text-color="white"
+            label="Отклонить"
+            unelevated
+            class="border-none bg-red col"
+            @click="onDecline"
+            no-caps
+            dense
+          />
+          <q-btn
+            v-if="_creationMode"
+            text-color="white"
+            label="Создать"
+            unelevated
+            class="border-none bg-blue-4 col"
+            type="submit"
+            no-caps
+            dense
+            :loading="_addLoading"
+            :disable="_addLoading"
+          />
+          <q-btn
+            v-if="
+              !_creationMode && getStatusById(selected.statusId).code != 'REQUEST'
+            "
+            text-color="white"
+            label="Изменить"
+            unelevated
+            class="border-none bg-blue-4 col"
+            type="submit"
+            no-caps
+            dense
+          />
+
+          <q-btn
+            v-if="
+              !_creationMode && getStatusById(selected.statusId).code != 'REQUEST'
+            "
+            text-color="white"
+            label="Удалить"
+            unelevated
+            class="border-none bg-red col"
+            @click="onRemoveOrder"
+            no-caps
+            dense
+          />
+          <q-btn
+            text-color="white"
+            label="Отмена"
+            unelevated
+            class="border-none bg-green col"
+            @click="onCancel()"
+            no-caps
+            dense
+          />
+        </div>
       </div>
+
     </q-form>
   </div>
 </template>
@@ -664,7 +679,7 @@ import { showNotifyResult } from "src/helpers/notification";
 import * as moment from "moment";
 export default {
   name: "OrderCreation",
-  props: ["height"],
+  props: ["height", "selected"],
   components: {
     Datepicker,
     ISelect,
@@ -672,7 +687,6 @@ export default {
   computed: {
     ...mapState("current", ["selectedTransportId", "orderIsEmergency"]),
     ...mapState("order", ["names"]),
-    ...mapState("current", ["order"]),
     ...mapState("place", ["places"]),
     ...mapState("contact", ["contacts"]),
     ...mapGetters("contact", ["getContactById"]),
@@ -681,6 +695,7 @@ export default {
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("transport", ["getByOnlyFreeFilter", "getTransportById"]),
+    ...mapGetters('order', ['orderRoute']),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
@@ -829,14 +844,76 @@ export default {
       "declineOrder",
     ]),
     ...mapMutations("current", [
-      "setTransport",
       "setSelectedTransportId",
       "setOrderIsEmergency",
-      "clearOrder",
     ]),
     ...mapMutations("order", ["setCustomerSubdivision"]),
     ...mapMutations("current", ["setSelectedTransportId"]),
     onCancel() {
+      this.resetForm();
+    },
+    async onApproveRoute() {
+      if (!this.selectedTransportId)
+        return showNotifyResult(false, "Выберите транспорт!");
+      if (!this._withPassengers && !this._withCargo)
+        return showNotifyResult(false, "Добавьте груз или пассажиров!");
+      const d = new Date(this._selectedDate);
+      d.setHours(this._orderTime.hours);
+      d.setMinutes(this._orderTime.minutes);
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      await this.approveOrder({
+        id: this.selected.id,
+        orderTime: this.selected.orderTime ? d : null,
+        departurePointName: this._departurePointName,
+        destinationName: this._destinationName,
+        isEmergency: this._orderIsEmergency,
+        passengerCount: this._withPassengers ? Number(this._passengerCount) : 0,
+        weight: this._withCargo ? Number(this._weight) : 0,
+        length: this._withCargo ? Number(this._length) : 0,
+        width: this._withCargo ? Number(this._width) : 0,
+        height: this._withCargo ? Number(this._height) : 0,
+        customerPhoneNumber: this._customerPhoneNumber,
+        customerFullname: this._customerFullname,
+        customerSubdivision: this._customerSubdivision,
+        contactPhoneNumber:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this._contactPhoneNumber
+            : null,
+        contactFullname:
+          this._allowContact &&
+            this._passengerCount &&
+            this._passengerCount >= 1
+            ? this._contactFullname
+            : null,
+        transportId: this.selectedTransportId ?? null,
+        name: this._name,
+        description: this._description,
+      });
+      for (const o of this.orderRoute(this.selected.id)) {
+        await this.approveOrder({
+          id: o.id,
+          orderTime: null,
+          departurePointName: this.getPlaceById(o.departurePointId).name,
+          destinationName: this.getPlaceById(o.destinationId).name,
+          isEmergency: o.orderIsEmergency,
+          passengerCount: Number(o.passengerCount),
+          weight: Number(o.weight),
+          length: Number(o.length),
+          width: Number(o.width),
+          height: Number(o.height),
+          customerPhoneNumber: this.getCustomerById(o.customerId).phoneNumber,
+          customerFullname: this.getCustomerById(o.customerId).fullname,
+          customerSubdivision: this.getCustomerById(o.customerId).subdivision,
+          contactPhoneNumber: o.contactId ? this.getContactById(o.contactId).phoneNumber : null,
+          contactFullname: o.contactId ? this.getContactById(o.contactId).fullname : null,
+          transportId: this.selectedTransportId ?? null,
+          name: o.name,
+          description: o.description,
+        });
+      }
       this.$refs.form.reset();
     },
     async onApprove() {
@@ -850,8 +927,8 @@ export default {
       d.setSeconds(0);
       d.setMilliseconds(0);
       await this.approveOrder({
-        id: this.order.id,
-        orderTime: this.order.orderTime ? d : null,
+        id: this.selected.id,
+        orderTime: this.selected.orderTime ? d : null,
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
@@ -888,7 +965,7 @@ export default {
       d.setSeconds(0);
       d.setMilliseconds(0);
       await this.declineOrder({
-        id: this.order.id,
+        id: this.selected.id,
       });
       this.$refs.form.reset();
     },
@@ -1028,8 +1105,8 @@ export default {
       d.setSeconds(0);
       d.setMilliseconds(0);
       await this.updateOrder({
-        id: this.order.id,
-        orderTime: this.order.orderTime ? d : null,
+        id: this.selected.id,
+        orderTime: this.selected.orderTime ? d : null,
         departurePointName: this._departurePointName,
         destinationName: this._destinationName,
         isEmergency: this._orderIsEmergency,
@@ -1063,7 +1140,7 @@ export default {
       this._creationMode ? await this.onAddOrder() : await this.onUpdateOrder();
     },
     async onRemoveOrder() {
-      await this.removeOrder({ id: this.order.id });
+      await this.removeOrder({ id: this.selected.id });
       this.$refs.form.reset();
     },
     resetForm() {
@@ -1097,49 +1174,48 @@ export default {
       this.combinedOrders = [];
       this._withPassengers = false;
       this._withCargo = false;
-      this.clearOrder();
       this.$emit("done");
     },
     loadData() {
-      if (this.order) {
-        this._selectedDate = new Date(this.order.orderTime);
+      if (this.selected) {
+        this._selectedDate = new Date(this.selected.orderTime);
         this._orderTime = {
           hours: this._selectedDate.getHours(),
           minutes: this._selectedDate.getMinutes(),
           seconds: 0,
         };
         this._departurePointName = this.getPlaceById(
-          this.order.departurePointId
+          this.selected.departurePointId
         ).name;
         this._destinationName = this.getPlaceById(
-          this.order.destinationId
+          this.selected.destinationId
         ).name;
 
-        this._orderIsEmergency = this.order.isEmergency;
-        this._passengerCount = this.order.passengerCount;
-        this._weight = this.order.weight;
-        this._length = this.order["length"];
-        this._width = this.order.width;
-        this._height = this.order.height;
-        this._name = this.order.name;
-        this._description = this.order.description;
-        const contact = this.getContactById(this.order?.contactId);
+        this._orderIsEmergency = this.selected.isEmergency;
+        this._passengerCount = this.selected.passengerCount;
+        this._weight = this.selected.weight;
+        this._length = this.selected["length"];
+        this._width = this.selected.width;
+        this._height = this.selected.height;
+        this._name = this.selected.name;
+        this._description = this.selected.description;
+        const contact = this.getContactById(this.selected?.contactId);
         this._allowContact =
           !!contact && !!this._passengerCount && this._passengerCount >= 1;
-        const customer = this.getCustomerById(this.order.customerId);
+        const customer = this.getCustomerById(this.selected.customerId);
         this._customerPhoneNumber = customer.phoneNumber;
         this._customerFullname = customer.fullname;
         this._customerSubdivision = customer.subdivision;
         this.setCustomerSubdivision(this._customerSubdivision);
         this._contactFullname = contact?.fullname;
         this._contactPhoneNumber = contact?.phoneNumber;
-        this.setSelectedTransportId(this.order.transportId);
-        this._withPassengers = this.order.passengerCount >= 1 ? true : false;
+        this.setSelectedTransportId(this.selected.transportId);
+        this._withPassengers = this.selected.passengerCount >= 1 ? true : false;
         this._withCargo =
-          this.order.width > 0 ||
-            this.order.height > 0 ||
-            this.order.weight > 0 ||
-            this.order.length > 0
+          this.selected.width > 0 ||
+            this.selected.height > 0 ||
+            this.selected.weight > 0 ||
+            this.selected.length > 0
             ? true
             : false;
         this._creationMode = false;
@@ -1212,12 +1288,13 @@ export default {
     };
   },
   watch: {
-    "order.id"() {
-      if (this.order) this.loadData();
+    "selected": {
+      handler(newVal, oldVal) {
+        this._creationMode = !newVal;
+        if (newVal != oldVal) this.loadData();
+      },
     },
-    order() {
-      this._creationMode = !this.order;
-    },
+
   },
 };
 </script>

@@ -8,12 +8,10 @@
 </template>
 
 <script>
-import BaseCard from "src/components/base/Card.vue";
 import OrderHistory from "src/components/customer/history/OrderHistory.vue";
 export default {
   name: "History",
   components: {
-    BaseCard,
     OrderHistory,
   },
 };

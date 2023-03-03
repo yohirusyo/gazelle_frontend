@@ -59,3 +59,27 @@ export function removeUser(state, id) {
   state.users = state.users.filter((user) => user.id != id);
   sortUsers(state)
 }
+
+export function setLoadingDrivers(state, loading) {
+  state.isLoadingDrivers = loading;
+}
+
+export function setLoadedDrivers(state, loaded) {
+  state.isLoadedDrivers = loaded;
+}
+
+export function setLoadingOperators(state, loading) {
+  state.isLoadingOperators = loading;
+}
+
+export function setLoadedOperators(state, loaded) {
+  state.isLoadedOperators = loaded;
+}
+
+export function setLoadingUsers(state, loading) {
+  state.isLoadingUsers = loading;
+}
+
+export function setLoadedUsers(state, loaded) {
+  state.isLoadedUsers = loaded;
+}

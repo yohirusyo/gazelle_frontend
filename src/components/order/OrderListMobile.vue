@@ -1,5 +1,8 @@
 <template>
-  <div :style="`height: 100%`" class="q-gutter-y-sm">
+  <div
+    :style="`height: 100%`"
+    class="q-gutter-y-sm"
+  >
     <div
       class="column"
       v-for="order of orders"
@@ -9,8 +12,8 @@
         order.isRequest && !order.isApproved
           ? 'bg-blue-2 '
           : order.isRequest && order.isApproved
-          ? 'bg-blue-1 '
-          : 'bg-white '
+            ? 'bg-blue-1 '
+            : 'bg-white '
       "
     >
       <div class="row justify-evenly">
@@ -18,7 +21,7 @@
           {{ order.id }}
         </q-chip>
         <q-chip :class="order.isEmergency ? 'bg-red text-white' : ''">
-          {{ order?.orderTime ? timeFormat(order?.orderTime) : "Маршрут" }}
+          {{ order?.orderTime? timeFormat(order?.orderTime): "Маршрут" }}
         </q-chip>
       </div>
 
@@ -27,11 +30,17 @@
           v-if="order.transportId"
           :number="formatTransportNumber(getTransportById(order.transportId))"
         />
-        <div class="q-pa-xs" v-else>Транспорт не выбран!</div>
+        <div
+          class="q-pa-xs"
+          v-else
+        >Транспорт не выбран!</div>
       </div>
 
       <div class="row justify-center">
-        <OrderStatus :orderId="order.id" />
+        <OrderListElementStatus
+          :statusId="order.statusId"
+          :statusChangedAt="order.statusChangedAt"
+        />
       </div>
 
       <div class="column items-center">
@@ -39,13 +48,13 @@
           {{ formatCustomerMobileFullname(getCustomerById(order.customerId)) }}
 
           {{
-            formatCustomerMobileSubdivision(getCustomerById(order.customerId))
+  formatCustomerMobileSubdivision(getCustomerById(order.customerId))
           }}
         </div>
         <div class="row text-grey items-center">
           <q-icon name="phone" />
           {{
-            formatCustomerMobilePhoneNumber(getCustomerById(order.customerId))
+  formatCustomerMobilePhoneNumber(getCustomerById(order.customerId))
           }}
         </div>
       </div>
@@ -75,7 +84,7 @@
 
 <script>
 import { mapState, mapMutations, mapGetters } from "vuex";
-import OrderStatus from "./OrderStatus.vue";
+import OrderListElementStatus from "./OrderListElement/OrderListElementStatus.vue";
 
 import {
   timeFormat,
@@ -93,7 +102,7 @@ export default {
   props: ["col", "height"],
   components: {
     AutoNumber,
-    OrderStatus,
+    OrderListElementStatus,
     BaseCard,
   },
   computed: {

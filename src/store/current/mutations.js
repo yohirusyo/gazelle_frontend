@@ -103,3 +103,7 @@ export function setRequest(state, request) {
 export function setSwapped(state, swapped) {
   state.swapped = swapped;
 }
+
+export function setManagement(state, management) {
+  state.management = management;
+}

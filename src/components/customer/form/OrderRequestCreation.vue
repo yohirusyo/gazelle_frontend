@@ -485,14 +485,14 @@
       <div class="row col col-shrink q-gutter-x-md">
         <q-btn
           text-color="white"
-          :label="_creationMode ? 'Создать' : 'Изменить'"
+          :label="_creationMode ? `Создать` : 'Изменить'"
           unelevated
           class="border-none bg-blue-4 col"
           type="submit"
           no-caps
           dense
           :loading="_addLoading"
-          :disable="_addLoading"
+          :disable="_addLoading || (myUnusedLimit != null && myUnusedLimit <= 0)"
         />
         <q-btn
           v-if="!_creationMode"
@@ -541,6 +541,7 @@ export default {
     ...mapState("customer", ["customers"]),
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("orderHistory", ["getRequestById"]),
+    ...mapGetters('hierarchy', ['myUnusedLimit']),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;

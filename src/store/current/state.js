@@ -15,5 +15,6 @@ export default function () {
     user: null,
     request: null,
     swapped: null,
+    management: null,
   };
 }

@@ -1,11 +1,24 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
+import { requestHelper } from 'src/helpers/loader';
 
-export async function requestPlaces({ commit }) {
-  return api.get(`place`).then(({ data }) => {
-    commit("set", data);
-  });
+export async function requestPlaces(context) {
+  requestHelper(
+    context,
+    async () => {
+      try {
+        ['place_update', 'place_create', "place_delete"].forEach(socketio.removeAllListeners)
+      } catch (error) { }
+      await api.get(`place`).then(({ data }) => {
+        context.commit("set", data);
+      });
+      socketio.on('place_update', place => context.commit("update", place))
+      socketio.on('place_create', place => context.commit("add", place))
+      socketio.on("place_delete", id => context.commit("remove", id))
+    }
+  )
+
 }
 
 export async function addPlace({ commit }, form) {
@@ -41,8 +54,4 @@ export async function removePlace({ commit }, { id }) {
     });
 }
 
-export async function subscribePlaceSockets({ commit }) {
-  socketio.on('place_update', place => commit("update", place))
-  socketio.on('place_create', place => commit("add", place))
-  socketio.on("place_delete", id => commit("remove", id))
-}
+

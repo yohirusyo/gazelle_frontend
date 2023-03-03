@@ -96,27 +96,7 @@
           v-model:selected="_selectedRow"
           selection="multiple"
           style="height: 100%"
-        >
-          <template v-slot:body-cell-map="props">
-            <q-td :props="props" class="map-td">
-              <q-btn
-                color="black"
-                label="Маршрут"
-                v-if="
-                  props.row.order.coordinatesHistory.length != 0 &&
-                  props.row.order.routeLength != null &&
-                  props.row.order.routeLength != 0
-                "
-                dense
-                flat
-                no-caps
-                unelevated
-                class="border-none"
-                @click="openMap(props.row.order)"
-              />
-            </q-td>
-          </template>
-        </q-table>
+        />
       </div>
     </div>
   </q-page>
@@ -309,15 +289,6 @@ export default {
           format: this.regular,
           sortable: true,
         },
-        {
-          name: "map",
-          required: true,
-          label: "Маршрут",
-          align: "center",
-          sortable: false,
-          field: (row) => row,
-        },
-
         {
           name: "routeLength",
           required: false,

@@ -1,6 +1,24 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
+import { requestHelper } from 'src/helpers/loader';
+
+export async function requestOrders(context) {
+  requestHelper(
+    context,
+    async () => {
+      try {
+        ['order_update', 'order_create', "order_update_done"].forEach(socketio.removeAllListeners)
+      } catch (error) { }
+      await api.get(`order`).then(({ data }) => {
+        context.commit("set", data);
+      })
+      socketio.on('order_update', order => context.commit("update", order))
+      socketio.on('order_create', order => context.commit("add", order))
+      socketio.on("order_update_done", order => context.commit("remove", order))
+    }
+  )
+}
 
 export async function addOrder({ commit }, form) {
   return api
@@ -14,9 +32,7 @@ export async function addOrder({ commit }, form) {
     });
 }
 
-export function rerender({ commit }) {
-  commit('rerender');
-}
+
 
 export async function addOrderRequest({ commit }, form) {
   return api
@@ -38,11 +54,7 @@ export async function requestNames({ commit }) {
     })
 }
 
-export async function requestOrders({ commit }) {
-  return api.get(`order`).then(({ data }) => {
-    commit("set", data);
-  });
-}
+
 
 export async function approveOrder({ commit }, { id, ...form }) {
   return api
@@ -104,8 +116,3 @@ export async function swapPriority({ commit }, { firstId, secondId }) {
     .patch(`order/swap-priority/${firstId}/${secondId}`)
 }
 
-export async function subscribeOrderSockets({ commit }) {
-  socketio.on('order_update', order => commit("update", order))
-  socketio.on('order_create', order => commit("add", order))
-  socketio.on("order_delete", id => commit("remove", id))
-}

@@ -12,7 +12,7 @@ function sort(state) {
       return 1;
     }
     return a.priority - b.priority
-  }).filter(order => !order.isDone && !order.isDeleted)
+  }).filter(order => !order.isDeleted)
 }
 
 export function add(state, order) {
@@ -34,13 +34,21 @@ export function rerender(state) {
 
 export function update(state, order) {
   const index = state.orders.findIndex((o) => o.id == order.id);
-  const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
-  state.orders[index] = order;
-  if (changedPriopity) sort(state)
+  if (index != -1) {
+    const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
+    state.orders[index] = order;
+    if (changedPriopity) sort(state)
+  }
 }
 
-export function remove(state, id) {
-  state.orders = state.orders.filter((order) => order.id != id);
+export function remove(state, ord) {
+  const index = state.orders.findIndex((o) => o.id == ord.id);
+  state.orders[index] = ord;
+  const order = state.orders[index];
+  if (!order.parentOrder) { console.warn('solo'); return state.orders = state.orders.filter((order) => order.id != ord.id); }
+  const isRouteNotDone = state.orders.some(o => o.parentOrder == order.parentOrder && o.isDone == false && o.id != ord.id);
+  if (isRouteNotDone) return;
+  state.orders = state.orders.filter((o) => o.parentOrder != order.parentOrder);
 }
 
 
@@ -78,4 +86,24 @@ export function setNames(state, names) {
 
 export function setName(state, name) {
   state.name = name
+}
+
+export function setHovered(state, hovered) {
+  state.hovered = hovered;
+}
+
+export function addToExpanded(state, id) {
+  state.expandedRoutes.push(id);
+}
+
+export function removeFromExpanded(state, id) {
+  state.expandedRoutes = state.expandedRoutes.filter(r => r.id != id)
+}
+
+export function setLoading(state, loading) {
+  state.isLoading = loading;
+}
+
+export function setLoaded(state, loaded) {
+  state.isLoaded = loaded;
 }

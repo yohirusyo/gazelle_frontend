@@ -16,3 +16,11 @@ export function update(state, contact) {
 export function remove(state, id) {
   state.contacts = state.contacts.filter((contact) => contact.id != id);
 }
+
+export function setLoading(state, loading) {
+  state.isLoading = loading;
+}
+
+export function setLoaded(state, loaded) {
+  state.isLoaded = loaded;
+}

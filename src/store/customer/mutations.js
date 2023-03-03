@@ -39,3 +39,11 @@ export function setCustomerPhoneNumber(state, phoneNumber) {
 export function setCustomerSubdivision(state, subdivision) {
   state.customerSubdivision = subdivision;
 }
+
+export function setLoading(state, loading) {
+  state.isLoading = loading;
+}
+
+export function setLoaded(state, loaded) {
+  state.isLoaded = loaded;
+}

@@ -65,7 +65,7 @@
             <div class="row items-center q-gutter-x-md justify-between">
               <span>
                 Заказ выполняется
-                <q-btn
+                <!-- <q-btn
                   color="black"
                   label="Маршрут"
                   v-if="item.order.coordinatesHistory.length != 0"
@@ -75,9 +75,12 @@
                   unelevated
                   class="border-none"
                   @click="openMap(item.order, true)"
-                />
+                /> -->
               </span>
-              <OrderStatus :orderId="item.order.id" />
+              <OrderListElementStatus
+                :statusId="item.order.statusId"
+                :statusChangedAt="item.order.statusChangedAt"
+              />
             </div>
 
             <div class="row text-black items-center q-gutter-x-md justify-between">
@@ -111,7 +114,7 @@
                 ? `${(item.order.routeLength / 1000).toFixed(1)}км`
                 : ""
             }}
-            <q-btn
+            <!-- <q-btn
               color="black"
               label="Маршрут"
               v-if="
@@ -125,7 +128,7 @@
               unelevated
               class="border-none"
               @click="openMap(item.order)"
-            />
+            /> -->
             <div class="row text-black items-center q-gutter-x-md justify-between">
               <AutoNumber
                 :number="item.transportNumber"
@@ -160,9 +163,10 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
-import OrderStatus from "src/components/order/OrderStatus.vue";
+
 import * as moment from "moment";
 import AutoNumber from "src/components/base/AutoNumber.vue";
+import OrderListElementStatus from "src/components/order/OrderListElement/OrderListElementStatus.vue";
 import {
   timeFormat,
   formatContact,
@@ -180,7 +184,7 @@ import { Dialog } from "quasar";
 export default {
   name: "OrderHistory",
   components: {
-    OrderStatus,
+    OrderListElementStatus,
     BaseCard,
     AutoNumber,
   },

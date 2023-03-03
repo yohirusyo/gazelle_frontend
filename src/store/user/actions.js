@@ -1,17 +1,126 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
+import { requestHelper } from 'src/helpers/loader';
 
-export async function requestDrivers({ commit }) {
-  return api.get(`user/drivers`).then(({ data }) => {
-    commit("setDriver", data);
-  });
+export async function requestDrivers(context) {
+  requestHelper(
+    context,
+    async () => {
+      const nonDriverRoles = ['WATCHER', 'ADMIN', 'OPERATOR'];
+      try {
+        ['user_update:DRIVER', 'user_create:DRIVER', "user_delete:DRIVER"].forEach(socketio.removeAllListeners)
+        nonDriverRoles.forEach(role => {
+          [`user_update:${role}`, `user_create:${role}`, `user_delete:${role}`].forEach(socketio.removeAllListeners)
+        })
+      } catch (error) { }
+
+      await api.get(`user/drivers`).then(({ data }) => {
+        context.commit("setDriver", data);
+      })
+
+      const { commit, rootState } = context;
+      socketio.on('user_update:DRIVER', driver => commit("updateDriver", driver))
+      socketio.on('user_create:DRIVER', driver => commit("addDriver", driver))
+      socketio.on("user_delete:DRIVER", id => commit("removeDriver", id))
+      nonDriverRoles.forEach(role => {
+        socketio.on(`user_update:${role}`, user => {
+          commit("updateUser", user);
+          if (rootState.current.currentUser?.id == user.id) {
+            commit('current/setCurrentUser', user, { root: true })
+          }
+        })
+        socketio.on(`user_create:${role}`, user => commit("addUser", user))
+        socketio.on(`user_delete:${role}`, id => {
+          commit("removeUser", id)
+          if (rootState.current.currentUser?.id == id) {
+            commit('auth/logout', null, { root: true })
+          }
+        })
+      })
+    },
+    'Drivers'
+  )
 }
 
-export async function requestNonDrivers({ commit }) {
-  return api.get(`user/non-drivers`).then(({ data }) => {
-    commit("setUser", data);
-  });
+export async function requestOperators(context) {
+  requestHelper(
+    context,
+    async () => {
+      const nonDriverRoles = ['WATCHER', 'ADMIN', 'OPERATOR'];
+      try {
+        ['user_update:DRIVER', 'user_create:DRIVER', "user_delete:DRIVER"].forEach(socketio.removeAllListeners)
+        nonDriverRoles.forEach(role => {
+          [`user_update:${role}`, `user_create:${role}`, `user_delete:${role}`].forEach(socketio.removeAllListeners)
+        })
+      } catch (error) { }
+
+      await api.get(`user/operators`).then(({ data }) => {
+        context.commit("setOperators", data);
+      })
+
+      const { commit, rootState } = context;
+      socketio.on('user_update:DRIVER', driver => commit("updateDriver", driver))
+      socketio.on('user_create:DRIVER', driver => commit("addDriver", driver))
+      socketio.on("user_delete:DRIVER", id => commit("removeDriver", id))
+      nonDriverRoles.forEach(role => {
+        socketio.on(`user_update:${role}`, user => {
+          commit("updateUser", user);
+          if (rootState.current.currentUser?.id == user.id) {
+            commit('current/setCurrentUser', user, { root: true })
+          }
+        })
+        socketio.on(`user_create:${role}`, user => commit("addUser", user))
+        socketio.on(`user_delete:${role}`, id => {
+          commit("removeUser", id)
+          if (rootState.current.currentUser?.id == id) {
+            commit('auth/logout', null, { root: true })
+          }
+        })
+      })
+    },
+    'Operators'
+  )
+}
+
+export async function requestNonDrivers(context) {
+  requestHelper(
+    context,
+    async () => {
+      const nonDriverRoles = ['WATCHER', 'ADMIN', 'OPERATOR'];
+      try {
+        ['user_update:DRIVER', 'user_create:DRIVER', "user_delete:DRIVER"].forEach(socketio.removeAllListeners)
+        nonDriverRoles.forEach(role => {
+          [`user_update:${role}`, `user_create:${role}`, `user_delete:${role}`].forEach(socketio.removeAllListeners)
+        })
+      } catch (error) { }
+
+      await api.get(`user/non-drivers`).then(({ data }) => {
+        context.commit("setUser", data);
+      })
+
+      const { commit, rootState } = context;
+      socketio.on('user_update:DRIVER', driver => commit("updateDriver", driver))
+      socketio.on('user_create:DRIVER', driver => commit("addDriver", driver))
+      socketio.on("user_delete:DRIVER", id => commit("removeDriver", id))
+      nonDriverRoles.forEach(role => {
+        socketio.on(`user_update:${role}`, user => {
+          commit("updateUser", user);
+          if (rootState.current.currentUser?.id == user.id) {
+            commit('current/setCurrentUser', user, { root: true })
+          }
+        })
+        socketio.on(`user_create:${role}`, user => commit("addUser", user))
+        socketio.on(`user_delete:${role}`, id => {
+          commit("removeUser", id)
+          if (rootState.current.currentUser?.id == id) {
+            commit('auth/logout', null, { root: true })
+          }
+        })
+      })
+    },
+    'Users'
+  )
 }
 
 export async function addDriver(
@@ -94,30 +203,4 @@ export async function removeUser({ commit }, { id }) {
     });
 }
 
-export async function requestOperators({ commit }) {
-  return api.get(`user/operators`).then(({ data }) => {
-    commit("setOperators", data);
-  });
-}
 
-export async function subscribeUserSockets({ commit, rootState }) {
-  socketio.on('user_update:DRIVER', driver => commit("updateDriver", driver))
-  socketio.on('user_create:DRIVER', driver => commit("addDriver", driver))
-  socketio.on("user_delete:DRIVER", id => commit("removeDriver", id))
-  const nonDriverRoles = ['WATCHER', 'ADMIN', 'OPERATOR'];
-  nonDriverRoles.forEach(role => {
-    socketio.on(`user_update:${role}`, user => {
-      commit("updateUser", user);
-      if (rootState.current.currentUser?.id == user.id) {
-        commit('current/setCurrentUser', user, { root: true })
-      }
-    })
-    socketio.on(`user_create:${role}`, user => commit("addUser", user))
-    socketio.on(`user_delete:${role}`, id => {
-      commit("removeUser", id)
-      if (rootState.current.currentUser?.id == id) {
-        commit('auth/logout', null, { root: true })
-      }
-    })
-  })
-}

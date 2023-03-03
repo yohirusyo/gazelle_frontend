@@ -23,3 +23,11 @@ export function update(state, place) {
 export function remove(state, id) {
   state.places = state.places.filter((place) => place.id != id);
 }
+
+export function setLoading(state, loading) {
+  state.isLoading = loading;
+}
+
+export function setLoaded(state, loaded) {
+  state.isLoaded = loaded;
+}

@@ -31,3 +31,11 @@ export function update(state, transport) {
 export function remove(state, id) {
   state.transports = state.transports.filter((transport) => transport.id != id);
 }
+
+export function setLoading(state, loading) {
+  state.isLoading = loading;
+}
+
+export function setLoaded(state, loaded) {
+  state.isLoaded = loaded;
+}

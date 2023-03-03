@@ -19,7 +19,13 @@ const routes = [
           requiresAuth: true,
         },
       },
-
+      {
+        path: 'limits', component: () => import('pages/Limits.vue'),
+        meta: {
+          roles: ['CUSTOMER'],
+          requiresAuth: true,
+        },
+      },
       {
         path: 'history', component: () => import('pages/History.vue'),
         meta: {

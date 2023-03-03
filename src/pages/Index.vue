@@ -1,5 +1,6 @@
 <template>
-  <q-page
+  <OperatorIndex />
+  <!-- <q-page
     class="row items-stretch justify-center"
     v-if="!$q.screen.xs"
   >
@@ -19,10 +20,24 @@
       class="col-6 column"
       v-if="currentUser?.role != 'CUSTOMER'"
     >
-      <div class="col bg-white q-pa-md column">
-        <Transport :col="6" />
+
+      <div class="col bg-white  column">
+        <div
+          class="col row"
+          style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)"
+        >
+          <div class="col q-pa-md">
+            <Transport :col="6" :isLocal="false" />
+
+          </div>
+        </div>
+        <div class="q-pa-md col">
+
+          <Transport :col="6" :isLocal="true" />
+        </div>
       </div>
     </div>
+
     <div
       class="col-6 column"
       v-else
@@ -44,37 +59,33 @@
       />
       <OrderRequestCreation v-else />
     </div>
-  </q-page>
+  </q-page> -->
 </template>
 
 <script>
-import BaseCard from "src/components/base/Card.vue";
+
+import CustomerIndex from "./Customer/Index.vue";
+import OperatorIndex from "./Operator/Index.vue";
 import Order from "src/components/order/OrderComponent.vue";
 import Transport from "src/components/transport/TransportComponent.vue";
-import Driver from "src/components/driver/DriverComponent.vue";
-import Place from "src/components/place/PlaceComponent.vue";
-import YaMap from "src/components/map/YaMap.vue";
 import OrderRequestCreation from "src/components/customer/form/OrderRequestCreation.vue";
 import OrderHistory from "src/components/customer/history/OrderHistory.vue";
 import { mapState } from "vuex";
 export default {
   name: "PageIndex",
   components: {
-    BaseCard,
     Order,
     Transport,
-    Driver,
-    Place,
-    YaMap,
     OrderRequestCreation,
     OrderHistory,
+    CustomerIndex,
+    OperatorIndex
   },
   computed: {
     ...mapState("current", ["currentUser"]),
   },
+
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

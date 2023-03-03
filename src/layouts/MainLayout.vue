@@ -1,14 +1,17 @@
 <template>
   <q-layout view="lHh lpR fFf">
-    <q-header bordered class="bg-white text-black">
+    <q-header
+      bordered
+      class="bg-white text-black"
+    >
       <q-toolbar class="row justify-between full-height q-pa-none">
         <div
           class="column items-center justify-center"
           style="
-            width: 50px;
-            height: 50px;
-            border-right: 1px solid rgba(0, 0, 0, 0.12);
-          "
+                      width: 50px;
+                      height: 50px;
+                      border-right: 1px solid rgba(0, 0, 0, 0.12);
+                    "
         >
           <q-avatar
             @click="$router.push({ path: '/' })"
@@ -17,12 +20,13 @@
             <img src="favicon.ico" />
           </q-avatar>
         </div>
-        <div v-if="!$q.screen.xs" class="col text-h5">
-          <div class="q-pl-md">Автотранспортное Управление</div>
-        </div>
         <div
-          class="q-pr-sm text-center col col-shrink column justify-center items-end"
+          v-if="!$q.screen.xs"
+          class="col text-h5"
         >
+          <div class="q-pl-md">Автотранспортное Управление </div>
+        </div>
+        <div class="q-pr-sm text-center col col-shrink column justify-center items-end">
           <span v-if="currentUser?.role != 'CUSTOMER'">
             {{ currentUser?.surname }}
             {{ currentUser?.name }}
@@ -31,7 +35,10 @@
           <span v-else>
             {{ currentUser?.fullname }}
           </span>
-          <div style="font-size: 0.8rem" class="text-grey">
+          <div
+            style="font-size: 0.8rem"
+            class="text-grey"
+          >
             {{ formatRole(currentUser?.role) }}
           </div>
         </div>
@@ -64,16 +71,20 @@
             <q-tooltip> Пользователи </q-tooltip>
           </q-btn>
 
-          <q-btn icon="las la-list" to="/" flat dense>
+          <q-btn
+            icon="las la-list"
+            to="/"
+            flat
+            dense
+          >
             <q-tooltip>
               {{
                 currentUser?.role != "CUSTOMER"
-                  ? `Панель ${
-                      currentUser?.role == "WATCHER"
-                        ? "просмотра"
-                        : "диспетчера"
-                    }`
-                  : "Заказ"
+                ? `Панель ${currentUser?.role == "WATCHER"
+                  ? "просмотра"
+                  : "диспетчера"
+                }`
+                : "Заказ"
               }}
             </q-tooltip>
           </q-btn>
@@ -86,6 +97,16 @@
             v-if="currentUser?.role == 'CUSTOMER' && $q.screen.xs"
           >
             <q-tooltip> История заказов </q-tooltip>
+          </q-btn>
+
+          <q-btn
+            icon="las la-chart-pie"
+            to="/limits"
+            flat
+            dense
+            v-if="currentUser?.role == 'CUSTOMER' && myHierarchy"
+          >
+            <q-tooltip> Лимиты </q-tooltip>
           </q-btn>
 
           <q-btn
@@ -157,15 +178,21 @@
           </q-btn>
         </div>
 
-        <q-btn icon="las la-sign-out-alt" @click="logout" dense flat />
+        <q-btn
+          icon="las la-sign-out-alt"
+          @click="logout"
+          dense
+          flat
+        />
       </div>
       <router-view class="col" />
+ 
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
 import { Loading } from "quasar";
 import { formatRole } from "src/helpers/formatters.js";
 export default {
@@ -182,37 +209,28 @@ export default {
     ...mapMutations("auth", ["setState"]),
     ...mapActions("current", ["requestCurrentUser"]),
     ...mapActions("transport", [
-      "subscribeTransportSockets",
       "requestTransports",
     ]),
     ...mapActions("order", [
-      "subscribeOrderSockets",
       "requestOrders",
       "requestNames",
     ]),
-    ...mapActions("contact", ["subscribeContactSockets", "requestContacts"]),
-    ...mapActions("customer", ["subscribeCustomerSockets", "requestCustomers"]),
-    ...mapActions("place", ["subscribePlaceSockets", "requestPlaces"]),
+    ...mapActions("contact", ["requestContacts"]),
+    ...mapActions("customer", ["requestCustomers"]),
+    ...mapActions("place", ["requestPlaces"]),
     ...mapActions("user", [
-      "subscribeUserSockets",
       "requestDrivers",
       "requestNonDrivers",
     ]),
     ...mapActions("status", ["requestStatuses"]),
+    ...mapActions('hierarchy', ['requestMyHierarchy']),
   },
   computed: {
     ...mapState("current", ["currentUser"]),
+    ...mapGetters('hierarchy', ['myHierarchy']),
   },
-  created() {
-    this.subscribeTransportSockets();
-    this.subscribeOrderSockets();
-    this.subscribeContactSockets();
-    this.subscribeCustomerSockets();
-    this.subscribePlaceSockets();
-    this.subscribeUserSockets();
-  },
+
   async mounted() {
-    Loading.show({ message: "Загрузка актуальной информации" });
     await Promise.all([
       this.requestCurrentUser(),
       this.requestTransports(),
@@ -224,8 +242,8 @@ export default {
       this.requestContacts(),
       this.requestCustomers(),
       this.requestNames(),
+      this.requestMyHierarchy()
     ]);
-    Loading.hide();
   },
 };
 </script>

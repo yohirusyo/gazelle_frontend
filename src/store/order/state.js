@@ -10,5 +10,10 @@ export default function () {
     departurePointName: null,
     name: null,
     names: [],
+    hovered: null,
+    expandedRoutes: [],
+
+    isLoaded: false,
+    isLoading: false,
   };
 }

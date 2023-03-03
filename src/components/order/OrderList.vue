@@ -49,182 +49,64 @@
       </q-th>
     </template>
     <template v-slot:body="props">
-      <q-tr
+      <OrderListElement
         :props="props"
-        :class="
-          _hoveredOrder?.id == props.row.id
-            ? 'bg-light-green-2'
-            : props.row.isRequest && !props.row.isApproved
-              ? 'bg-blue-2'
-              : props.row.isRequest && props.row.isApproved
-                ? 'bg-blue-1'
-                : ''
-        "
-        @click="setOrder(props.row)"
-        :id="'order-list-item-' + props.row.id"
-      >
-        <q-td
-          key="time"
-          :props="props"
-        >
-          <div class="col-2 text-center column items-center">
-            <span>
-              {{ "№ " + props.row.id }}
-            </span>
-            <q-chip
-              class="q-mx-none q-mt-none "
-              :class="props.row.isEmergency ? 'bg-red text-white' : ''"
-            >
-              <div> {{
-                props.row?.orderTime
-                  ? timeFormat(props.row?.orderTime)
-                  : "Маршрут"
-              }}
-              </div>
-
-            </q-chip>
-            <q-chip
-              class="q-mx-none q-mt-none "
-              style="font-size: 0.75rem"
-              v-if="timeFormatOrder(props.row?.orderTime)"
-            >
-              <div>
-                {{ timeFormatOrder(props.row?.orderTime) }}
-              </div>
-            </q-chip>
-          </div>
-          <q-tooltip>
-            <span>Наименование груза: {{ props.row.name }}</span>
-            <br v-if="props.row.description && props.row.description != ''" />
-            <span v-if="props.row.description && props.row.description != ''">Описание: {{
-              props.row.description
-            }}</span>
-          </q-tooltip>
-        </q-td>
-        <q-td
-          key="customer"
-          :props="props"
-          class="pre"
-        >
-          {{
-  formatCustomerMobileSubdivision(
-    getCustomerById(props.row.customerId)
-)
-          }}
-          <q-tooltip>
-            {{
-  formatCustomerMobileFullname(
-    getCustomerById(props.row.customerId)
-)
-            }}
-            {{
-  formatCustomerMobilePhoneNumber(
-    getCustomerById(props.row.customerId)
-)
-            }}
-          </q-tooltip>
-        </q-td>
-
-        <q-td
-          key="departurePoint"
-          :props="props"
-        >
-          {{ formatPlace(getPlaceById(props.row.departurePointId)) }}
-        </q-td>
-        <q-td
-          key="destination"
-          :props="props"
-        >
-          {{ formatPlace(getPlaceById(props.row.destinationId)) }}
-        </q-td>
-
-        <q-td
-          key="transportId"
-          :props="props"
-        >
-          <div
-            class="row justify-center"
-            v-if="props.row.transportId"
-          >
-            <AutoNumber :number="
-              formatTransportNumber(getTransportById(props.row.transportId))
-            " />
-          </div>
-          <div v-else>Транспорт не выбран!</div>
-        </q-td>
-        <q-td
-          key="status"
-          :props="props"
-        >
-          <OrderStatus :orderId="props.row.id" />
-        </q-td>
-        <q-td
-          key="priority"
-          :props="props"
-        >
-          <OrderPriority :orderId="props.row.id" />
-        </q-td>
-      </q-tr>
+        @onSelected="onSelected"
+      />
+      <OrderListElement
+        v-for="o of orderRouteFull(props.row.id)"
+        :key="o.id"
+        :props="{ ...props, row: o }"
+        v-if="props.expand || _hoveredOrder?.id == props.row.id"
+        @onSelected="onSelected"
+      />
     </template>
   </q-table>
 </template>
 
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
-import OrderStatus from "./OrderStatus.vue";
-import {
-  timeFormat,
-  timeFormatOrder,
-  formatContact,
-  formatCustomer,
-  formatCustomerMobileSubdivision,
-  formatCustomerMobileFullname,
-  formatCustomerMobilePhoneNumber,
-  formatPlace,
-  formatTransportNumber,
-} from "src/helpers/formatters";
-import AutoNumber from "../base/AutoNumber.vue";
-import OrderPriority from "./OrderPriority.vue";
 import Sortable from "sortablejs";
+import OrderListElement from "./OrderListElement/OrderListElement.vue";
 export default {
   name: "OrderList",
   props: ["col", "height"],
   components: {
-    AutoNumber,
-    OrderStatus,
-    OrderPriority,
+    OrderListElement
   },
   computed: {
-    ...mapState("order", ["orders"]),
-    ...mapGetters("order", ["subdivisions", "filteredOrders"]),
-    ...mapGetters("contact", ["getContactById"]),
-    ...mapGetters("customer", ["getCustomerById"]),
-    ...mapGetters("place", ["getPlaceById"]),
-    ...mapGetters("transport", ["getTransportById"]),
+    ...mapState("order", ["orders", 'hovered']),
+    ...mapGetters("order", ["subdivisions", "filteredOrders", 'orderRouteFull']),
     ...mapState("current", ["hoveredTransportId"]),
     ...mapState("current", ["currentUser"]),
-    ...mapGetters("status", ["getStatusById"]),
+    ...mapGetters('status', ['getStatusById']),
     _orderList: {
       get() {
         const filtered = this.filteredOrders({
           subdivisions: this._selectedSubdivisions,
         })
-        return filtered/* .filter(o => {
+        return filtered.filter(o => {
           if (!o.orderTime) {
-            console.warn({parent: o.parentOrder, id: o.id})
             const parent = filtered.find(or => or.id == o.parentOrder);
             if (!parent) return true;
             else {
-              console.warn(parent.orderTime, parent.id, o.id)
               return new Date(parent.orderTime) < this._timerActives
             }
           } else {
-            // return new Date(o.orderTime) < this._timerActives;
-            return true;
+            return new Date(o.orderTime) < this._timerActives;
+            // return true;
           }
-        }) */;
+        });
       },
     },
+    _hoveredOrder: {
+      get() {
+        return this.hovered;
+      },
+      set(val) {
+        this.setHovered(val);
+      }
+    }
   },
   mounted() {
     this._selectedSubdivisions = this.subdivisions;
@@ -281,12 +163,16 @@ export default {
   },
   data() {
     return {
-      _rerenderCounter: 0,
-      _hoveredOrder: null,
       _selectedSubdivisions: [],
-      swapped: null,
       _timerActives: null,
       columns: [
+        {
+          name: "expand",
+          required: true,
+          label: "Маршрут",
+          align: "center",
+          sortable: false,
+        },
         {
           name: "time",
           required: true,
@@ -341,20 +227,13 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("current", ["setOrder"]),
-    ...mapActions("order", ["rerender"]),
     ...mapActions("order", ["swapPriority"]),
-    timeFormat,
-    timeFormatOrder,
-    formatContact,
-    formatCustomer,
-    formatPlace,
-    formatTransportNumber,
-    formatCustomerMobileSubdivision,
-    formatCustomerMobileFullname,
-    formatCustomerMobilePhoneNumber,
+    ...mapMutations('order', ['setHovered']),
     updateActivesInterval() {
       this._timerActives = Date.now() + 7200000;
+    },
+    onSelected(sel) {
+      this.$emit('onSelected', sel);
     }
   },
 };
