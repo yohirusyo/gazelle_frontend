@@ -77,7 +77,6 @@ export default {
     ...mapState("current", ["currentUser"]),
     ...mapState("current", [
       "selectedTransportId",
-      // "order",
       "orderIsEmergency",
       "hoveredTransportId",
     ]),

@@ -45,7 +45,7 @@ export function remove(state, ord) {
   const index = state.orders.findIndex((o) => o.id == ord.id);
   state.orders[index] = ord;
   const order = state.orders[index];
-  if (!order.parentOrder) { console.warn('solo'); return state.orders = state.orders.filter((order) => order.id != ord.id); }
+  if (!order.parentOrder) {  return state.orders = state.orders.filter((order) => order.id != ord.id); }
   const isRouteNotDone = state.orders.some(o => o.parentOrder == order.parentOrder && o.isDone == false && o.id != ord.id);
   if (isRouteNotDone) return;
   state.orders = state.orders.filter((o) => o.parentOrder != order.parentOrder);

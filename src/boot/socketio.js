@@ -1,14 +1,32 @@
-import { boot } from 'quasar/wrappers'
-import io from 'socket.io-client';
+import { boot } from "quasar/wrappers";
+import io from "socket.io-client";
 import JsonExcel from "vue-json-excel3";
 
-const socketio = io(`ws://${process.env.API}`, {
-  path: '/ws'
-})
+const initConnection = () => {
+  if (!localStorage.getItem("connection")) {
+    localStorage.setItem("connection", "atu");
+  }
+};
+
+initConnection();
+
+const socketio = io(
+  `ws://${process.env.API[localStorage.getItem("connection")]}`,
+  {
+    path: "/ws",
+  }
+);
+
+const changeSocketConnection = () => {
+  socketio.io.uri = `ws://${
+    process.env.API[localStorage.getItem("connection")]
+  }`;
+  socketio.disconnect().connect();
+};
 
 export default boot(async ({ app }) => {
-  app.config.globalProperties.$socket = socketio
-  app.component("downloadExcel", JsonExcel)
+  app.config.globalProperties.$socket = socketio;
+  app.component("downloadExcel", JsonExcel);
 });
 
-export { socketio }
+export { socketio, changeSocketConnection };

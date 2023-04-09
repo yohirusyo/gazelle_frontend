@@ -19,7 +19,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ["axios", 'socketio'],
+    boot: ["axios", "socketio"],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ["app.scss"],
@@ -64,13 +64,19 @@ module.exports = configure(function (ctx) {
           unused: true,
           properties: true,
           warnings: true,
-        }
+        },
       },
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
       env: {
-        API: ctx.dev ? '95.213.216.231:3125' /* 'localhost:3125' */ : '95.213.216.231:3125'
+        API:
+          ctx.dev 
+            ? {
+                atu: /* "taxi.mmk.ru:3125", */  "localhost:3125",
+                mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
+              }
+            : { atu: "taxi.mmk.ru:3125", mmkmetiz: "taxi.mmk.ru:3126" },
       },
       // https://quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
@@ -93,7 +99,7 @@ module.exports = configure(function (ctx) {
       config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
-      lang: 'ru', // Quasar language pack
+      lang: "ru", // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
@@ -103,7 +109,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
       cssAddon: true,
       // Quasar plugins
-      plugins: ["Notify", "Dialog", 'Loading'],
+      plugins: ["Notify", "Dialog", "Loading"],
     },
 
     // animations: 'all', // --- includes all animations

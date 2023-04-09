@@ -22,6 +22,7 @@
           no-caps
           :ripple="false"
           style="border-radius: 8px"
+          v-if="!onlyCreate"
         >
           <q-tooltip>
             {{ label }}
@@ -105,6 +106,7 @@
           no-caps
           :ripple="false"
           style="border-radius: 8px"
+          v-if="!onlyCreate"
         >
           <q-tooltip>
             {{ label }}
@@ -135,7 +137,7 @@
 import { mapState } from "vuex";
 export default {
   name: "MenuItem",
-  props: ["col", "label", "modelValue", "withoutRole"],
+  props: ["col", "label", "modelValue", "withoutRole", 'onlyCreate'],
   computed: {
     ...mapState("current", ["currentUser"]),
   },
@@ -148,7 +150,9 @@ export default {
   },
   methods: {
     async onDone() {
-      this.tab = "main";
+      if (!this.onlyCreate) {
+        this.tab = "main";
+      }
       this.selectedValue = null;
     },
     setSelected(val) {
@@ -157,11 +161,15 @@ export default {
   },
   async mounted() {
     this.height = this.$refs.tabs.$el.clientHeight - 2;
+    if (this.onlyCreate) {
+      this.tab = "create";
+    }
   },
   watch: {
     modelValue(newModelValue) {
       if (!!newModelValue) {
         this.tab = "create";
+        this.setSelected(newModelValue)
       }
     },
     selectedValue(newSelValue) {

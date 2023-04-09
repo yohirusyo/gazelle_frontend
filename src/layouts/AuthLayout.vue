@@ -19,6 +19,7 @@
           @submit="onSubmit"
           ref="form"
         >
+          <ConnectionChanger @connectionChanged="changeConnection" />
           <q-select
             v-model="selectedOperator"
             type="text"
@@ -154,6 +155,9 @@
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import BaseCard from "components/base/Card.vue";
 import { Loading } from "quasar";
+import ConnectionChanger from "src/components/base/ConnectionChanger.vue";
+import { switchConnection, switchAxiosConnection } from "src/boot/axios";
+import { changeSocketConnection } from "src/boot/socketio";
 export default {
   name: "Authorization",
   data() {
@@ -168,26 +172,41 @@ export default {
   },
   components: {
     BaseCard,
+    ConnectionChanger,
   },
   async mounted() {
     Loading.show({ message: "Проверка авторизации" });
-    try {
-      await this.requestCurrentUser();
-      if (
-        localStorage.getItem("token") != null &&
-        localStorage.getItem("token") != "" &&
-        this.isLoggedIn == true
-      ) {
-        return this.$router.push({ path: "/" });
+    if (
+      this.$route.name === "Authorization" &&
+      typeof this.$route.params.userdata === "string" &&
+      this.$route.params.userdata !== ""
+    ) {
+      const { token, connection } = JSON.parse(this.$route.params.userdata);
+      switchConnection(connection);
+      switchAxiosConnection();
+      changeSocketConnection();
+      this.setToken({ token });
+      localStorage.setItem("mobile", "true");
+      return this.$router.push({ path: "/" });
+    } else {
+      try {
+        await this.requestCurrentUser();
+        if (
+          localStorage.getItem("token") != null &&
+          localStorage.getItem("token") != "" &&
+          this.isLoggedIn == true
+        ) {
+          return this.$router.push({ path: "/" });
+        }
+      } catch (error) {
+        await this.requestOperators();
       }
-    } catch (error) {
-      await this.requestOperators();
     }
     Loading.hide();
   },
   methods: {
     ...mapActions("auth", ["Signin"]),
-    ...mapMutations("auth", ["setState"]),
+    ...mapMutations("auth", ["setState", "setToken"]),
     ...mapActions("user", ["requestOperators"]),
     ...mapActions("current", ["requestCurrentUser"]),
     async onSubmit() {
@@ -207,6 +226,9 @@ export default {
       this.login = null;
       this.selectedOperator = null;
       this.password = null;
+    },
+    async changeConnection() {
+      await this.requestOperators(true);
     },
   },
   computed: {

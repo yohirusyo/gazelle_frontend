@@ -23,6 +23,5 @@ export const getManagementRequests = (state) => (managementId) => {
 export const myUnusedLimit = (state, getters, rootState) => {
   const myHierarchy = getters.myHierarchy;
   const spendedToWorkers = getters.spendedToWorkers;
-  console.warn(myHierarchy?.monthFactLimit, myHierarchy?.monthUsed, spendedToWorkers);
   return myHierarchy?.monthFactLimit - myHierarchy?.monthUsed - spendedToWorkers;
 };

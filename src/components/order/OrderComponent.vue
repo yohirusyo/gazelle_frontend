@@ -17,10 +17,9 @@
         :height="height"
       />
     </template>
-    <template #create="{ height, onDone, selected }">
+    <template #create="{ onDone, selected }">
       <OrderCreation
         @done="onDone"
-        :height="height"
         :selected="selected"
       />
     </template>

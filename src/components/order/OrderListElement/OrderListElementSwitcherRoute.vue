@@ -1,12 +1,11 @@
 <template>
-
     <div class="fit row items-center justify-center">
         <q-btn
             dense
             icon="las la-compress-arrows-alt"
-            @click.stop="close"
+            @click.stop="_modelValue = !_modelValue"
             flat
-            v-if="props.expand"
+            v-if="_modelValue"
         >
             <q-tooltip>
                 Скрыть маршрут
@@ -15,7 +14,7 @@
         <q-btn
             dense
             icon="las la-expand-arrows-alt"
-            @click.stop="expand"
+            @click.stop="_modelValue = !_modelValue"
             flat
             v-else
         >
@@ -30,19 +29,19 @@
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
-    props: ['orderId', 'props'],
+    props: ['orderId', 'props', 'modelValue'],
     computed: {
         ...mapGetters('order', ['isExpanded']),
+        _modelValue: {
+            get() {
+                return this.modelValue;
+            },
+            set(val) {
+                this.$emit("update:modelValue", val);
+            }
+        },
     },
     methods: {
-        expand() {
-            // this.addToExpanded(this.orderId);
-            this.props.expand = true;
-        },
-        close() {
-            // this.removeFromExpanded(this.orderId);
-            this.props.expand = false;
-        },
         ...mapMutations('order', ['addToExpanded', 'removeFromExpanded'])
     }
 }

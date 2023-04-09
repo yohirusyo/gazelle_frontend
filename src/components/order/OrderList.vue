@@ -20,7 +20,7 @@
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <q-icon
+        <!-- <q-icon
           name="las la-filter"
           size="1.5em"
         >
@@ -45,34 +45,25 @@
               </q-item>
             </q-list>
           </q-menu>
-        </q-icon>
+        </q-icon> -->
       </q-th>
     </template>
     <template v-slot:body="props">
-      <OrderListElement
-        :props="props"
-        @onSelected="onSelected"
-      />
-      <OrderListElement
-        v-for="o of orderRouteFull(props.row.id)"
-        :key="o.id"
-        :props="{ ...props, row: o }"
-        v-if="props.expand || _hoveredOrder?.id == props.row.id"
-        @onSelected="onSelected"
-      />
+      <RouteElement :props="props" @onSelected="onSelected"/>
+
     </template>
   </q-table>
 </template>
 
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
-import Sortable from "sortablejs";
-import OrderListElement from "./OrderListElement/OrderListElement.vue";
+// import Sortable from "sortablejs";
+import RouteElement from "./OrderListElement/RouteElement.vue";
 export default {
   name: "OrderList",
   props: ["col", "height"],
   components: {
-    OrderListElement
+    RouteElement
   },
   computed: {
     ...mapState("order", ["orders", 'hovered']),
@@ -82,21 +73,14 @@ export default {
     ...mapGetters('status', ['getStatusById']),
     _orderList: {
       get() {
-        const filtered = this.filteredOrders({
-          subdivisions: this._selectedSubdivisions,
-        })
+        // const filtered = this.filteredOrders({
+        //   subdivisions: this._selectedSubdivisions,
+        // })
+        const filtered = this.orders;
         return filtered.filter(o => {
-          if (!o.orderTime) {
-            const parent = filtered.find(or => or.id == o.parentOrder);
-            if (!parent) return true;
-            else {
-              return new Date(parent.orderTime) < this._timerActives
-            }
-          } else {
-            return new Date(o.orderTime) < this._timerActives;
-            // return true;
-          }
+          return new Date(o.orderTime) < this._timerActives;
         });
+        // return filtered;
       },
     },
     _hoveredOrder: {
@@ -110,19 +94,6 @@ export default {
   },
   mounted() {
     this._selectedSubdivisions = this.subdivisions;
-    const element = document.querySelector(
-      "#order-list .q-virtual-scroll__content"
-    );
-    const self = this;
-    const sortable = Sortable.create(element, {
-      async onEnd(event) {
-        await self.swapPriority({
-          firstId: self._orderList[event.newIndex].id,
-          secondId: self._orderList[event.oldIndex].id,
-        });
-      },
-      filter: ".ignore-elements",
-    });
     this.updateActivesInterval();
     setInterval(this.updateActivesInterval, 60000)
   },
@@ -146,15 +117,17 @@ export default {
           "EXIT_TO_DESTINATION",
         ];
         const fOrders = this.orders.filter(
-          (order) => order.transportId == this.hoveredTransportId
+          (route) => {
+            return route.orders.some(order => order.transportId == this.hoveredTransportId)
+          }
         );
         if (fOrders.length == 0) return (this._hoveredOrder = null);
         this._hoveredOrder = fOrders.reduce((prev, current) => {
-          if (busyStatuses.includes(this.getStatusById(prev.statusId).code))
-            return prev;
-          if (busyStatuses.includes(this.getStatusById(current.statusId).code))
-            return current;
-          return prev.priority < current?.priority ? prev : current;
+          if (prev.orders.some(o => busyStatuses.includes(this.getStatusById(o.statusId).code)))
+          return prev;
+          if (current.orders.some(o => busyStatuses.includes(this.getStatusById(o.statusId).code)))
+          return current;
+          return prev.createdAt < current.createdAt ? prev : current;
         }, fOrders[0]);
         const scrollTo = this._orderList.findIndex((o) => o.id == this._hoveredOrder.id);
         this.$refs.scroll.scrollTo(scrollTo);
@@ -215,14 +188,7 @@ export default {
           label: "Статус",
           align: "center",
           sortable: false,
-        },
-        {
-          name: "priority",
-          required: false,
-          label: "",
-          align: "center",
-          sortable: false,
-        },
+        }
       ],
     };
   },

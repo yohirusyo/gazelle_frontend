@@ -1,56 +1,80 @@
 function sort(state) {
-  state.orders.sort((a, b) => {
-    if (a.isRequest && !a.isApproved && b.isRequest && !b.isApproved) {
-      return a.priority - b.priority;
-    } else if (a.isRequest && a.isApproved && b.isRequest && !b.isApproved) {
-      return 1;
-    } else if (b.isRequest && b.isApproved && a.isRequest && !a.isApproved) {
-      return -1;
-    } else if (a.isRequest && !a.isApproved && !b.isRequest) {
-      return -1
-    } else if (b.isRequest && !b.isApproved && !a.isRequest) {
-      return 1;
-    }
-    return a.priority - b.priority
-  }).filter(order => !order.isDeleted)
+  state.orders
+    .sort((a, b) => {
+      if (a.isRequest && !a.isApproved && b.isRequest && !b.isApproved) {
+        return a.createdAt - b.createdAt;
+      } else if (a.isRequest && a.isApproved && b.isRequest && !b.isApproved) {
+        return 1;
+      } else if (b.isRequest && b.isApproved && a.isRequest && !a.isApproved) {
+        return -1;
+      } else if (a.isRequest && !a.isApproved && !b.isRequest) {
+        return -1;
+      } else if (b.isRequest && !b.isApproved && !a.isRequest) {
+        return 1;
+      }
+      return a.createdAt - b.createdAt;
+    })
+    .filter((order) => !order.isDeleted && !order.isDone && !order.isDeclined);
 }
 
-export function add(state, order) {
-  const index = state.orders.findIndex((o) => o.id == order.id);
-  if (index == -1) {
-    state.orders.push(order);
-    sort(state)
-  }
-}
+// export function add(state, order) {
+//   const index = state.orders.findIndex((o) => o.id == order.routeId);
+//   if (index != -1) {
+//     state.orders[index]
+//     sort(state)
+//   }
+// }
 
 export function set(state, orders) {
   state.orders = orders;
-  sort(state)
-}
-
-export function rerender(state) {
   sort(state);
 }
 
+// export function rerender(state) {
+//   sort(state);
+// }
+
 export function update(state, order) {
-  const index = state.orders.findIndex((o) => o.id == order.id);
+  const route = state.orders.find((r) =>
+    r.orders.map((o) => o.id).includes(order.id)
+  );
+  const index = route.orders.findIndex((o) => o.id == order.id);
   if (index != -1) {
-    const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
-    state.orders[index] = order;
-    if (changedPriopity) sort(state)
+    // const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
+    route.orders[index] = order;
+    // if (changedPriopity) sort(state)
   }
 }
 
-export function remove(state, ord) {
-  const index = state.orders.findIndex((o) => o.id == ord.id);
-  state.orders[index] = ord;
-  const order = state.orders[index];
-  if (!order.parentOrder) { console.warn('solo'); return state.orders = state.orders.filter((order) => order.id != ord.id); }
-  const isRouteNotDone = state.orders.some(o => o.parentOrder == order.parentOrder && o.isDone == false && o.id != ord.id);
-  if (isRouteNotDone) return;
-  state.orders = state.orders.filter((o) => o.parentOrder != order.parentOrder);
+export function addRoute(state, route) {
+  state.orders.push(route);
+  sort(state);
 }
 
+export function updateRoute(state, route) {
+  const index = state.orders.findIndex((r) => r.id == route.id);
+  if (index != -1) {
+    state.orders[index] = route;
+    sort(state);
+  }
+}
+
+export function removeRoute(state, id) {
+  const index = state.orders.findIndex((r) => r.id == id);
+  if (index != -1) {
+    state.orders.splice(index, 1);
+  }
+}
+
+// export function remove(state, ord) {
+//   const index = state.orders.findIndex((o) => o.id == ord.id);
+//   state.orders[index] = ord;
+//   const order = state.orders[index];
+//   if (!order.parentOrder) { console.warn('solo'); return state.orders = state.orders.filter((order) => order.id != ord.id); }
+//   const isRouteNotDone = state.orders.some(o => o.parentOrder == order.parentOrder && o.isDone == false && o.id != ord.id);
+//   if (isRouteNotDone) return;
+//   state.orders = state.orders.filter((o) => o.parentOrder != order.parentOrder);
+// }
 
 export function setCustomerFullname(state, fullname) {
   state.customerFullname = fullname;
@@ -81,11 +105,11 @@ export function setDeparturePointName(state, name) {
 }
 
 export function setNames(state, names) {
-  state.names = names
+  state.names = names;
 }
 
 export function setName(state, name) {
-  state.name = name
+  state.name = name;
 }
 
 export function setHovered(state, hovered) {
@@ -97,7 +121,7 @@ export function addToExpanded(state, id) {
 }
 
 export function removeFromExpanded(state, id) {
-  state.expandedRoutes = state.expandedRoutes.filter(r => r.id != id)
+  state.expandedRoutes = state.expandedRoutes.filter((r) => r.id != id);
 }
 
 export function setLoading(state, loading) {

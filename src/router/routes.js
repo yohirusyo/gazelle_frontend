@@ -2,7 +2,7 @@
 const routes = [
   {
     name: "Authorization",
-    path: "/authorization",
+    path: "/authorization/:userdata?",
     component: () => import("src/layouts/AuthLayout.vue"),
     meta: {
       requiresAuth: false,
@@ -20,70 +20,70 @@ const routes = [
         },
       },
       {
-        path: 'limits', component: () => import('pages/Limits.vue'),
+        path: 'limits', component: () => import('src/pages/Operator/Limits.vue'),
         meta: {
           roles: ['CUSTOMER'],
           requiresAuth: true,
         },
       },
       {
-        path: 'history', component: () => import('pages/History.vue'),
+        path: 'history', component: () => import('src/pages/Customer/History.vue'),
         meta: {
           roles: ['CUSTOMER'],
           requiresAuth: true,
         },
       },
       {
-        path: 'report', component: () => import('pages/Report.vue'),
+        path: 'report', component: () => import('src/pages/Admin/Report.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],
           requiresAuth: true,
         },
       },
       {
-        path: 'report-shifts', component: () => import('pages/ShiftReport.vue'),
+        path: 'report-shifts', component: () => import('src/pages/Admin/ShiftReport.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],
           requiresAuth: true,
         },
       },
       {
-        path: 'report-operator-shifts', component: () => import('pages/OperatorShiftReport.vue'),
+        path: 'report-operator-shifts', component: () => import('src/pages/Admin/OperatorShiftReport.vue'),
         meta: {
           roles: ['ADMIN'],
           requiresAuth: true,
         },
       },
       {
-        path: 'transport', component: () => import('pages/Transport.vue'),
+        path: 'transport', component: () => import('src/pages/Operator/Transport.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],
           requiresAuth: true,
         },
       },
       {
-        path: 'map', component: () => import('pages/Map.vue'),
+        path: 'map', component: () => import('src/pages/Operator/Map.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],
           requiresAuth: true,
         },
       },
       {
-        path: 'driver', component: () => import('pages/Driver.vue'),
+        path: 'driver', component: () => import('src/pages/Operator/Driver.vue'),
         meta: {
           roles: ['ADMIN', 'OPERATOR'],
           requiresAuth: true,
         },
       },
       {
-        path: 'user', component: () => import('pages/User.vue'),
+        path: 'user', component: () => import('src/pages/Operator/User.vue'),
         meta: {
           roles: ['ADMIN'],
           requiresAuth: true,
         },
       },
       {
-        path: 'admin', component: () => import('pages/Admin.vue'),
+        path: 'admin', component: () => import('src/pages/Admin/Admin.vue'),
         meta: {
           roles: ['ADMIN'],
           requiresAuth: true,

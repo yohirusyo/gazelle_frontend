@@ -1,23 +1,25 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
-import { requestHelper } from 'src/helpers/loader';
+import { requestHelper } from "src/helpers/loader";
 
 export async function requestOrders(context) {
-  requestHelper(
-    context,
-    async () => {
-      try {
-        ['order_update', 'order_create', "order_update_done"].forEach(socketio.removeAllListeners)
-      } catch (error) { }
-      await api.get(`order`).then(({ data }) => {
-        context.commit("set", data);
-      })
-      socketio.on('order_update', order => context.commit("update", order))
-      socketio.on('order_create', order => context.commit("add", order))
-      socketio.on("order_update_done", order => context.commit("remove", order))
-    }
-  )
+  requestHelper(context, async () => {
+    try {
+      ["order_update", "order_create", "order_update_done"].forEach(
+        socketio.removeAllListeners
+      );
+    } catch (error) {}
+    await api.get(`order/routes`).then(({ data }) => {
+      context.commit("set", data);
+    });
+    socketio.on("order_update", (order) => context.commit("update", order));
+    socketio.on("route_create", (route) => context.commit("addRoute", route));
+    socketio.on("route_update", (route) =>
+      context.commit("updateRoute", route)
+    );
+    socketio.on("route_delete", (id) => context.commit("removeRoute", id));
+  });
 }
 
 export async function addOrder({ commit }, form) {
@@ -32,11 +34,32 @@ export async function addOrder({ commit }, form) {
     });
 }
 
+export async function addRoute({ commit }, form) {
+  return api
+    .post(`order/batch`, form)
+    .then(({ data }) => {
+      showNotifyResult(true, "Маршрут успешно создан!");
+      return data;
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка создания маршрута!");
+    });
+}
 
+export async function updateRoute({ commit }, { id, ...form }) {
+  return api
+    .patch(`order/batch/${id}`, form)
+    .then(({ data }) => {
+      showNotifyResult(true, "Маршрут успешно изменен!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка изменения маршрута!");
+    });
+}
 
 export async function addOrderRequest({ commit }, form) {
   return api
-    .post('/order/request', form)
+    .post("/order/request", form)
     .then(({ data }) => {
       showNotifyResult(true, "Заказ успешно создан!");
       return data;
@@ -47,14 +70,10 @@ export async function addOrderRequest({ commit }, form) {
 }
 
 export async function requestNames({ commit }) {
-  return api
-    .get(`order/names`)
-    .then(({ data }) => {
-      commit("setNames", data);
-    })
+  return api.get(`order/names`).then(({ data }) => {
+    commit("setNames", data);
+  });
 }
-
-
 
 export async function approveOrder({ commit }, { id, ...form }) {
   return api
@@ -100,6 +119,17 @@ export async function removeOrder({ commit }, { id }) {
     });
 }
 
+export async function removeRoute({ commit }, { id }) {
+  return api
+    .delete(`order/batch/${id}`)
+    .then((_) => {
+      showNotifyResult(true, "Маршрут успешно удален!");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка удаления маршрута!");
+    });
+}
+
 export async function backToRequest({ commit }, id) {
   return api
     .patch(`order/back-to-request/${id}`)
@@ -112,7 +142,5 @@ export async function backToRequest({ commit }, id) {
 }
 
 export async function swapPriority({ commit }, { firstId, secondId }) {
-  return api
-    .patch(`order/swap-priority/${firstId}/${secondId}`)
+  return api.patch(`order/swap-priority/${firstId}/${secondId}`);
 }
-

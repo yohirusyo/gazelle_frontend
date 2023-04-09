@@ -2,19 +2,18 @@
     <q-tr
         :props="props"
         :class="_class"
-        @click="props.row.isDone ? null : onSelected(props.row)"
-        :id="'order-list-item-' + props.row.id"
+        @click="order.isDone ? null : onSelected(order)"
+        :id="'order-list-item-' + order.id"
     >
         <q-td
             key="expand"
             :props="props"
         >
             <OrderListElementSwitcherRoute
-                :orderId="props.row.orderId"
-                :props="props"
-                v-if="props.row.id == props.row.parentOrder"
+                v-model="_modelValue"
+                v-if="order.id == order.parentOrder && props.row.orders.length != 1"
             />
-            <div v-else-if="props.row.parentOrder == null"> Одиночная</div>
+            <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null"> Одиночная</div>
             <div
                 v-else
                 class="column items-center"
@@ -26,7 +25,7 @@
                     color="grey"
                     style="transform: rotate(90deg);"
                 />
-                № {{ props.row.parentOrder }}
+                № {{ order.parentOrder }}
             </div>
         </q-td>
         <q-td
@@ -34,61 +33,55 @@
             :props="props"
         >
             <OrderListElementTime
-                :id="props.row.id"
-                :isEmergency="props.row.isEmergency"
-                :orderTime="props.row.orderTime"
-                :name="props.row.name"
-                :description="props.row.description"
+                :id="order.id"
+                :isEmergency="order.isEmergency"
+                :orderTime="order.orderTime"
+                :name="order.name"
+                :description="order.description"
             />
         </q-td>
         <q-td
             key="customer"
             :props="props"
         >
-            <OrderListElementCustomer :customerId="props.row.customerId" />
+            <OrderListElementCustomer :customerId="order.customerId" />
         </q-td>
 
         <q-td
             key="departurePoint"
             :props="props"
         >
-            <OrderListElementPlace :placeId="props.row.departurePointId" />
+            <OrderListElementPlace :placeId="order.departurePointId" />
         </q-td>
         <q-td
             key="destination"
             :props="props"
         >
-            <OrderListElementPlace :placeId="props.row.destinationId" />
+            <OrderListElementPlace :placeId="order.destinationId" />
         </q-td>
 
         <q-td
             key="transportId"
             :props="props"
         >
-            <OrderListElementTransport :transportId="props.row.transportId" />
+            <OrderListElementTransport :transportId="order.transportId" />
         </q-td>
         <q-td
             key="status"
             :props="props"
         >
             <OrderListElementStatus
-                :statusId="props.row.statusId"
-                :statusChangedAt="props.row.statusChangedAt"
-                :isDone="props.row.isDone"
+                :statusId="order.statusId"
+                :statusChangedAt="order.statusChangedAt"
+                :isDone="order.isDone"
             />
         </q-td>
-        <q-td
-            key="priority"
-            :props="props"
-        >
-            <OrderPriority :orderId="props.row.id" />
-        </q-td>
+      
     </q-tr>
 </template>
 
 <script>
 import { mapMutations, mapState } from 'vuex';
-import OrderPriority from '../OrderPriority.vue';
 import OrderListElementTime from './OrderListElementTime.vue';
 import OrderListElementCustomer from './OrderListElementCustomer.vue';
 import OrderListElementPlace from './OrderListElementPlace.vue';
@@ -96,7 +89,7 @@ import OrderListElementTransport from './OrderListElementTransport.vue';
 import OrderListElementStatus from './OrderListElementStatus.vue';
 import OrderListElementSwitcherRoute from './OrderListElementSwitcherRoute.vue';
 export default {
-    props: ['props'],
+    props: ['props', 'modelValue', 'order'],
     methods: {
         ...mapMutations("current", ["setOrder"]),
         onSelected(sel) {
@@ -104,7 +97,6 @@ export default {
         }
     },
     components: {
-        OrderPriority,
         OrderListElementStatus,
         OrderListElementTime,
         OrderListElementCustomer,
@@ -115,20 +107,24 @@ export default {
     computed: {
         ...mapState('order', ['hovered']),
         _orderClass() {
-            if ((this.hovered && this.hovered?.parentOrder != null && this.props.row.parentOrder != null && this.props.row.parentOrder == this.hovered.parentOrder) || this.hovered?.id == this.props.row.id)
+            if (this.hovered && this.hovered.orders.map(o => o.id).includes(this.order.id))
                 return 'hovered-order';
-            if (this.props.row.isRequest && !this.props.row.isApproved)
+            if (this.order.isRequest && !this.order.isApproved)
                 return 'bg-blue-2';
-            if (this.props.row.isRequest && this.props.row.isApproved)
+            if (this.order.isRequest && this.order.isApproved)
                 return 'bg-blue-1';
             return '';
         },
         _endedClass() {
-            if (this.props.row.isDone) return 'ended-order'
+            if (this.order.isDone) return 'ended-order'
             return '';
         },
         _class() {
             return [this._orderClass, this._endedClass].join(' ')
+        },
+        _modelValue: {
+            get() { return this.modelValue },
+            set(val) { this.$emit("update:modelValue", val); }
         }
     }
 }

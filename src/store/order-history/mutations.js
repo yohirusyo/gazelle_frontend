@@ -1,6 +1,10 @@
 function sort(state) {
   state.history.sort((a, b) => {
-    return a.order.id - b.order.id;
+    return a.createdAt - b.createdAt;
+  }).map((r, index) => {
+    if (index === 0) return r.head = true;
+    if (state.history[index].group != state.history[index - 1].group) return r.head = true;
+    return r;
   })
 }
 
