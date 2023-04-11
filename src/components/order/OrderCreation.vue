@@ -86,6 +86,28 @@
           />
         </div>
 
+        <div
+          class="col row q-gutter-x-sm items-center"
+          v-if="
+            !_creationMode &&
+            selected &&
+            selected.isRequest &&
+            selected.isApproved &&
+            !isCustomer
+          "
+        >
+          <q-btn
+            text-color="white"
+            label="Вернуть в запрос"
+            unelevated
+            class="border-none bg-grey col"
+            color="primary"
+            @click="onBackToRequest"
+            no-caps
+            dense
+          />
+        </div>
+
         <div class="col row q-gutter-x-sm items-center">
           <q-btn
             v-if="_creationMode"
@@ -327,6 +349,16 @@ export default {
         ...this.buildRoute(),
         isApproved: false,
         isDeclined: true,
+      });
+      this.$refs.form.reset();
+    },
+    async onBackToRequest() {
+      await this.updateRoute({
+        id: this.selected.id,
+        ...this.buildRoute(),
+        isApproved: false,
+        isDeclined: false,
+        isRequest: true,
       });
       this.$refs.form.reset();
     },
