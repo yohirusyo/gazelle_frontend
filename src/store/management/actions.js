@@ -29,8 +29,8 @@ export async function requestMyManagement(context) {
       await api.get(`management/my`).then(({ data }) => {
         context.commit("add", data);
       }).catch(console.warn);
-      socketio.on('management_update', management => context.context.commit("update", management))
-      socketio.on("management_delete", id => context.context.commit("remove", id))
+      socketio.on('management_update', management => context.commit("update", management))
+      socketio.on("management_delete", id => context.commit("remove", id))
     },
     'My'
   )

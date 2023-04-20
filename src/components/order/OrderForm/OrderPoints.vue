@@ -52,7 +52,7 @@ export default {
   methods: {
     remove(id) {
       const point = this.points.find((p) => p.id === id);
-      if (point.isNew) {
+      if (point.isNew || !this.isEditMode) {
         const idx = this.points.findIndex((p) => p.id === id);
         this.points.splice(idx, 1);
       } else {
@@ -117,7 +117,7 @@ export default {
         },
       };
       if (!!firstPoint && !this.isEditMode) {
-        this.points.push({  
+        this.points.push({
           ...p,
           passenger: {
             withPassengers: firstPoint.passenger.withPassengers,
@@ -141,10 +141,15 @@ export default {
       }
       this.id++;
     },
+    initPoints() {
+      if (this.points.length === 0) {
+        this.addPoint();
+      }
+      this.id = this.points.length + 1;
+    },
   },
   mounted() {
-    this.id = this.points.length + 1;
-    this.addPoint();
+    this.initPoints();
     const element = document.querySelector("#points-list");
     const self = this;
     const sortable = Sortable.create(element, {
@@ -156,6 +161,11 @@ export default {
         });
       },
     });
+  },
+  watch: {
+    points(val) {
+      this.initPoints();
+    },
   },
 };
 </script>

@@ -1,7 +1,14 @@
 export const myWorkers = (state, getters, rootState) =>
   state.hierarchy?.filter((h) => h.bossId == rootState.current.currentUser.id);
-export const myHierarchy = (state, getters, rootState) =>
-  state.hierarchy?.find((h) => h.ownerId == rootState.current.currentUser.id || h.bossId == rootState.current.currentUser.id);
+export const myHierarchy = (state, getters, rootState) => {
+  const ownerHierarchy = state.hierarchy?.find(
+    (h) => h.ownerId == rootState.current.currentUser.id
+  );
+  if (ownerHierarchy) return ownerHierarchy;
+  return state.hierarchy?.find(
+    (h) => h.bossId == rootState.current.currentUser.id
+  );
+};
 
 export const spendedToWorkers = (state, getters, rootState) => {
   const workers = getters.myWorkers;
@@ -23,5 +30,7 @@ export const getManagementRequests = (state) => (managementId) => {
 export const myUnusedLimit = (state, getters, rootState) => {
   const myHierarchy = getters.myHierarchy;
   const spendedToWorkers = getters.spendedToWorkers;
-  return myHierarchy?.monthFactLimit - myHierarchy?.monthUsed - spendedToWorkers;
+  return (
+    myHierarchy?.monthFactLimit - myHierarchy?.monthUsed - spendedToWorkers
+  );
 };

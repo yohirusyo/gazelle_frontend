@@ -90,7 +90,7 @@ const routes = [
         },
       },
       {
-        path: ':id', component: () => import('pages/Index.vue'),
+        path: ':id/:copy?', component: () => import('pages/Index.vue'),
         meta: {
           roles: ['CUSTOMER'],
           requiresAuth: true,

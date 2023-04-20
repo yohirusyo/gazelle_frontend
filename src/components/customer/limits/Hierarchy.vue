@@ -1,8 +1,8 @@
 <template>
     <div class="column col">
-        <div class="col row justify-center items-center text-h3">
+        <!-- <div class="col row justify-center items-center text-h3">
             <LimitChart />
-        </div>
+        </div> -->
         <div class="col column">
             <div class="col col-shrink text-h6">
                 Использование такси персоналом

@@ -24,7 +24,10 @@
               label="Место отправления"
             />
 
-            <OrderPoints v-model="points" :isEditMode="!!selected" />
+            <OrderPoints
+              v-model="points"
+              :isEditMode="!!selected && !copyMode"
+            />
 
             <OrderDescription v-model="description" />
 
@@ -110,16 +113,25 @@
 
         <div class="col row q-gutter-x-sm items-center">
           <q-btn
-            v-if="_creationMode"
+            v-if="_creationMode || copyMode"
             text-color="white"
-            label="Создать"
+            :label="
+              _customerCreationCheck
+                ? 'У вас израсходован лимит поездок!'
+                : 'Создать'
+            "
             unelevated
-            class="border-none bg-blue-4 col"
+            class="border-none col"
+            :class="
+              _customerCreationCheck
+                ? 'bg-red-3 text-black text-bold'
+                : 'bg-blue-4'
+            "
             type="submit"
             no-caps
             dense
             :loading="_addLoading"
-            :disable="_addLoading"
+            :disable="_addLoading || _customerCreationCheck"
           />
           <q-btn
             v-if="_editMenuActive"
@@ -170,7 +182,7 @@ import OrderDescription from "./OrderForm/OrderDescription.vue";
 import OrderTime from "./OrderForm/OrderTime.vue";
 export default {
   name: "OrderCreation",
-  props: ["selected", "isCustomer"],
+  props: ["selected", "isCustomer", "copyMode"],
   components: {
     ISelect,
     OrderCustomerISelect,
@@ -191,6 +203,7 @@ export default {
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapGetters("contact", ["getContactById"]),
     ...mapGetters("orderHistory", ["getRequestById"]),
+    ...mapGetters("hierarchy", ["myUnusedLimit"]),
     _orderIsEmergency: {
       get() {
         return this.orderIsEmergency;
@@ -213,6 +226,7 @@ export default {
     },
     _editMenuActive: {
       get() {
+        if (this.copyMode) return false;
         if (this.isCustomer) {
           return (
             !this._creationMode &&
@@ -244,6 +258,12 @@ export default {
             !this.selected.isDeclined) ||
             !this.selected.isRequest)
         );
+      },
+    },
+    _customerCreationCheck: {
+      get() {
+        if (!this.isCustomer) return false;
+        return this.myUnusedLimit != null && this.myUnusedLimit <= 0;
       },
     },
     // _transport: {
@@ -299,8 +319,8 @@ export default {
         description: this.description,
         elements: this.points.map(this.buildPoint),
         isRequest: this.selected?.isRequest,
-        isApproved: this.selected?.isApproved,
-        isDeclined: this.selected?.isDeclined,
+        isApproved: this.copyMode ? false : this.selected?.isApproved,
+        isDeclined: this.copyMode ? false : this.selected?.isDeclined,
       };
     },
     buildPoint(point) {
@@ -326,9 +346,9 @@ export default {
             ? point.passenger.contact.fullname
             : null,
         name: point.cargo.withCargo ? point.cargo.name : "Пассажиры", // TODO Пассажиры
-        isNew: point.isNew,
-        existingId: point.existingId,
-        forDelete: point.forDelete,
+        isNew: this.copyMode ? true : point.isNew,
+        existingId: this.copyMode ? null : point.existingId,
+        forDelete: this.copyMode ? false : point.forDelete,
       };
     },
     async onApprove() {
@@ -383,7 +403,9 @@ export default {
       this.$refs.form.reset();
     },
     async onSubmit() {
-      this._creationMode ? await this.onAddOrder() : await this.onUpdateOrder();
+      this._creationMode || this.copyMode
+        ? await this.onAddOrder()
+        : await this.onUpdateOrder();
     },
     async onRemoveOrder() {
       await this.removeRoute({ id: this.selected.id });
@@ -410,6 +432,7 @@ export default {
       this.description = null;
       this.points = [];
       this.$emit("done");
+      this.$emit("routeCopy", false);
     },
     loadData() {
       if (this.selected) {
@@ -417,7 +440,7 @@ export default {
 
         this._orderIsEmergency = this.selected.isEmergency;
 
-        this.orderTime = new Date(order.orderTime);
+        this.orderTime = this.copyMode ? new Date() : new Date(order.orderTime);
 
         this.departurePointName = this.getPlaceById(
           order.departurePointId
@@ -433,12 +456,13 @@ export default {
 
         this.description = order.description;
 
-        this.setSelectedTransportId(order.transportId);
+        if (!this.copyMode) this.setSelectedTransportId(order.transportId);
+        else this.setSelectedTransportId(null);
 
-        this.points = this.selected.orders.map((o) => {
+        this.points = this.selected.orders.map((o, index) => {
           const contact = this.getContactById(o.contactId);
           return {
-            id: o.priority,
+            id: this.copyMode ? index : o.priority,
             isNew: false,
             destinationName: this.getPlaceById(o.destinationId).name,
             passenger: {
@@ -491,6 +515,9 @@ export default {
     if (this.$route.params.id) {
       const route = this.getRequestById(this.$route.params.id);
       this.$emit("routeSelected", route);
+    }
+    if (this.$route.params.copy != null && this.$route.params.copy === "copy") {
+      this.$emit("routeCopy", true);
     }
     this.loadData();
   },

@@ -4,7 +4,7 @@
         v-if="!$q.screen.xs"
     >
         <div class="col-12 row justify-center">
-            <div class="col col-8 bg-white q-pa-md column">
+            <div class="col col-8 bg-white column">
                 <Limits />
             </div>
         </div>

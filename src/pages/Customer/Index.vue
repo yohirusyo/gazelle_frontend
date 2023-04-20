@@ -12,6 +12,8 @@
             :selected="selected"
             :isCustomer="true"
             @routeSelected="setRoute"
+            @routeCopy="setCopy"
+            :copyMode="_copy"
           />
         </template>
       </MenuItemV2>
@@ -21,6 +23,7 @@
         v-if="!$q.screen.xs"
         class="col"
         @routeSelected="setRoute"
+        @routeCopy="setCopy"
       />
     </div>
   </q-page>
@@ -45,15 +48,27 @@ export default {
         this.route = val;
       },
     },
+    _copy: {
+      get() {
+        return this.copy;
+      },
+      set(val) {
+        this.copy = val;
+      },
+    },
   },
   data() {
     return {
       route: null,
+      copy: false,
     };
   },
   methods: {
     setRoute(route) {
       this._route = route;
+    },
+    setCopy(val) {
+      this._copy = val;
     },
   },
 };

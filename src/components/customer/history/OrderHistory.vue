@@ -17,9 +17,18 @@
           radius="md"
           @click="editElement(item)"
         >
-          <div class="q-ml-md text-grey" v-if="item.orders.length != 1">
-            Маршрут № {{ item.id }}
+          <div class="row justify-between">
+            <div class="q-ml-md text-grey">Маршрут № {{ item.id }}</div>
+            <div>
+              <q-btn
+                dense
+                flat
+                icon="lar la-copy"
+                @click.stop.prevent="copyElement(item)"
+              />
+            </div>
           </div>
+
           <HistoryElement
             v-for="order of item.orders"
             :key="order.id"
@@ -94,6 +103,14 @@ export default {
         } else {
           this.$emit("routeSelected", item);
         }
+      }
+    },
+    copyElement(item) {
+      if (this.$q.screen.xs) {
+        this.$router.push({ path: `/${item.id}/copy` });
+      } else {
+        this.$emit("routeSelected", item);
+        this.$emit("routeCopy", true);
       }
     },
   },

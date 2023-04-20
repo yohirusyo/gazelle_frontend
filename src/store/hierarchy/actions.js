@@ -34,6 +34,11 @@ export async function addToMyHierarchy({}, form) {
   return api.post(`management/hierarchy`, form);
 }
 
+export async function updateHierarchy({}, form) {
+  return api.patch(`management/hierarchy`, form);
+}
+
+
 export async function requestLimit({}, form) {
   return api.post(`management/limit-request`, form);
 }

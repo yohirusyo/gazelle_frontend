@@ -72,7 +72,6 @@
           </div>
           <div class="column items-stretch q-mt-md">
             <div class="row q-gutter-x-md">
-
               <q-input
                 v-model="_weight"
                 type="number"
@@ -86,8 +85,7 @@
                 label="Вес (кг)"
                 lazy-rules
                 :rules="[
-                  (val) =>
-                    (val !== null && val !== '') || 'Обязательное поле!',
+                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]"
                 autocomplete="off"
                 class="col"
@@ -105,8 +103,7 @@
                 label="Длина (мм)"
                 lazy-rules
                 :rules="[
-                  (val) =>
-                    (val !== null && val !== '') || 'Обязательное поле!',
+                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]"
                 autocomplete="off"
                 class="col"
@@ -126,8 +123,7 @@
                 label="Ширина (мм)"
                 lazy-rules
                 :rules="[
-                  (val) =>
-                    (val !== null && val !== '') || 'Обязательное поле!',
+                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]"
                 autocomplete="off"
                 class="col"
@@ -145,19 +141,29 @@
                 label="Высота (мм)"
                 lazy-rules
                 :rules="[
-                  (val) =>
-                    (val !== null && val !== '') || 'Обязательное поле!',
+                  (val) => (val !== null && val !== '') || 'Обязательное поле!',
                 ]"
                 autocomplete="off"
                 class="col"
               />
-
             </div>
             <q-checkbox
               v-model="_isLocal"
               label="Транспорт АТУ"
               dense
               class="q-pa-md"
+            />
+            <q-input
+              v-model="_agGUID"
+              square
+              outlined
+              dense
+              hide-bottom-space
+              hide-hint
+              label-color="grey"
+              label="Идентификатор Автограф (GUID)"
+              autocomplete="off"
+              class="col"
             />
           </div>
         </q-scroll-area>
@@ -236,6 +242,7 @@ export default {
         length: Number(this._length),
         height: Number(this._height),
         isLocal: this._isLocal,
+        agGUID: this._agGUID,
       });
       this.$refs.form.reset();
     },
@@ -251,6 +258,7 @@ export default {
         length: Number(this._length),
         height: Number(this._height),
         isLocal: this._isLocal,
+        agGUID: this._agGUID,
       });
       this.$refs.form.reset();
     },
@@ -268,11 +276,12 @@ export default {
       this._transportNumber = null;
       this._place = null;
       this._driver = null;
-      this._width = 0
-      this._weight = 0
-      this._height = 0
-      this._length = 0
-      this._isLocal = false
+      this._width = 0;
+      this._weight = 0;
+      this._height = 0;
+      this._length = 0;
+      this._isLocal = false;
+      this._agGUID = null;
       this.$emit("done");
       this.clearTransport();
     },
@@ -287,6 +296,7 @@ export default {
         this._height = Number(this.selected.height);
         this._length = Number(this.selected.length);
         this._isLocal = this.selected.isLocal;
+        this._agGUID = this.selected.agGUID;
         this._creationMode = false;
       } else {
         this._creationMode = true;
@@ -307,6 +317,7 @@ export default {
       _weight: 0,
       _length: 0,
       _isLocal: false,
+      _agGUID: null,
       _creationMode: true,
     };
   },
@@ -314,7 +325,7 @@ export default {
     this.loadData();
   },
   watch: {
-    "selected": {
+    selected: {
       handler(newVal, oldVal) {
         this._creationMode = !newVal;
         if (newVal != oldVal) this.loadData();
