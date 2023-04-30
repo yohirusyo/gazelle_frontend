@@ -1,10 +1,9 @@
 import * as moment from "moment";
 
 export const getSortedHistory = (state) => (onlyMy) => {
-  console.log({ onlyMy });
-  const stateHistory = onlyMy
+  const stateHistory = /* onlyMy
     ? state.history.filter((o) => o.orders[0].customerId == onlyMy)
-    : state.history;
+    :  */state.history;
   return stateHistory;
 };
 

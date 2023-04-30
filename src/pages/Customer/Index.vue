@@ -7,7 +7,7 @@
     >
       <MenuItemV2 :col="col" label="Заказы" v-model="_route" :onlyCreate="true">
         <template #create="{ onDone, selected }">
-          <OrderCreation
+          <OrderForm
             @done="onDone"
             :selected="selected"
             :isCustomer="true"
@@ -30,14 +30,14 @@
 </template>
 
 <script>
-import OrderHistory from "src/components/customer/history/OrderHistory.vue";
+import OrderHistory from "src/components/history/OrderHistory.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
-import OrderCreation from "src/components/order/OrderCreation.vue";
+import OrderForm from "src/components/order/form/Form.vue";
 export default {
   components: {
     OrderHistory,
     MenuItemV2,
-    OrderCreation,
+    OrderForm,
   },
   computed: {
     _route: {

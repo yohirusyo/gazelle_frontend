@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import OrderPlaceISelect from "./OrderPlaceISelect.vue";
 export default {
   props: ["modelValue", "isZeroCargo"],
   computed: {
@@ -51,9 +50,6 @@ export default {
         });
       },
     },
-  },
-  components: {
-    OrderPlaceISelect,
   },
 };
 </script>

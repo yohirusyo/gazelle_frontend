@@ -1,11 +1,11 @@
 <template>
-    <OrderListElement
+    <Order
         :props="props"
         v-model="showed"
         :order="props.row.orders[0]"
         @onSelected="onSelected"
     />
-    <OrderListElement
+    <Order
         v-for="o of route"
         :key="o.id"
         :props="props"
@@ -16,12 +16,12 @@
 </template>
 
 <script>
-import OrderListElement from "./OrderListElement.vue";
+import Order from 'src/components/order/list/element/order/Order.vue'
 import { mapState } from 'vuex'
 export default {
     props: ['props'],
     components: {
-        OrderListElement // v-if="showed || _hoveredOrder"
+        Order
     },
     data() {
         return {

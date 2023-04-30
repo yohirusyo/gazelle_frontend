@@ -37,14 +37,6 @@
         </div>
       </template>
     </q-virtual-scroll>
-    <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn
-        fab
-        :icon="!_isOnlyMy ? 'las la-user-alt' : 'las la-user-alt-slash'"
-        color="primary"
-        @click="_isOnlyMy = !_isOnlyMy"
-      />
-    </q-page-sticky>
   </div>
 </template>
 

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Limits from 'src/components/customer/limits/Limits.vue';
+import Limits from 'src/components/limits/Limits.vue';
 // import * as moment from 'moment';
 // import 'moment-weekday-calc';
 export default {

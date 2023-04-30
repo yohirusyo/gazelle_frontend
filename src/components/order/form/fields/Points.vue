@@ -1,6 +1,6 @@
 <template>
   <div class="column q-gutter-y-sm q-ma-none" id="points-list">
-    <OrderPoint
+    <Point
       :modelValue="point"
       v-for="(point, index) of points"
       :key="point.id"
@@ -25,13 +25,13 @@
 </template>
 
 <script>
-import OrderPoint from "./OrderPoint.vue";
+import Point from "./Point.vue";
 import Sortable from "sortablejs";
 
 export default {
   props: ["modelValue", "isEditMode"],
   components: {
-    OrderPoint,
+    Point,
   },
   computed: {
     points: {

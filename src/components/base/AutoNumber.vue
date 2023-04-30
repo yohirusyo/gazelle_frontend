@@ -7,14 +7,12 @@
       <div class="dot right">.</div>
       <div class="dot left">.</div>
       <div class="half-number col col-shrink row half-number-left no-wrap">
-        <div class="number-letter">{{ _parsedNumber?.[0] }}</div>
-        <div>{{ _parsedNumber?.[1] }}</div>
-        <div class="number-letter">{{ _parsedNumber?.[2] }}</div>
+        <div>{{ _parsedNumber?.start }}</div>
+        <div>{{ _parsedNumber?.numbers }}</div>
+        <div>{{ _parsedNumber?.end }}</div>
       </div>
-      <div
-        class="half-number col col-shrink column items-end justify-center"
-      >
-        <div class="reg q-pr-xs">{{ _parsedNumber?.[3] }}</div>
+      <div class="half-number col col-shrink column items-end justify-center">
+        <div class="reg pr-xs">{{ _parsedNumber?.region }}</div>
         <div class="row items-center no-wrap">
           <div class="rus">RUS</div>
           <img class="flag" src="flag-of-russia.png" />
@@ -44,18 +42,19 @@ export default {
       )
         return;
       number = number.replace(/\s+/g, "");
-      return [
-        number.substring(0, 1),
-        number.substring(1, 4),
-        number.substring(4, 6),
-        number.substring(6),
-      ];
+      return {
+        start: number.substring(0, 1),
+        numbers: number.substring(1, 4),
+        end: number.substring(4, 6),
+        region: number.substring(6),
+      };
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+
 .main-number {
   background-color: black;
   border-radius: 6px;
@@ -96,7 +95,6 @@ export default {
   width: 10px;
   object-fit: contain;
   margin-left: 2px;
-//   border: 1px solid black;
 }
 
 .dot {
@@ -110,5 +108,50 @@ export default {
 
 .left {
   left: 3px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.no-wrap {
+  flex-wrap: nowrap;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.pr-xs {
+  padding-right: 4px;
+}
+
+.col {
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  flex: 10000 1 0%;
+}
+
+.col-shrink {
+  flex: 0 1 auto;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.justify-center {
+  justify-content: center;
 }
 </style>

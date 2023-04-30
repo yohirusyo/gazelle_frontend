@@ -49,35 +49,37 @@
       </q-th>
     </template>
     <template v-slot:body="props">
-      <RouteElement :props="props" @onSelected="onSelected"/>
-
+      <RouteElement :props="props" @onSelected="onSelected" />
     </template>
   </q-table>
 </template>
 
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
-// import Sortable from "sortablejs";
-import RouteElement from "./OrderListElement/RouteElement.vue";
+import RouteElement from "./element/Element.vue";
 export default {
   name: "OrderList",
   props: ["col", "height"],
   components: {
-    RouteElement
+    RouteElement,
   },
   computed: {
-    ...mapState("order", ["orders", 'hovered']),
-    ...mapGetters("order", ["subdivisions", "filteredOrders", 'orderRouteFull']),
+    ...mapState("order", ["orders", "hovered"]),
+    ...mapGetters("order", [
+      "subdivisions",
+      "filteredOrders",
+      "orderRouteFull",
+    ]),
     ...mapState("current", ["hoveredTransportId"]),
     ...mapState("current", ["currentUser"]),
-    ...mapGetters('status', ['getStatusById']),
+    ...mapGetters("status", ["getStatusById"]),
     _orderList: {
       get() {
         // const filtered = this.filteredOrders({
         //   subdivisions: this._selectedSubdivisions,
         // })
         const filtered = this.orders;
-        return filtered.filter(o => {
+        return filtered.filter((o) => {
           return new Date(o.orderTime) < this._timerActives;
         });
         // return filtered;
@@ -89,13 +91,13 @@ export default {
       },
       set(val) {
         this.setHovered(val);
-      }
-    }
+      },
+    },
   },
   mounted() {
     this._selectedSubdivisions = this.subdivisions;
     this.updateActivesInterval();
-    setInterval(this.updateActivesInterval, 60000)
+    setInterval(this.updateActivesInterval, 60000);
   },
 
   watch: {
@@ -116,20 +118,30 @@ export default {
           "ENTRY_TO_DESTINATION",
           "EXIT_TO_DESTINATION",
         ];
-        const fOrders = this.orders.filter(
-          (route) => {
-            return route.orders.some(order => order.transportId == this.hoveredTransportId)
-          }
-        );
+        const fOrders = this.orders.filter((route) => {
+          return route.orders.some(
+            (order) => order.transportId == this.hoveredTransportId
+          );
+        });
         if (fOrders.length == 0) return (this._hoveredOrder = null);
         this._hoveredOrder = fOrders.reduce((prev, current) => {
-          if (prev.orders.some(o => busyStatuses.includes(this.getStatusById(o.statusId).code)))
-          return prev;
-          if (current.orders.some(o => busyStatuses.includes(this.getStatusById(o.statusId).code)))
-          return current;
+          if (
+            prev.orders.some((o) =>
+              busyStatuses.includes(this.getStatusById(o.statusId).code)
+            )
+          )
+            return prev;
+          if (
+            current.orders.some((o) =>
+              busyStatuses.includes(this.getStatusById(o.statusId).code)
+            )
+          )
+            return current;
           return prev.createdAt < current.createdAt ? prev : current;
         }, fOrders[0]);
-        const scrollTo = this._orderList.findIndex((o) => o.id == this._hoveredOrder.id);
+        const scrollTo = this._orderList.findIndex(
+          (o) => o.id == this._hoveredOrder.id
+        );
         this.$refs.scroll.scrollTo(scrollTo);
       }
     },
@@ -188,19 +200,19 @@ export default {
           label: "Статус",
           align: "center",
           sortable: false,
-        }
+        },
       ],
     };
   },
   methods: {
     ...mapActions("order", ["swapPriority"]),
-    ...mapMutations('order', ['setHovered']),
+    ...mapMutations("order", ["setHovered"]),
     updateActivesInterval() {
       this._timerActives = Date.now() + 7200000;
     },
     onSelected(sel) {
-      this.$emit('onSelected', sel);
-    }
+      this.$emit("onSelected", sel);
+    },
   },
 };
 </script>

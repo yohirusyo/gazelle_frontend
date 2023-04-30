@@ -151,9 +151,6 @@ export default {
     ...mapState("current", ["onlyFree", "onlyWithDrivers"]),
     ...mapState("status", ["statuses"]),
     ...mapGetters("transport", ["getByOnlyFreeFilter"]),
-    ...mapGetters("status", ["getStatusById"]),
-    ...mapGetters("user", ["getDriverById"]),
-    ...mapGetters("place", ["getPlaceById"]),
     ...mapState("current", ["currentUser"]),
     freeStatuses: {
       get() {

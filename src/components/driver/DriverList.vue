@@ -54,9 +54,24 @@ export default {
   },
   methods: {
     ...mapMutations("current", ["setDriver"]),
+    async fetchVersion() {
+      try {
+        const response = await fetch(
+          "http://taxi.mmk.ru/updates/new/version.info",
+          {
+            method: "GET",
+          }
+        );
+        const data = await response.text();
+        const version = data.split(";")[0];
+        this.version = version;
+      } catch (error) {
+        this.version = null;
+      }
+    },
   },
   async mounted() {
-    this.version = "1.1.3";
+    await this.fetchVersion();
   },
   data() {
     return {

@@ -9,7 +9,7 @@
       <div class="col row">
         <q-scroll-area class="col">
           <div class="column col q-gutter-y-md">
-            <OrderCustomerISelect
+            <CustomerSelect
               v-if="!isCustomer"
               :phoneNumber="customer.phoneNumber"
               :fullname="customer.fullname"
@@ -19,20 +19,20 @@
               @update:subdivision="(val) => (customer.subdivision = val)"
             />
 
-            <OrderPlaceISelect
+            <PlaceSelect
               v-model="departurePointName"
               label="Место отправления"
             />
 
-            <OrderPoints
+            <PointsConstructor
               v-model="points"
               :isEditMode="!!selected && !copyMode"
             />
 
-            <OrderDescription v-model="description" />
+            <DescriptionField v-model="description" />
 
             <div class="row justify-center items-center q-gutter-x-md">
-              <OrderTime v-model="orderTime" />
+              <OrderTimePicker v-model="orderTime" />
             </div>
 
             <!-- <q-select
@@ -143,6 +143,16 @@
             no-caps
             dense
           />
+          <q-btn
+            v-if="isCustomer && !_creationMode"
+            text-color="white"
+            label="Удалить"
+            unelevated
+            class="border-none bg-red col"
+            @click="onDecline"
+            no-caps
+            dense
+          />
 
           <q-btn
             v-if="_removeMenuActive"
@@ -172,24 +182,22 @@
 <script>
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
-import ISelect from "components/base/ISelect.vue";
 import { showNotifyResult } from "src/helpers/notification";
 import * as moment from "moment";
-import OrderCustomerISelect from "./OrderForm/OrderCustomerISelect.vue";
-import OrderPlaceISelect from "./OrderForm/OrderPlaceISelect.vue";
-import OrderPoints from "./OrderForm/OrderPoints.vue";
-import OrderDescription from "./OrderForm/OrderDescription.vue";
-import OrderTime from "./OrderForm/OrderTime.vue";
+import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
+import PlaceSelect from "src/components/order/form/fields/Place.vue";
+import PointsConstructor from "src/components/order/form/fields/Points.vue";
+import DescriptionField from "src/components/order/form/fields/Description.vue";
+import OrderTimePicker from "src/components/order/form/fields/Time.vue";
 export default {
   name: "OrderCreation",
   props: ["selected", "isCustomer", "copyMode"],
   components: {
-    ISelect,
-    OrderCustomerISelect,
-    OrderPlaceISelect,
-    OrderPoints,
-    OrderDescription,
-    OrderTime,
+    CustomerSelect,
+    PlaceSelect,
+    PointsConstructor,
+    DescriptionField,
+    OrderTimePicker,
   },
   computed: {
     ...mapState("current", [
@@ -216,7 +224,7 @@ export default {
       get() {
         return (
           !this._creationMode &&
-          this.selected &&
+          this.selected && 
           this.selected.isRequest &&
           !this.selected.isApproved &&
           !this.selected.isDeclined &&

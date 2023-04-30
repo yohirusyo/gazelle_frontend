@@ -114,7 +114,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
-import LimitApprovement from "../customer/limits/LimitApprovement.vue";
+import LimitApprovement from "src/components/limits/LimitApprovement.vue";
 export default {
     components: {
         LimitApprovement

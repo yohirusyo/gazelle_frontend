@@ -18,7 +18,7 @@
       />
     </template>
     <template #create="{ onDone, selected }">
-      <OrderCreation
+      <OrderForm
         @done="onDone"
         :selected="selected"
       />
@@ -27,16 +27,16 @@
 </template>
 
 <script>
-import OrderList from "./OrderList.vue";
-import OrderListMobile from "./OrderListMobile.vue";
-import OrderCreation from "./OrderCreation.vue";
+import OrderList from "./List/List.vue";
+import OrderListMobile from "./List/mobile/List.vue";
+import OrderForm from "src/components/order/form/Form.vue";
 import { mapState } from "vuex";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 export default {
   name: "Order",
   components: {
     OrderList,
-    OrderCreation,
+    OrderForm,
     OrderListMobile,
     MenuItemV2,
   },

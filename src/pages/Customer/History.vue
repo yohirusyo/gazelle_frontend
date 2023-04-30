@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import OrderHistory from "src/components/customer/history/OrderHistory.vue";
+import OrderHistory from "src/components/history/OrderHistory.vue";
 export default {
   name: "History",
   components: {

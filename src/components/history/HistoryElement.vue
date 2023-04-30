@@ -37,7 +37,7 @@
   >
     <div class="row items-center q-gutter-x-md justify-between">
       <span> Заказ выполняется </span>
-      <OrderListElementStatus
+      <Status
         :statusId="order.statusId"
         :statusChangedAt="order.statusChangedAt"
       />
@@ -89,12 +89,12 @@
 import { mapState, mapGetters } from "vuex";
 import * as moment from "moment";
 import AutoNumber from "src/components/base/AutoNumber.vue";
-import OrderListElementStatus from "src/components/order/OrderListElement/OrderListElementStatus.vue";
+import Status from 'src/components/order/list/element/order/Status.vue'
 export default {
   props: ["order"],
   components: {
     AutoNumber,
-    OrderListElementStatus,
+    Status,
   },
   computed: {
     ...mapState("current", ["currentUser"]),

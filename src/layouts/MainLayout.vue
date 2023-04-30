@@ -21,7 +21,7 @@
           <div class="q-pl-md" v-if="connection === 'atu'">
             Автотранспортное Управление
           </div>
-          <div class="q-pl-md" v-if="connection === 'mmkmetiz'">ММК-Метиз</div>
+          <div class="q-pl-md" v-if="connection === 'mmkmetiz'">ММК-МЕТИЗ</div>
         </div>
         <div
           class="q-pr-sm text-center col col-shrink column justify-center items-end"

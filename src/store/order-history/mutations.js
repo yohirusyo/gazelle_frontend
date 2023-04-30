@@ -13,16 +13,14 @@ export function set(state, history) {
   sort(state);
 }
 
-export function add(state, order) {
+
+export function update(state, order) {
+  console.log(order);
   const index = state.history.findIndex((o) => o.id == order.id);
   if (index == -1)
     state.history.push(order);
-  sort(state)
-}
-
-export function update(state, order) {
-  const index = state.history.findIndex((o) => o.id == order.id);
-  state.history[index] = order;
+  else
+    state.history[index] = order;
   sort(state)
 }
 
