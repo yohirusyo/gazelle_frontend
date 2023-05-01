@@ -6,13 +6,13 @@
 
 <script>
 import VueApexCharts from 'vue3-apexcharts'
-import * as moment from 'moment';
+import dayjs from 'dayjs';
 export default {
     components: {
         ApexChart: VueApexCharts
     },
     mounted() {
-        this.series.data = Array(moment().endOf('month').date()).map(d => 5);
+        this.series.data = Array(dayjs().endOf('month').date()).map(d => 5);
     },
     data() {
         return {

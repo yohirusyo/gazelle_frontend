@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import dayjs from 'dayjs';
 export const statsSubidivisions = (state) => {
     const orders = state.orderStats.map(os => os.order);
     const customers = orders.map(order => order.customer);
@@ -12,12 +12,12 @@ export const driversFullnames = (state) => {
 }
 
 export const getMinDate = (state) => () => {
-    return moment(state.min).format('YYYY/MM/DD');
+    return dayjs(state.min).format('YYYY/MM/DD');
 }
 
 export const getMaxDate = (state) => () => {
 
-    return moment(state.max).format('YYYY/MM/DD');
+    return dayjs(state.max).format('YYYY/MM/DD');
 }
 
 export const getFilteredStats = (state) => (fullname, subdivision) => {

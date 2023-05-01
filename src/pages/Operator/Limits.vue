@@ -20,8 +20,8 @@
 
 <script>
 import Limits from 'src/components/limits/Limits.vue';
-// import * as moment from 'moment';
-// import 'moment-weekday-calc';
+// import dayjs from 'dayjs';
+// import 'dayjs-weekday-calc';
 export default {
     name: "LimitsPage",
     components: {
@@ -29,9 +29,9 @@ export default {
     },
 
     // mounted() {
-    //     const startmonth = moment().startOf('month');
-    //     const endmonth = moment().endOf('month')
-    //     const dates = moment().dateRangeToDates({
+    //     const startmonth = dayjs().startOf('month');
+    //     const endmonth = dayjs().endOf('month')
+    //     const dates = dayjs().dateRangeToDates({
     //         rangeStart: [startmonth.year(), startmonth.month(), startmonth.date()],
     //         rangeEnd: [endmonth.year(), endmonth.month(), endmonth.date()],
     //         weekdays: [1, 2, 3, 4, 5]

@@ -9,7 +9,7 @@
         <download-excel
           :data="getFilteredShiftStats()"
           :fields="fields"
-          :name="`(Смены) Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`"
+          :name="`(Смены) Отчет ${dayjs().format('DD.MM.YYYY HH:mm')}.xls`"
           class="col row q-ma-none"
         >
           <q-btn
@@ -83,11 +83,13 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
-import * as moment from "moment";
+import dayjs from "dayjs";
 import { Loading, Dialog } from "quasar";
 import ISelect from "components/base/ISelect.vue";
-import MapOrder from "components/report/Map.vue";
-
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 export default {
   name: "ShiftReport",
   components: {
@@ -307,7 +309,7 @@ export default {
   },
   methods: {
     ...mapActions("userStats", ["requestShiftStats", "requestShiftStatsDates"]),
-    moment,
+    dayjs,
     // async openMap(order) {
     //   Dialog.create({
     //     component: MapOrder,
@@ -321,17 +323,17 @@ export default {
     },
     secondsDuration(val) {
       if (this.checkNull(val)) val = 0;
-      return moment
-        .utc(moment.duration(val, "milliseconds").asMilliseconds())
+      return dayjs
+        .utc(dayjs.duration(val, "milliseconds").asMilliseconds())
         .format("HH:mm:ss");
     },
     DDMMYYYY(val) {
       if (this.checkNull(val)) return null;
-      return moment(val).format("DD.MM.YYYY");
+      return dayjs(val).format("DD.MM.YYYY");
     },
     HHmm(val) {
       if (this.checkNull(val)) return null;
-      return moment(val).format("HH:mm");
+      return dayjs(val).format("HH:mm");
     },
     HHmmORCurrent(val) {
       if (val) return this.HHmm(val);
@@ -365,8 +367,8 @@ export default {
     this.width = this.$refs.page.$el.clientWidth;
     await this.requestShiftStatsDates();
     this._selectedDate = {
-      from: moment().format("DD.MM.YYYY"),
-      to: moment().format("DD.MM.YYYY"),
+      from: dayjs().format("DD.MM.YYYY"),
+      to: dayjs().format("DD.MM.YYYY"),
     };
     await this.requestShiftStats(this._selectedDate);
     Loading.hide();

@@ -2,7 +2,7 @@
   <q-tr class="text-center">
     <q-td key="date">{{
       item.order.orderTime
-        ? moment(item.order.orderTime).format("DD.MM.YYYY HH:mm:ss")
+        ? dayjs(item.order.orderTime).format("DD.MM.YYYY HH:mm:ss")
         : "Маршрут"
     }}</q-td>
 
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import * as moment from "moment";
+import dayjs from "dayjs";
 export default {
   props: ["item", "isMinutes"],
   data() {
@@ -24,7 +24,7 @@ export default {
     };
   },
   methods: {
-    moment,
+    dayjs,
     toMinutes(time) {
       if (!time) return "0.00";
       return (time / 60000).toFixed(2);

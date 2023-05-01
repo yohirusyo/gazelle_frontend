@@ -1,12 +1,12 @@
 import { date } from "quasar";
-import * as moment from 'moment';
+import dayjs from 'dayjs';
 
 export const timeFormat = (d) => date.formatDate(d, "HH:mm")
 
 export const timeFormatOrder = (d) => {
     if (!d) return
-    const now = moment();
-    const dd = moment(d);
+    const now = dayjs();
+    const dd = dayjs(d);
     if (!now.isSame(dd, 'date'))
         return dd.format('DD.MM.YYYY')
 }

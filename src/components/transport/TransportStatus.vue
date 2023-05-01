@@ -15,7 +15,9 @@ import {
   formatPlace,
   formatTransportNumber,
 } from "src/helpers/formatters";
-import * as moment from "moment";
+import dayjs from "dayjs";
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 export default {
   name: "TransportStatus",
   props: ["transportId"],
@@ -34,10 +36,10 @@ export default {
     formatPlace,
     formatTransportNumber,
     updateStatus() {
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
+      const start = dayjs(this.transport?.statusChangedAt);
+      const diff = dayjs().diff(start);
       if (
-        moment.duration(diff).asMinutes() >= 15 &&
+        dayjs.duration(diff).asMinutes() >= 15 &&
         this.getStatusById(this.transport?.statusId)?.code == "FREE"
       ) {
         this._isFreeMoreThan15Minutes = true;

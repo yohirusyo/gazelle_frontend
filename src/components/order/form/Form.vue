@@ -31,9 +31,7 @@
 
             <DescriptionField v-model="description" />
 
-            <div class="row justify-center items-center q-gutter-x-md">
-              <OrderTimePicker v-model="orderTime" />
-            </div>
+            <OrderTimePicker v-model="orderTime" />
 
             <!-- <q-select
               v-if="$q.screen.xs"
@@ -183,7 +181,7 @@
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 import { showNotifyResult } from "src/helpers/notification";
-import * as moment from "moment";
+import dayjs from "dayjs";
 import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import PlaceSelect from "src/components/order/form/fields/Place.vue";
 import PointsConstructor from "src/components/order/form/fields/Points.vue";
@@ -224,7 +222,7 @@ export default {
       get() {
         return (
           !this._creationMode &&
-          this.selected && 
+          this.selected &&
           this.selected.isRequest &&
           !this.selected.isApproved &&
           !this.selected.isDeclined &&
@@ -517,7 +515,7 @@ export default {
         this._creationMode = true;
       }
     },
-    moment,
+    dayjs,
   },
   mounted() {
     if (this.$route.params.id) {

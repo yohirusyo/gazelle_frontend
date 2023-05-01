@@ -1,12 +1,12 @@
-import * as moment from 'moment';
+import dayjs from 'dayjs';
 
 export const getShiftMinDate = (state) => () => {
-    return moment(state.shiftMin).format('YYYY/MM/DD');
+    return dayjs(state.shiftMin).format('YYYY/MM/DD');
 }
 
 export const getShiftMaxDate = (state) => () => {
 
-    return moment(state.shiftMax).format('YYYY/MM/DD');
+    return dayjs(state.shiftMax).format('YYYY/MM/DD');
 }
 
 export const getFilteredShiftStats = (state) => (/* fullname, subdivision */) => {
@@ -14,11 +14,11 @@ export const getFilteredShiftStats = (state) => (/* fullname, subdivision */) =>
 }
 
 export const getOperatorShiftMinDate = (state) => () => {
-    return moment(state.operatorShiftMin).format('YYYY/MM/DD');
+    return dayjs(state.operatorShiftMin).format('YYYY/MM/DD');
 }
 
 export const getOperatorShiftMaxDate = (state) => () => {
-    return moment(state.operatorShiftMax).format('YYYY/MM/DD');
+    return dayjs(state.operatorShiftMax).format('YYYY/MM/DD');
 }
 
 export const getFilteredOperatorShiftStats = (state) => (/* fullname, subdivision */) => {

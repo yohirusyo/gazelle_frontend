@@ -34,7 +34,7 @@
       :key="index"
       :icon="getTransportContentLayout(t)"
       :hint-content="
-        moment(t.coordinatesChangedAt).format('HH:mm:ss DD.MM.YYYY')
+        dayjs(t.coordinatesChangedAt).format('HH:mm:ss DD.MM.YYYY')
       "
     />
     <ymap-marker
@@ -50,7 +50,7 @@
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { yandexMap, ymapMarker } from "vue-yandex-maps";
 import { formatDriverMobileFullname } from "src/helpers/formatters";
-import * as moment from "moment";
+import dayjs from "dayjs";
 export default {
   name: "YaMap",
   components: {
@@ -85,7 +85,7 @@ export default {
   methods: {
     ...mapMutations("current", ["setCoords", "setPlace", "clearCoords"]),
     formatDriverMobileFullname,
-    moment,
+    dayjs,
     getPlaceIcon(name) {
       return {
         content: name,

@@ -1,19 +1,11 @@
 <template>
-  <q-tr
-    @click="onSelected(transport)"
-    class="text-center"
-  >
+  <q-tr @click="onSelected(transport)" class="text-center">
     <q-td
       key="select "
       class="col-1 text-center"
       v-if="currentUser?.role != 'WATCHER'"
     >
-      <q-checkbox
-        v-model="_selected"
-        :disable="!_isNotDisabled"
-        dense
-      />
-
+      <q-checkbox v-model="_selected" :disable="!_isNotDisabled" dense />
     </q-td>
 
     <q-td key="type">{{ transport?.type }}</q-td>
@@ -26,12 +18,8 @@
         <AutoNumber :number="transport?.transportNumber" />
       </div>
     </q-td>
-    <q-td
-      key="driver"
-      class="pre"
-    >
+    <q-td key="driver" class="pre">
       {{ formatDriver(getDriverById(transport?.driverId)) }}
-
     </q-td>
     <q-td key="place">
       {{ formatPlace(getPlaceById(transport?.placeId)) }}
@@ -60,8 +48,11 @@ import {
 } from "src/helpers/formatters";
 import AutoNumber from "../base/AutoNumber.vue";
 import TransportStatus from "./TransportStatus.vue";
-import * as moment from "moment";
-
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 export default {
   name: "TransportListElement",
   components: {
@@ -73,7 +64,7 @@ export default {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
-    ...mapGetters('transport', ['getTransportById']),
+    ...mapGetters("transport", ["getTransportById"]),
     ...mapState("current", ["currentUser"]),
     ...mapState("current", [
       "selectedTransportId",
@@ -88,7 +79,7 @@ export default {
     transport: {
       get() {
         return this.getTransportById(this.id);
-      }
+      },
     },
     _isNotDisabled() {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
@@ -126,16 +117,16 @@ export default {
     formatPlace,
     formatTransportNumber,
     updateStatus() {
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
+      const start = dayjs(this.transport?.statusChangedAt);
+      const diff = dayjs().diff(start);
       if (
-        moment.duration(diff).asHours() >= 1 &&
+        dayjs.duration(diff).asHours() >= 1 &&
         this.getStatusById(this.transport?.statusId)?.isBusy
       ) {
         this._isBusyMoreThan1Hour = true;
         this._isFreeMoreThan15Minutes = false;
       } else if (
-        moment.duration(diff).asMinutes() >= 15 &&
+        dayjs.duration(diff).asMinutes() >= 15 &&
         this.getStatusById(this.transport?.statusId)?.code == "FREE"
       ) {
         this._isFreeMoreThan15Minutes = true;
@@ -146,17 +137,17 @@ export default {
       }
     },
     updateDuration() {
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
-      if (moment.duration(diff).asDays() >= 1) {
-        this.duration = moment.utc(diff).format("DDд. HH:mm");
+      const start = dayjs(this.transport?.statusChangedAt);
+      const diff = dayjs().diff(start);
+      if (dayjs.duration(diff).asDays() >= 1) {
+        this.duration = dayjs.utc(diff).format("DDд. HH:mm");
       } else {
-        this.duration = moment.utc(diff).format("HH:mm");
+        this.duration = dayjs.utc(diff).format("HH:mm");
       }
     },
     onSelected(sel) {
-      this.$emit('onSelected', sel);
-    }
+      this.$emit("onSelected", sel);
+    },
   },
   data() {
     return {

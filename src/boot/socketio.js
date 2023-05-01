@@ -1,7 +1,7 @@
 import { boot } from "quasar/wrappers";
 import io from "socket.io-client";
 import JsonExcel from "vue-json-excel3";
-
+import "dayjs/locale/ru";
 const initConnection = () => {
   if (!localStorage.getItem("connection")) {
     localStorage.setItem("connection", "atu");

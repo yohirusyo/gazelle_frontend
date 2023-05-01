@@ -18,7 +18,9 @@ import {
     formatDriver,
     formatPlace,
 } from "src/helpers/formatters";
-import * as moment from "moment";
+import dayjs from "dayjs";
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 export default {
     name: "OrderStatus",
     props: ["statusId", 'statusChangedAt', 'isDone'],
@@ -30,10 +32,10 @@ export default {
         formatDriver,
         formatPlace,
         updateStatus() {
-            const start = moment(this.statusChangedAt);
-            const diff = moment().diff(start);
+            const start = dayjs(this.statusChangedAt);
+            const diff = dayjs().diff(start);
             if (
-                moment.duration(diff).asMinutes() >= 15 &&
+                dayjs.duration(diff).asMinutes() >= 15 &&
                 this.getStatusById(this.statusId)?.code == "FREE"
             ) {
                 this._isFreeMoreThan15Minutes = true;

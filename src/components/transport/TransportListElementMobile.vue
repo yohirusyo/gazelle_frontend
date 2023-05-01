@@ -41,7 +41,11 @@ import {
   formatDriverMobileFullname,
   formatDriverMobilePhoneNumber,
 } from "src/helpers/formatters";
-import * as moment from "moment";
+import dayjs from "dayjs";
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 export default {
   name: "TransportListElementMobile",
   components: {
@@ -55,16 +59,16 @@ export default {
     formatDriverMobileFullname,
     formatDriverMobilePhoneNumber,
     updateStatus() {
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
+      const start = dayjs(this.transport?.statusChangedAt);
+      const diff = dayjs().diff(start);
       if (
-        moment.duration(diff).asHours() >= 1 &&
+        dayjs.duration(diff).asHours() >= 1 &&
         this.getStatusById(this.transport?.statusId)?.isBusy
       ) {
         this._isBusyMoreThan1Hour = true;
         this._isFreeMoreThan15Minutes = false;
       } else if (
-        moment.duration(diff).asMinutes() >= 15 &&
+        dayjs.duration(diff).asMinutes() >= 15 &&
         this.getStatusById(this.transport?.statusId)?.code == "FREE"
       ) {
         this._isFreeMoreThan15Minutes = true;
@@ -96,12 +100,12 @@ export default {
         this.transport.statusId != null
       )
         this.updateStatus();
-      const start = moment(this.transport?.statusChangedAt);
-      const diff = moment().diff(start);
-      if (moment.duration(diff).asDays() >= 1) {
-        this.duration = moment.utc(diff).format("DDд. HH:mm:ss");
+      const start = dayjs(this.transport?.statusChangedAt);
+      const diff = dayjs().diff(start);
+      if (dayjs.duration(diff).asDays() >= 1) {
+        this.duration = dayjs.utc(diff).format("DDд. HH:mm:ss");
       } else {
-        this.duration = moment.utc(diff).format("HH:mm:ss");
+        this.duration = dayjs.utc(diff).format("HH:mm:ss");
       }
     }, 1000);
   },

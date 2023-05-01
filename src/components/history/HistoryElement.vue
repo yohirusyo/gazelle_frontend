@@ -8,7 +8,7 @@
       `аказ
                 №${order.id}, ` +
       (order.orderTime
-        ? `в ${moment(order.orderTime).format("HH:mm")}`
+        ? `в ${dayjs(order.orderTime).format("HH:mm")}`
         : `время заказа не назначено`)
     }}
   </div>
@@ -87,7 +87,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import AutoNumber from "src/components/base/AutoNumber.vue";
 import Status from 'src/components/order/list/element/order/Status.vue'
 export default {
@@ -107,7 +107,7 @@ export default {
     },
   },
   methods: {
-    moment,
+    dayjs,
   },
 };
 </script>

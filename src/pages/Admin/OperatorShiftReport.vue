@@ -9,7 +9,7 @@
         <download-excel
           :data="getFilteredOperatorShiftStats()"
           :fields="fields"
-          :name="`(Диспетчеры) Отчет ${moment().format('DD.MM.YYYY HH:mm')}.xls`"
+          :name="`(Диспетчеры) Отчет ${dayjs().format('DD.MM.YYYY HH:mm')}.xls`"
           class="col row q-ma-none"
         >
           <q-btn
@@ -83,7 +83,9 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
-import * as moment from "moment";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 import { Loading } from "quasar";
 import ISelect from "components/base/ISelect.vue";
 
@@ -195,19 +197,19 @@ export default {
       "requestOperatorShiftStats",
       "requestOperatorShiftStatsDates",
     ]),
-    moment,
+    dayjs,
     checkNull(val) {
       return val === null || val === undefined;
     },
     secondsDuration(val) {
       if (this.checkNull(val)) val = 0;
-      return moment
-        .utc(moment.duration(val, "milliseconds").asMilliseconds())
+      return dayjs
+        .utc(dayjs.duration(val, "milliseconds").asMilliseconds())
         .format("HH:mm:ss");
     },
     DDMMYYYY(val) {
       if (this.checkNull(val)) return null;
-      return moment(val).format("DD.MM.YYYY");
+      return dayjs(val).format("DD.MM.YYYY");
     },
     regular(val) {
       if (this.checkNull(val)) return null;
@@ -227,8 +229,8 @@ export default {
     this.width = this.$refs.page.$el.clientWidth;
     await this.requestOperatorShiftStatsDates();
     this._selectedDate = {
-      from: moment().format("DD.MM.YYYY"),
-      to: moment().format("DD.MM.YYYY"),
+      from: dayjs().format("DD.MM.YYYY"),
+      to: dayjs().format("DD.MM.YYYY"),
     };
     await this.requestOperatorShiftStats(this._selectedDate);
     Loading.hide();

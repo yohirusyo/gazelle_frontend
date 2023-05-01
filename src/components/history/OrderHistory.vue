@@ -10,7 +10,7 @@
           v-if="item.head"
           style="font-size: 1.1rem"
         >
-          {{ moment(item.createdAt).lang("ru").format("D MMM, dddd") }}
+          {{ dayjs(item.createdAt).locale("ru").format("D MMM, dddd") }}
         </div>
         <div
           class="bg-white q-pa-sm column q-mb-sm"
@@ -42,7 +42,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import HistoryElement from "./HistoryElement.vue";
 export default {
   name: "OrderHistory",
@@ -82,7 +82,7 @@ export default {
       "subscribeHistorySockets",
     ]),
     ...mapMutations("current", ["setRequest"]),
-    moment,
+    dayjs,
     editElement(item) {
       if (
         this.currentUser.id == item.orders[0].customerId &&

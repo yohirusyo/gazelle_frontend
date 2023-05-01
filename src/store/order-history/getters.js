@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import dayjs from "dayjs";
 
 export const getSortedHistory = (state) => (onlyMy) => {
   const stateHistory = /* onlyMy
