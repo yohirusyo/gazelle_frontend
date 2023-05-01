@@ -66,7 +66,7 @@ module.exports = configure(function (ctx) {
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]
       // ]
-      analyze: true,
+      analyze: false,
       gzip: true,
       minify: true,
       sourceMap: true,
