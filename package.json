@@ -13,7 +13,6 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "@vuepic/vue-datepicker": "^4.5.1",
-    "apexcharts": "^3.40.0",
     "axios": "^1.2.1",
     "dayjs": "^1.11.7",
     "quasar": "^2.6.0",
@@ -23,7 +22,6 @@
     "vue-json-excel3": "0.0.7",
     "vue-router": "^4.0.0",
     "vue-yandex-maps": "^0.12.7",
-    "vue3-apexcharts": "^1.4.1",
     "vuex": "^4.0.1",
     "ymaps": "^0.2.1"
   },
