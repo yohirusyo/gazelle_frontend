@@ -18,10 +18,7 @@
           </q-avatar>
         </div>
         <div v-if="!$q.screen.xs" class="col text-h5">
-          <div class="q-pl-md" v-if="connection === 'atu'">
-            Автотранспортное Управление
-          </div>
-          <div class="q-pl-md" v-if="connection === 'mmkmetiz'">ММК-МЕТИЗ</div>
+          <div class="q-pl-md">{{ сonnectionName() }}</div>
         </div>
         <div
           class="q-pr-sm text-center col col-shrink column justify-center items-end"
@@ -188,6 +185,7 @@ import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
 import { Loading } from "quasar";
 import { formatRole } from "src/helpers/formatters.js";
 import { getConnection } from "src/boot/axios";
+import { сonnectionName } from "src/helpers/formatters";
 export default {
   name: "MainLayout",
   components: {},
@@ -211,6 +209,7 @@ export default {
     ...mapActions("user", ["requestDrivers", "requestNonDrivers"]),
     ...mapActions("status", ["requestStatuses"]),
     ...mapActions("hierarchy", ["requestMyHierarchy"]),
+    сonnectionName,
   },
   computed: {
     ...mapState("current", ["currentUser"]),

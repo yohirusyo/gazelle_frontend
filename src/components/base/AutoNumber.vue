@@ -38,7 +38,7 @@ export default {
       if (
         !/[ETYOPAHKXCBM]{1}\s{0,1}\d{3}\s{0,1}[ETYOPAHKXCBM]{2}\s{0,1}\d{2,3}/.test(
           number
-        )
+        ) 
       )
         return;
       number = number.replace(/\s+/g, "");

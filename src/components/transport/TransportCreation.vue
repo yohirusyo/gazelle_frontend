@@ -149,7 +149,7 @@
             </div>
             <q-checkbox
               v-model="_isLocal"
-              label="Транспорт АТУ"
+              :label="`Транспорт ${shortConnectionName()}`"
               dense
               class="q-pa-md"
             />
@@ -211,7 +211,7 @@
 
 <script>
 import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
-
+import { shortConnectionName } from "src/helpers/formatters";
 export default {
   name: "TransportCreation",
   props: ["height", "selected"],
@@ -305,6 +305,7 @@ export default {
     onCancel() {
       this.resetForm();
     },
+    shortConnectionName,
   },
   data() {
     return {

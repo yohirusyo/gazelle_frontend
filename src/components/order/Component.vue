@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import OrderList from "./List/List.vue";
-import OrderListMobile from "./List/mobile/List.vue";
+import OrderList from "./list/List.vue";
+import OrderListMobile from "./list/mobile/List.vue";
 import OrderForm from "src/components/order/form/Form.vue";
 import { mapState } from "vuex";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
