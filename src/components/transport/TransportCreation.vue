@@ -148,11 +148,13 @@
               />
             </div>
             <q-checkbox
+              v-if="shortConnectionName() != 'ММК-МЕТИЗ'"
               v-model="_isLocal"
               :label="`Транспорт ${shortConnectionName()}`"
               dense
               class="q-pa-md"
             />
+            <div class="q-pa-sm" v-if="shortConnectionName() == 'ММК-МЕТИЗ'"></div>
             <q-input
               v-model="_agGUID"
               square
