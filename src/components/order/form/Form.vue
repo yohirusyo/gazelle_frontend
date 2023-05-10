@@ -14,9 +14,11 @@
               :phoneNumber="customer.phoneNumber"
               :fullname="customer.fullname"
               :subdivision="customer.subdivision"
+              :mvz="customer.mvz"
               @update:phoneNumber="(val) => (customer.phoneNumber = val)"
               @update:fullname="(val) => (customer.fullname = val)"
               @update:subdivision="(val) => (customer.subdivision = val)"
+              @update:mvz="(val) => (customer.mvz = val)"
             />
 
             <PlaceSelect
@@ -322,6 +324,7 @@ export default {
         customerPhoneNumber: this.customer.phoneNumber,
         customerFullname: this.customer.fullname,
         customerSubdivision: this.customer.subdivision,
+        customermvz: this.customer.mvz,
         description: this.description,
         elements: this.points.map(this.buildPoint),
         isRequest: this.selected?.isRequest,
@@ -425,12 +428,14 @@ export default {
           fullname: this.currentUser.fullname,
           subdivision: this.currentUser.subdivision,
           phoneNumber: this.currentUser.phoneNumber,
+          mvz: this.currentUser.mvz,
         };
       } else {
         this.customer = {
           fullname: null,
           subdivision: null,
           phoneNumber: null,
+          mvz: null,
         };
       }
       this.departurePointName = null;
@@ -452,12 +457,12 @@ export default {
           order.departurePointId
         ).name;
 
-        const { fullname, phoneNumber, subdivision } = this.getCustomerById(
-          order.customerId
-        );
+        const { fullname, phoneNumber, subdivision, mvz } =
+          this.getCustomerById(order.customerId);
         this.customer.fullname = fullname;
         this.customer.phoneNumber = phoneNumber;
         this.customer.subdivision = subdivision;
+        this.customer.mvz = mvz;
         this.setCustomerSubdivision(subdivision);
 
         this.description = order.description;
@@ -502,12 +507,14 @@ export default {
             fullname: this.currentUser.fullname,
             subdivision: this.currentUser.subdivision,
             phoneNumber: this.currentUser.phoneNumber,
+            mvz: this.currentUser.mvz,
           };
         } else {
           this.customer = {
             fullname: null,
             subdivision: null,
             phoneNumber: null,
+            mvz: null,
           };
         }
         this.setCustomerSubdivision(this.customer.subdivision);
@@ -529,7 +536,12 @@ export default {
   },
   data() {
     return {
-      customer: { fullname: null, subdivision: null, phoneNumber: null },
+      customer: {
+        fullname: null,
+        subdivision: null,
+        phoneNumber: null,
+        mvz: null,
+      },
       departurePointName: null,
       orderTime: new Date(),
       description: null,

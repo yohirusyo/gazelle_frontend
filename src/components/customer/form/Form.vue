@@ -13,9 +13,11 @@
               :phoneNumber="phoneNumber"
               :fullname="fullname"
               :subdivision="subdivision"
+              :mvz="mvz"
               @update:phoneNumber="(val) => (phoneNumber = val)"
               @update:fullname="(val) => (fullname = val)"
               @update:subdivision="(val) => (subdivision = val)"
+              @update:mvz="(val) => (mvz = val)"
             />
           </div>
         </q-scroll-area>
@@ -70,7 +72,7 @@
 
 <script>
 import { mapActions } from "vuex";
-import CustomerSelect from './fields/Customer.vue'
+import CustomerSelect from "./fields/Customer.vue";
 export default {
   name: "CustomerForm",
   components: {
@@ -82,6 +84,7 @@ export default {
       fullname: null,
       subdivision: null,
       phoneNumber: null,
+      mvz: null,
       _creationMode: false,
     };
   },
@@ -93,6 +96,7 @@ export default {
         fullname: this.fullname,
         phoneNumber: this.phoneNumber,
         subdivision: this.subdivision,
+        mvz: this.mvz,
       });
       this.$refs.form.reset();
     },
@@ -102,6 +106,7 @@ export default {
         fullname: this.fullname,
         phoneNumber: this.phoneNumber,
         subdivision: this.subdivision,
+        mvz: this.mvz,
       });
       this.$refs.form.reset();
     },
@@ -114,6 +119,7 @@ export default {
       this.fullname = null;
       this.subdivision = null;
       this.phoneNumber = null;
+      this.mvz = null;
 
       this.$emit("done");
     },
@@ -125,12 +131,14 @@ export default {
         this.fullname = this.selected.fullname;
         this.phoneNumber = this.selected.phoneNumber;
         this.subdivision = this.selected.subdivision;
+        this.mvz = this.selected.mvz;
 
         this._creationMode = false;
       } else {
         this.fullname = null;
         this.subdivision = null;
         this.phoneNumber = null;
+        this.mvz = null;
 
         this._creationMode = true;
       }

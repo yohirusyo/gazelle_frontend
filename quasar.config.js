@@ -79,7 +79,7 @@ module.exports = configure(function (ctx) {
         },
       },
       env: {
-        API: ctx.dev && false
+        API: ctx.dev
           ? {
               atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
               mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3125",
