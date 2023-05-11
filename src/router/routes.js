@@ -15,7 +15,7 @@ const routes = [
       {
         path: '', component: () => import('pages/Index.vue'),
         meta: {
-          roles: ['WATCHER', 'ADMIN', 'OPERATOR', 'CUSTOMER'],
+          roles: ['WATCHER', 'ADMIN', 'OPERATOR', 'CUSTOMER', "WATCHER_WITH_REPORTS"],
           requiresAuth: true,
         },
       },
@@ -36,7 +36,7 @@ const routes = [
       {
         path: 'report', component: () => import('src/pages/Admin/Report.vue'),
         meta: {
-          roles: ['ADMIN', 'OPERATOR'],
+          roles: ['ADMIN', 'OPERATOR', "WATCHER_WITH_REPORTS"],
           requiresAuth: true,
         },
       },
