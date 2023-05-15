@@ -69,6 +69,8 @@ export const formatRole = (role) => {
       return "Администратор";
     case "WATCHER":
       return "Наблюдатель";
+    case "WATCHER_WITH_REPORTS":
+      return "Руководитель";
     case "DRIVER":
       return "Водитель";
     case "CUSTOMER":

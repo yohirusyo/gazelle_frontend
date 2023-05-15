@@ -34,7 +34,7 @@
           no-caps
           :ripple="false"
           style="border-radius: 8px"
-          v-if="currentUser?.role != 'WATCHER'"
+          v-if="!currentUser?.role.includes('WATCHER')"
         >
           <q-tooltip>
             {{ modelValue ? "Редактирование" : "Создание" }}
@@ -42,7 +42,7 @@
         </q-tab>
         <slot
           name="menu"
-          v-if="currentUser?.role != 'WATCHER'"
+          v-if="!currentUser?.role.includes('WATCHER')"
         />
       </q-tabs>
     </div>
@@ -118,7 +118,7 @@
           no-caps
           :ripple="false"
           style="border-radius: 8px"
-          v-if="currentUser?.role != 'WATCHER'"
+          v-if="!currentUser?.role.includes('WATCHER')"
         >
           <q-tooltip>
             {{ modelValue ? "Редактирование" : "Создание" }}
@@ -126,7 +126,7 @@
         </q-tab>
         <slot
           name="menu"
-          v-if="currentUser?.role != 'WATCHER'"
+          v-if="!currentUser?.role.includes('WATCHER')"
         />
       </q-tabs>
     </div>

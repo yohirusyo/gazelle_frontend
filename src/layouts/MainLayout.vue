@@ -69,7 +69,7 @@
               {{
                 currentUser?.role != "CUSTOMER"
                   ? `Панель ${
-                      currentUser?.role == "WATCHER"
+                      currentUser?.role.includes("WATCHER")
                         ? "просмотра"
                         : "диспетчера"
                     }`
@@ -114,7 +114,8 @@
             flat
             dense
             v-if="
-              currentUser?.role != 'WATCHER' && currentUser?.role != 'CUSTOMER'
+              !currentUser?.role.includes('WATCHER') &&
+              currentUser?.role != 'CUSTOMER'
             "
           >
             <q-tooltip> Водители </q-tooltip>
@@ -126,7 +127,8 @@
             flat
             dense
             v-if="
-              currentUser?.role != 'WATCHER' && currentUser?.role != 'CUSTOMER'
+              !currentUser?.role.includes('WATCHER') &&
+              currentUser?.role != 'CUSTOMER'
             "
           >
             <q-tooltip> Карта </q-tooltip>
@@ -151,7 +153,10 @@
             to="/report-shifts"
             flat
             dense
-            v-if="currentUser?.role == 'ADMIN'"
+            v-if="
+              currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS'
+            "
           >
             <q-tooltip> Отчёт по водителям </q-tooltip>
           </q-btn>
@@ -161,7 +166,10 @@
             to="/report-operator-shifts"
             flat
             dense
-            v-if="currentUser?.role == 'ADMIN'"
+            v-if="
+              currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS'
+            "
           >
             <q-tooltip> Отчёт по диспетчерам </q-tooltip>
           </q-btn>

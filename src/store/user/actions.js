@@ -7,7 +7,7 @@ export async function requestDrivers(context) {
   requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR"];
+      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
       try {
         [
           "user_update:DRIVER",
@@ -59,7 +59,7 @@ export async function requestOperators(context, isAnyway = false) {
   requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR"];
+      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
       try {
         [
           "user_update:DRIVER",
@@ -112,7 +112,7 @@ export async function requestNonDrivers(context) {
   requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR"];
+      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
       try {
         [
           "user_update:DRIVER",

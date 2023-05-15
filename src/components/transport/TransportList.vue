@@ -8,7 +8,7 @@
         isLocal
       )
     "
-    :columns="currentUser?.role == 'WATCHER' ? watchercolumns : columns"
+    :columns="currentUser?.role.includes('WATCHER') ? watchercolumns : columns"
     row-key="id"
     wrap-cells
     virtual-scroll

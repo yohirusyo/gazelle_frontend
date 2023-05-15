@@ -298,6 +298,10 @@ export default {
           description: "Наблюдатель",
           value: "WATCHER",
         },
+        {
+          description: "Руководитель",
+          value: "WATCHER_WITH_REPORTS",
+        },
       ],
     };
   },

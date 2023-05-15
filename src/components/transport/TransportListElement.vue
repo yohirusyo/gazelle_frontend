@@ -3,7 +3,7 @@
     <q-td
       key="select "
       class="col-1 text-center"
-      v-if="currentUser?.role != 'WATCHER'"
+      v-if="!currentUser?.role.includes('WATCHER')"
     >
       <q-checkbox v-model="_selected" :disable="!_isNotDisabled" dense />
     </q-td>

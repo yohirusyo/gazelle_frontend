@@ -1,4 +1,3 @@
-
 const routes = [
   {
     name: "Authorization",
@@ -9,90 +8,108 @@ const routes = [
     },
   },
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    path: "/",
+    component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: '', component: () => import('pages/Index.vue'),
+        path: "",
+        component: () => import("pages/Index.vue"),
         meta: {
-          roles: ['WATCHER', 'ADMIN', 'OPERATOR', 'CUSTOMER', "WATCHER_WITH_REPORTS"],
+          roles: [
+            "WATCHER",
+            "ADMIN",
+            "OPERATOR",
+            "CUSTOMER",
+            "WATCHER_WITH_REPORTS",
+          ],
           requiresAuth: true,
         },
       },
       {
-        path: 'limits', component: () => import('src/pages/Operator/Limits.vue'),
+        path: "limits",
+        component: () => import("src/pages/Operator/Limits.vue"),
         meta: {
-          roles: ['CUSTOMER'],
+          roles: ["CUSTOMER"],
           requiresAuth: true,
         },
       },
       {
-        path: 'history', component: () => import('src/pages/Customer/History.vue'),
+        path: "history",
+        component: () => import("src/pages/Customer/History.vue"),
         meta: {
-          roles: ['CUSTOMER'],
+          roles: ["CUSTOMER"],
           requiresAuth: true,
         },
       },
       {
-        path: 'report', component: () => import('src/pages/Admin/Report.vue'),
+        path: "report",
+        component: () => import("src/pages/Admin/Report.vue"),
         meta: {
-          roles: ['ADMIN', 'OPERATOR', "WATCHER_WITH_REPORTS"],
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
           requiresAuth: true,
         },
       },
       {
-        path: 'report-shifts', component: () => import('src/pages/Admin/ShiftReport.vue'),
+        path: "report-shifts",
+        component: () => import("src/pages/Admin/ShiftReport.vue"),
         meta: {
-          roles: ['ADMIN', 'OPERATOR'],
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
           requiresAuth: true,
         },
       },
       {
-        path: 'report-operator-shifts', component: () => import('src/pages/Admin/OperatorShiftReport.vue'),
+        path: "report-operator-shifts",
+        component: () => import("src/pages/Admin/OperatorShiftReport.vue"),
         meta: {
-          roles: ['ADMIN'],
+          roles: ["ADMIN", "WATCHER_WITH_REPORTS"],
           requiresAuth: true,
         },
       },
       {
-        path: 'transport', component: () => import('src/pages/Operator/Transport.vue'),
+        path: "transport",
+        component: () => import("src/pages/Operator/Transport.vue"),
         meta: {
-          roles: ['ADMIN', 'OPERATOR'],
+          roles: ["ADMIN", "OPERATOR"],
           requiresAuth: true,
         },
       },
       {
-        path: 'map', component: () => import('src/pages/Operator/Map.vue'),
+        path: "map",
+        component: () => import("src/pages/Operator/Map.vue"),
         meta: {
-          roles: ['ADMIN', 'OPERATOR'],
+          roles: ["ADMIN", "OPERATOR"],
           requiresAuth: true,
         },
       },
       {
-        path: 'driver', component: () => import('src/pages/Operator/Driver.vue'),
+        path: "driver",
+        component: () => import("src/pages/Operator/Driver.vue"),
         meta: {
-          roles: ['ADMIN', 'OPERATOR'],
+          roles: ["ADMIN", "OPERATOR"],
           requiresAuth: true,
         },
       },
       {
-        path: 'user', component: () => import('src/pages/Operator/User.vue'),
+        path: "user",
+        component: () => import("src/pages/Operator/User.vue"),
         meta: {
-          roles: ['ADMIN'],
+          roles: ["ADMIN"],
           requiresAuth: true,
         },
       },
       {
-        path: 'admin', component: () => import('src/pages/Admin/Admin.vue'),
+        path: "admin",
+        component: () => import("src/pages/Admin/Admin.vue"),
         meta: {
-          roles: ['ADMIN'],
+          roles: ["ADMIN"],
           requiresAuth: true,
         },
       },
       {
-        path: ':id/:copy?', component: () => import('pages/Index.vue'),
+        path: ":id/:copy?",
+        component: () => import("pages/Index.vue"),
         meta: {
-          roles: ['CUSTOMER'],
+          roles: ["CUSTOMER"],
           requiresAuth: true,
         },
       },
@@ -105,9 +122,9 @@ const routes = [
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue')
-  }
-]
+    path: "/:catchAll(.*)*",
+    component: () => import("pages/Error404.vue"),
+  },
+];
 
-export default routes
+export default routes;
