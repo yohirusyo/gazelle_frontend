@@ -24,7 +24,11 @@
       </q-th>
     </template>
     <template v-slot:body="props">
-      <RouteElement :props="props" @onSelected="onSelected" />
+      <RouteElement
+        :props="props"
+        @onSelected="onSelected"
+        :yesterdayTime="_yesterdayTime"
+      />
     </template>
   </q-table>
 </template>
@@ -33,9 +37,14 @@
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 import RouteElement from "./element/Element.vue";
 import CustomerFilter from "./element/filters/Customer.vue";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 export default {
   name: "OrderList",
-  props: ["col", "height"],
+  props: ["col", "height", "twoHoursToStart"],
   components: {
     RouteElement,
     CustomerFilter,
@@ -58,7 +67,9 @@ export default {
         const filtered = this.orders;
         return filtered.filter((o) => {
           return (
-            new Date(o.orderTime) < this._timerActives &&
+            ((this.twoHoursToStart &&
+              new Date(o.orderTime) < this._timerActives) ||
+              !this.twoHoursToStart) &&
             (this.selectedCustomers.length == 0 ||
               this.selectedCustomers.includes(o.orders[0].customerId))
           );
@@ -131,6 +142,7 @@ export default {
     return {
       _selectedSubdivisions: [],
       _timerActives: null,
+      _yesterdayTime: null,
       columns: [
         {
           name: "expand",
@@ -190,6 +202,14 @@ export default {
     ...mapMutations("order", ["setHovered"]),
     updateActivesInterval() {
       this._timerActives = Date.now() + 7200000;
+      this._yesterdayTime = dayjs()
+        .subtract(1, "day")
+        .set("hour", 14)
+        .set("minute", 0)
+        .set("second", 0)
+        .set("millisecond", 0)
+        .utc()
+        .unix();
     },
     onSelected(sel) {
       this.$emit("onSelected", sel);

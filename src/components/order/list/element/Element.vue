@@ -4,6 +4,7 @@
     v-model="showed"
     :order="props.row.orders[0]"
     @onSelected="onSelected"
+    :yesterdayTime="yesterdayTime"
   />
   <Order
     v-for="o of route"
@@ -12,6 +13,7 @@
     :order="o"
     v-if="showed || _hoveredOrder"
     @onSelected="onSelected"
+    :yesterdayTime="yesterdayTime"
   />
 </template>
 
@@ -19,7 +21,7 @@
 import Order from "src/components/order/list/element/order/Order.vue";
 import { mapState } from "vuex";
 export default {
-  props: ["props"],
+  props: ["props", "yesterdayTime"],
   emits: {
     onSelected: null,
   },

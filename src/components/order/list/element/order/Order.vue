@@ -33,6 +33,7 @@
         :orderTime="order.orderTime"
         :name="order.name"
         :description="order.description"
+        :class="_isYesterdayTime ? 'bg-blue' : ''"
       />
     </q-td>
     <q-td key="customer" :props="props">
@@ -67,13 +68,19 @@ import Place from "./Place.vue";
 import Transport from "./Transport.vue";
 import Status from "./Status.vue";
 import SwitcherRouteShow from "./SwitcherRouteShow.vue";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 export default {
-  props: ["props", "modelValue", "order"],
+  props: ["props", "modelValue", "order", "yesterdayTime"],
   methods: {
     ...mapMutations("current", ["setOrder"]),
     onSelected(sel) {
       this.$emit("onSelected", sel);
     },
+    dayjs,
   },
   components: {
     Time,
@@ -85,6 +92,13 @@ export default {
   },
   computed: {
     ...mapState("order", ["hovered"]),
+    _isYesterdayTime: {
+      get() {
+        return (
+          dayjs(this.props.row.orderTime).utc() < dayjs.unix(this.yesterdayTime)
+        );
+      },
+    },
     _orderClass() {
       if (
         this.hovered &&

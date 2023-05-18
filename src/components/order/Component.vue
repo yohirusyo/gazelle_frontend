@@ -1,27 +1,24 @@
 <template>
-  <MenuItemV2
-    :col="col"
-    label="Заказы"
-    v-model="order"
-  >
+  <MenuItemV2 :col="col" label="Заказы" v-model="order">
     <template #main="{ height, onSelected }">
       <OrderList
         :col="col"
         v-if="!$q.screen.xs"
         :height="height"
         @onSelected="onSelected"
+        :twoHoursToStart="twoHoursToStart"
       />
-      <OrderListMobile
-        :col="col"
-        v-else
-        :height="height"
-      />
+      <OrderListMobile :col="col" v-else :height="height" />
     </template>
     <template #create="{ onDone, selected }">
-      <OrderForm
-        @done="onDone"
-        :selected="selected"
-      />
+      <OrderForm @done="onDone" :selected="selected" />
+    </template>
+    <template #menu="{}">
+      <div class="column items-center justify-center q-x-auto">
+        <q-checkbox class="col" v-model="twoHoursToStart" size="xs">
+          <q-tooltip> 2 часа до начала </q-tooltip>
+        </q-checkbox>
+      </div>
     </template>
   </MenuItemV2>
 </template>
@@ -43,6 +40,11 @@ export default {
   props: ["col"],
   computed: {
     ...mapState("current", ["order"]),
+  },
+  data() {
+    return {
+      twoHoursToStart: true,
+    };
   },
 };
 </script>
