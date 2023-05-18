@@ -63,7 +63,7 @@ export function clearSelectedTransportId(state) {
 }
 
 export function setCurrentUser(state, user) {
-  user.role = user.role ?? 'CUSTOMER';
+  user.role = user?.role ?? 'CUSTOMER';
   state.currentUser = user;
 }
 

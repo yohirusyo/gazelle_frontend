@@ -46,8 +46,8 @@ import {
   formatPlace,
   formatTransportNumber,
 } from "src/helpers/formatters";
-import AutoNumber from "../base/AutoNumber.vue";
-import TransportStatus from "./TransportStatus.vue";
+import AutoNumber from "src/components/base/AutoNumber.vue";
+import TransportStatus from "src/components/transport/TransportStatus.vue";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);

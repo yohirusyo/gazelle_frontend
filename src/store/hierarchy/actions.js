@@ -3,8 +3,8 @@ import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
 import { requestHelper } from "src/helpers/loader";
 
-export async function requestMyHierarchy(context) {
-  requestHelper(
+export async function requestMyHierarchy(context, ignore = false) {
+  return requestHelper(
     context,
     async () => {
       try {
@@ -26,7 +26,8 @@ export async function requestMyHierarchy(context) {
         );
       } catch (error) {}
     },
-    "Hierarchy"
+    "Hierarchy",
+    ignore
   );
 }
 
@@ -38,7 +39,6 @@ export async function updateHierarchy({}, form) {
   return api.patch(`management/hierarchy`, form);
 }
 
-
 export async function requestLimit({}, form) {
   return api.post(`management/limit-request`, form);
 }
@@ -48,20 +48,18 @@ export async function changeRequestLimitStatus({}, { id, ...form }) {
 }
 
 export async function getManagementLimitRequests(context, { id }) {
-  requestHelper(
+  return requestHelper(
     context,
     async () => {
       try {
         ["limit_request_update"].forEach(socketio.removeAllListeners);
       } catch (error) {}
-      await api
-        .get(`management/limit-request/${id}`)
-        .then(({ data }) =>
-          context.commit("setManagement", {
-            limitRequests: data,
-            managementId: id,
-          })
-        );
+      await api.get(`management/limit-request/${id}`).then(({ data }) =>
+        context.commit("setManagement", {
+          limitRequests: data,
+          managementId: id,
+        })
+      );
       socketio.on("limit_request_update", (lr) =>
         context.commit("lrupdate", lr)
       );

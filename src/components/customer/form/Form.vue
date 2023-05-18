@@ -51,7 +51,7 @@
             label="Сбросить пароль"
             unelevated
             class="border-none bg-blue-4 col"
-            @click="resetPassword({ id: customer.id, isUser: false })"
+            @click="resetPassword({ id: selected.id, isUser: false })"
             no-caps
             dense
           />

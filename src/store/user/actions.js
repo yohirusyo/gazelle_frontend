@@ -3,11 +3,16 @@ import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
 import { requestHelper } from "src/helpers/loader";
 
-export async function requestDrivers(context) {
-  requestHelper(
+export async function requestDrivers(context, ignore = false) {
+  return requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
+      const nonDriverRoles = [
+        "WATCHER",
+        "ADMIN",
+        "OPERATOR",
+        "WATCHER_WITH_REPORTS",
+      ];
       try {
         [
           "user_update:DRIVER",
@@ -51,15 +56,21 @@ export async function requestDrivers(context) {
         });
       });
     },
-    "Drivers"
+    "Drivers",
+    ignore
   );
 }
 
 export async function requestOperators(context, isAnyway = false) {
-  requestHelper(
+  return requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
+      const nonDriverRoles = [
+        "WATCHER",
+        "ADMIN",
+        "OPERATOR",
+        "WATCHER_WITH_REPORTS",
+      ];
       try {
         [
           "user_update:DRIVER",
@@ -108,11 +119,16 @@ export async function requestOperators(context, isAnyway = false) {
   );
 }
 
-export async function requestNonDrivers(context) {
-  requestHelper(
+export async function requestNonDrivers(context, ignore = false) {
+  return requestHelper(
     context,
     async () => {
-      const nonDriverRoles = ["WATCHER", "ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"];
+      const nonDriverRoles = [
+        "WATCHER",
+        "ADMIN",
+        "OPERATOR",
+        "WATCHER_WITH_REPORTS",
+      ];
       try {
         [
           "user_update:DRIVER",
@@ -156,7 +172,8 @@ export async function requestNonDrivers(context) {
         });
       });
     },
-    "Users"
+    "Users",
+    ignore
   );
 }
 

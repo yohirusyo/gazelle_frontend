@@ -3,23 +3,28 @@ import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
 import { requestHelper } from "src/helpers/loader";
 
-export async function requestOrders(context) {
-  requestHelper(context, async () => {
-    try {
-      ["order_update", "order_create", "order_update_done"].forEach(
-        socketio.removeAllListeners
+export async function requestOrders(context, ignore = false) {
+  return requestHelper(
+    context,
+    async () => {
+      try {
+        ["order_update", "order_create", "order_update_done"].forEach(
+          socketio.removeAllListeners
+        );
+      } catch (error) {}
+      await api.get(`order/routes`).then(({ data }) => {
+        context.commit("set", data);
+      });
+      socketio.on("order_update", (order) => context.commit("update", order));
+      socketio.on("route_create", (route) => context.commit("addRoute", route));
+      socketio.on("route_update", (route) =>
+        context.commit("updateRoute", route)
       );
-    } catch (error) {}
-    await api.get(`order/routes`).then(({ data }) => {
-      context.commit("set", data);
-    });
-    socketio.on("order_update", (order) => context.commit("update", order));
-    socketio.on("route_create", (route) => context.commit("addRoute", route));
-    socketio.on("route_update", (route) =>
-      context.commit("updateRoute", route)
-    );
-    socketio.on("route_delete", (id) => context.commit("removeRoute", id));
-  });
+      socketio.on("route_delete", (id) => context.commit("removeRoute", id));
+    },
+    "",
+    ignore
+  );
 }
 
 export async function addOrder({ commit }, form) {

@@ -35,8 +35,8 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import BaseCard from "src/components/base/Card.vue";
-import AutoNumber from "../base/AutoNumber.vue";
-import TransportStatus from "./TransportStatus.vue";
+import AutoNumber from "src/components/base/AutoNumber.vue";
+import TransportStatus from "src/components/transport/TransportStatus.vue";
 import {
   formatDriverMobileFullname,
   formatDriverMobilePhoneNumber,

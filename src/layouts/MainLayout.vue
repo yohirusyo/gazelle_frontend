@@ -24,6 +24,9 @@
           class="q-pr-sm text-center col col-shrink column justify-center items-end"
         >
           <span v-if="currentUser?.role != 'CUSTOMER'">
+            <span v-if="currentUser?.role == 'ADMIN'">{{
+              api.defaults.baseURL
+            }}</span>
             {{ currentUser?.surname }}
             {{ currentUser?.name }}
             {{ currentUser?.middlename }}
@@ -192,7 +195,7 @@
 import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
 import { Loading } from "quasar";
 import { formatRole } from "src/helpers/formatters.js";
-import { getConnection } from "src/boot/axios";
+import { getConnection, api } from "src/boot/axios";
 import { сonnectionName } from "src/helpers/formatters";
 export default {
   name: "MainLayout",
@@ -202,6 +205,7 @@ export default {
       drawer: false,
       connection: getConnection(),
       isMobile: localStorage.getItem("mobile") === "true",
+      api,
     };
   },
   methods: {
@@ -225,19 +229,19 @@ export default {
   },
 
   async mounted() {
-    await Promise.all([
-      this.requestCurrentUser(),
-      this.requestTransports(),
-      this.requestPlaces(),
-      this.requestOrders(),
-      this.requestDrivers(),
-      this.requestNonDrivers(),
-      this.requestStatuses(),
-      this.requestContacts(),
-      this.requestCustomers(),
-      this.requestNames(),
-      this.requestMyHierarchy(),
-    ]);
+    // await Promise.all([
+    this.requestCurrentUser();
+    this.requestTransports(true);
+    this.requestPlaces(true);
+    this.requestOrders(true);
+    this.requestDrivers(true);
+    this.requestNonDrivers(true);
+    this.requestStatuses(true);
+    this.requestContacts(true);
+    this.requestCustomers(true);
+    this.requestNames();
+    this.requestMyHierarchy(true);
+    // ]);
   },
 };
 </script>

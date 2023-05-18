@@ -47,8 +47,8 @@
 </template>
 
 <script>
-import TransportList from "./TransportList.vue";
-import TransportListMobile from "./TransportListMobile.vue";
+import TransportList from "./list/List.vue";
+import TransportListMobile from "./list/mobile/List.vue";
 import TransportCreation from "./TransportCreation.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import { mapMutations, mapState } from "vuex";

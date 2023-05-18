@@ -1,7 +1,7 @@
 import { api } from "boot/axios";
 import { socketio } from "boot/socketio";
 import { showNotifyResult } from "src/helpers/notification";
-import { requestHelper } from 'src/helpers/loader';
+import { requestHelper } from "src/helpers/loader";
 
 export async function addCustomer({ commit }, form) {
   return api
@@ -25,20 +25,27 @@ export async function updateCustomer({ commit }, { id, ...form }) {
     });
 }
 
-export async function requestCustomers(context) {
-  requestHelper(
+export async function requestCustomers(context, ignore = false) {
+  return requestHelper(
     context,
     async () => {
       try {
-        ['customer_update', 'customer_create', "customer_delete"].forEach(socketio.removeAllListeners)
-      } catch (error) { }
+        ["customer_update", "customer_create", "customer_delete"].forEach(
+          socketio.removeAllListeners
+        );
+      } catch (error) {}
       await api.get(`customer`).then(({ data }) => {
         context.commit("set", data);
       });
-      socketio.on('customer_update', customer => context.commit("update", customer))
-      socketio.on('customer_create', customer => context.commit("add", customer))
-      socketio.on("customer_delete", id => context.commit("remove", id))
-    }
-  )
-
+      socketio.on("customer_update", (customer) =>
+        context.commit("update", customer)
+      );
+      socketio.on("customer_create", (customer) =>
+        context.commit("add", customer)
+      );
+      socketio.on("customer_delete", (id) => context.commit("remove", id));
+    },
+    "",
+    ignore
+  );
 }

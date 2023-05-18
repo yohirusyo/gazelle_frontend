@@ -4,7 +4,7 @@ import { socketio } from "boot/socketio";
 import { requestHelper } from 'src/helpers/loader';
 
 export async function requestManagements(context) {
-  requestHelper(
+  return requestHelper(
     context,
     async () => {
       try {
@@ -20,7 +20,7 @@ export async function requestManagements(context) {
 }
 
 export async function requestMyManagement(context) {
-  requestHelper(
+  return requestHelper(
     context,
     async () => {
       try {

@@ -1,8 +1,6 @@
 <template>
   <div
     class="column"
-    v-for="route of orders"
-    :key="route.id"
     @click="setOrder(route)"
     :class="
       route.isRequest && !route.isApproved
@@ -24,7 +22,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
 
 import Header from "./Header.vue";
 import Customer from "./Customer.vue";
@@ -38,7 +36,6 @@ export default {
     Order,
   },
   computed: {
-    ...mapState("order", ["orders"]),
 
     firstOrder: {
       get() {

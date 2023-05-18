@@ -20,32 +20,7 @@
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <!-- <q-icon
-          name="las la-filter"
-          size="1.5em"
-        >
-          <q-menu persistent>
-            <q-list style="min-width: 100px">
-              <q-item
-                style="user-select: none"
-                clickable
-                v-for="s of subdivisions"
-                :class="_selectedSubdivisions.includes(s) ? 'bg-blue-2' : ''"
-                @click="
-                  _selectedSubdivisions.includes(s)
-                    ? _selectedSubdivisions.splice(
-                      _selectedSubdivisions.indexOf(s),
-                      1
-                    )
-                    : _selectedSubdivisions.push(s)
-                "
-                :key="s"
-              >
-                <q-item-section>{{ s }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-icon> -->
+        <CustomerFilter />
       </q-th>
     </template>
     <template v-slot:body="props">
@@ -57,14 +32,16 @@
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 import RouteElement from "./element/Element.vue";
+import CustomerFilter from "./element/filters/Customer.vue";
 export default {
   name: "OrderList",
   props: ["col", "height"],
   components: {
     RouteElement,
+    CustomerFilter,
   },
   computed: {
-    ...mapState("order", ["orders", "hovered"]),
+    ...mapState("order", ["orders", "hovered", "selectedCustomers"]),
     ...mapGetters("order", [
       "subdivisions",
       "filteredOrders",
@@ -80,7 +57,11 @@ export default {
         // })
         const filtered = this.orders;
         return filtered.filter((o) => {
-          return new Date(o.orderTime) < this._timerActives;
+          return (
+            new Date(o.orderTime) < this._timerActives &&
+            (this.selectedCustomers.length == 0 ||
+              this.selectedCustomers.includes(o.orders[0].customerId))
+          );
         });
         // return filtered;
       },

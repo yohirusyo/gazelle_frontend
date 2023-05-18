@@ -131,3 +131,12 @@ export function setLoading(state, loading) {
 export function setLoaded(state, loaded) {
   state.isLoaded = loaded;
 }
+
+export function addToSelectedSubdivisions(state, customerId) {
+  state.selectedCustomers.push(customerId);
+}
+
+export function removeFromSelectedSubdivisions(state, customerId) {
+  const index = state.selectedCustomers.indexOf(customerId);
+  state.selectedCustomers.splice(index, 1);
+}

@@ -1,29 +1,40 @@
 import { api } from "boot/axios";
 import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "src/boot/socketio";
-import { requestHelper } from 'src/helpers/loader';
+import { requestHelper } from "src/helpers/loader";
 
-export async function requestTransports(context) {
-  requestHelper(
+export async function requestTransports(context, ignore = false) {
+  return requestHelper(
     context,
     async () => {
       try {
-        ['transport_update', 'transport_create', "transport_delete"].forEach(socketio.removeAllListeners)
-      } catch (error) { }
+        ["transport_update", "transport_create", "transport_delete"].forEach(
+          socketio.removeAllListeners
+        );
+      } catch (error) {}
       await api.get(`transport`).then(({ data }) => {
         context.commit("set", data);
-      })
-      socketio.on('transport_update', transport => context.commit("update", { ...transport, driver: context.rootGetters['user/getDriverById'](transport.driverId) }))
-      socketio.on('transport_create', transport => context.commit("add", { ...transport, driver: context.rootGetters['user/getDriverById'](transport.driverId) }))
-      socketio.on("transport_delete", id => context.commit("remove", id))
-    }
-  )
+      });
+      socketio.on("transport_update", (transport) =>
+        context.commit("update", {
+          ...transport,
+          driver: context.rootGetters["user/getDriverById"](transport.driverId),
+        })
+      );
+      socketio.on("transport_create", (transport) =>
+        context.commit("add", {
+          ...transport,
+          driver: context.rootGetters["user/getDriverById"](transport.driverId),
+        })
+      );
+      socketio.on("transport_delete", (id) => context.commit("remove", id));
+    },
+    "",
+    ignore
+  );
 }
 
-export async function addTransport(
-  { commit },
-  form
-) {
+export async function addTransport({ commit }, form) {
   return api
     .post(`transport`, form)
     .then(({ data }) => {

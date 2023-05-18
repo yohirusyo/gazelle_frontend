@@ -14,7 +14,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import TransportListElementMobile from "./TransportListElementMobile.vue";
+import TransportListElementMobile from "./element/Element.vue";
 export default {
   name: "TransportListMobile",
   components: {

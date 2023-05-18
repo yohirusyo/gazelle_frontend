@@ -78,13 +78,15 @@ module.exports = configure(function (ctx) {
           warnings: true,
         },
       },
+      useFilenameHashes: true,
       env: {
-        API: ctx.dev
-          ? {
-              atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
-              mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
-            }
-          : { atu: "taxi.mmk.ru:3125", mmkmetiz: "taxi.mmk.ru:3126" },
+        API:
+          ctx.dev && false
+            ? {
+                atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
+                mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
+              }
+            : { atu: "taxi.mmk.ru:3125", mmkmetiz: "taxi.mmk.ru:3126" },
       },
     },
 
@@ -99,7 +101,7 @@ module.exports = configure(function (ctx) {
       config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
-      lang: 'ru', // Quasar language pack
+      lang: "ru", // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
