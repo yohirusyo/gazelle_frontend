@@ -143,7 +143,6 @@
             flat
             dense
             v-if="
-              currentUser?.role != 'WATCHER' &&
               // !$q.screen.xs &&
               currentUser?.role != 'CUSTOMER'
             "

@@ -47,6 +47,8 @@ export default {
         return this.modelValue;
       },
       set(val) {
+        if (val < new Date())
+          return this.$emit("update:modelValue", new Date());
         this.$emit("update:modelValue", val);
       },
     },

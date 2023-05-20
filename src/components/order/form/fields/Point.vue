@@ -4,6 +4,9 @@
     style="border: 1px solid rgba(0, 0, 0, 0.12)"
     :class="{ 'bg-red-1': _forDelete }"
   >
+    <div v-if="modelValue.existingId" class="text-center">
+      Номер заказа {{ modelValue.existingId }}
+    </div>
     <div class="row q-mt-none">
       <PlaceSelect
         v-model="_destinationName"

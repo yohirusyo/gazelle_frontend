@@ -138,7 +138,7 @@ export default {
     },
     updateDuration() {
       const start = dayjs(this.transport?.statusChangedAt);
-      const diff = dayjs().diff(start);
+      const diff = dayjs().diff(start) < 0 ? 0 : dayjs().diff(start);
       if (dayjs.duration(diff).asDays() >= 1) {
         this.duration = dayjs.utc(diff).format("DDд. HH:mm");
       } else {

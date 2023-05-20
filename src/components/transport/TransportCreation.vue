@@ -154,7 +154,10 @@
               dense
               class="q-pa-md"
             />
-            <div class="q-pa-sm" v-if="shortConnectionName() == 'ММК-МЕТИЗ'"></div>
+            <div
+              class="q-pa-sm"
+              v-if="shortConnectionName() == 'ММК-МЕТИЗ'"
+            ></div>
             <q-input
               v-model="_agGUID"
               square
@@ -172,7 +175,7 @@
       </div>
       <div class="row q-gutter-x-md">
         <q-btn
-          v-if="_creationMode"
+          v-if="_creationMode && !currentUser?.role.includes('WATCHER')"
           text-color="white"
           label="Создать"
           unelevated
@@ -181,7 +184,7 @@
           no-caps
         />
         <q-btn
-          v-if="!_creationMode"
+          v-if="!_creationMode && !currentUser?.role.includes('WATCHER')"
           text-color="white"
           label="Изменить"
           unelevated
@@ -190,7 +193,7 @@
           no-caps
         />
         <q-btn
-          v-if="!_creationMode"
+          v-if="!_creationMode && !currentUser?.role.includes('WATCHER')"
           text-color="white"
           label="Удалить"
           unelevated
@@ -218,7 +221,7 @@ export default {
   name: "TransportCreation",
   props: ["height", "selected"],
   computed: {
-    ...mapState("current", ["place"]),
+    ...mapState("current", ["place", "currentUser"]),
     ...mapState("place", ["places"]),
     ...mapState("user", ["drivers"]),
     ...mapGetters("user", ["getDriverById"]),

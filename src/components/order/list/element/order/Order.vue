@@ -34,6 +34,8 @@
         :name="order.name"
         :description="order.description"
         :class="_isYesterdayTime ? 'bg-blue' : ''"
+        :maxWeight="_maxWeight"
+        :createdAt="order.createdAt"
       />
     </q-td>
     <q-td key="customer" :props="props">
@@ -95,7 +97,7 @@ export default {
     _isYesterdayTime: {
       get() {
         return (
-          dayjs(this.props.row.orderTime).utc() < dayjs.unix(this.yesterdayTime)
+          dayjs(this.props.row.createdAt).utc() < dayjs.unix(this.yesterdayTime)
         );
       },
     },
@@ -122,6 +124,14 @@ export default {
       },
       set(val) {
         this.$emit("update:modelValue", val);
+      },
+    },
+    _maxWeight: {
+      get() {
+        return this.props.row.orders.reduce((prev, curr) => {
+          if (curr.weight > prev) prev = curr.weight;
+          return prev;
+        }, 0);
       },
     },
   },

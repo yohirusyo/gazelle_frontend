@@ -35,6 +35,7 @@ export default {
   },
   computed: {
     ...mapState("order", ["hovered"]),
+
     _hoveredOrder: {
       get() {
         return this.props.row.id === this.hovered?.id;
@@ -48,7 +49,8 @@ export default {
   },
   methods: {
     onSelected() {
-      this.$emit("onSelected", this.props.row);
+  
+        this.$emit("onSelected", this.props.row);
     },
   },
 };

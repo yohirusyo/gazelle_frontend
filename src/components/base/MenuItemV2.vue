@@ -40,10 +40,7 @@
             {{ modelValue ? "Редактирование" : "Создание" }}
           </q-tooltip>
         </q-tab>
-        <slot
-          name="menu"
-          v-if="!currentUser?.role.includes('WATCHER')"
-        />
+        <slot name="menu" v-if="!currentUser?.role.includes('WATCHER')" />
       </q-tabs>
     </div>
 
@@ -53,28 +50,19 @@
       class="col column"
       :class="$q.screen.xs ? '' : 'menu-scroll-area '"
       keep-alive
-      :style="`height: ${height}px; ${!$q.screen.xs
-        ? 'border: 1px solid rgba(0, 0, 0, 0.12);'
-        : '  background: rgba(173, 216, 230, 0.1)'
-        }`"
+      :style="`height: ${height}px; ${
+        !$q.screen.xs
+          ? 'border: 1px solid rgba(0, 0, 0, 0.12);'
+          : '  background: rgba(173, 216, 230, 0.1)'
+      }`"
       transition-prev="jump-up"
       transition-next="jump-up"
     >
-      <q-tab-panel
-        name="main"
-        class="col column menu-scroll-area_inner"
-      >
-        <slot
-          name="main"
-          :height="height"
-          :onSelected="setSelected"
-        />
+      <q-tab-panel name="main" class="col column menu-scroll-area_inner">
+        <slot name="main" :height="height" :onSelected="setSelected" />
       </q-tab-panel>
 
-      <q-tab-panel
-        name="create"
-        class="col column"
-      >
+      <q-tab-panel name="create" class="col column">
         <slot
           name="create"
           :height="height"
@@ -124,10 +112,7 @@
             {{ modelValue ? "Редактирование" : "Создание" }}
           </q-tooltip>
         </q-tab>
-        <slot
-          name="menu"
-          v-if="!currentUser?.role.includes('WATCHER')"
-        />
+        <slot name="menu" v-if="!currentUser?.role.includes('WATCHER')" />
       </q-tabs>
     </div>
   </div>
@@ -137,7 +122,7 @@
 import { mapState } from "vuex";
 export default {
   name: "MenuItem",
-  props: ["col", "label", "modelValue", "withoutRole", 'onlyCreate'],
+  props: ["col", "label", "modelValue", "withoutRole", "onlyCreate"],
   computed: {
     ...mapState("current", ["currentUser"]),
   },
@@ -157,7 +142,7 @@ export default {
     },
     setSelected(val) {
       this.selectedValue = val;
-    }
+    },
   },
   async mounted() {
     this.height = this.$refs.tabs.$el.clientHeight - 2;
@@ -169,14 +154,14 @@ export default {
     modelValue(newModelValue) {
       if (!!newModelValue) {
         this.tab = "create";
-        this.setSelected(newModelValue)
+        this.setSelected(newModelValue);
       }
     },
     selectedValue(newSelValue) {
       if (!!newSelValue) {
         this.tab = "create";
       }
-    }
+    },
   },
 };
 </script>

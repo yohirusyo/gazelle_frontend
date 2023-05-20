@@ -6,6 +6,9 @@
       class="col column justify-between q-pa-md"
       ref="form"
     >
+      <div v-if="selected" class="text-center">
+        Номер маршрута {{ selected.id }}
+      </div>
       <div class="col row">
         <q-scroll-area class="col">
           <div class="column col q-gutter-y-md">
@@ -96,7 +99,8 @@
             selected &&
             selected.isRequest &&
             selected.isApproved &&
-            !isCustomer
+            !isCustomer &&
+            !currentUser?.role.includes('WATCHER')
           "
         >
           <q-btn
@@ -134,7 +138,7 @@
             :disable="_addLoading || _customerCreationCheck"
           />
           <q-btn
-            v-if="_editMenuActive"
+            v-if="_editMenuActive && !currentUser?.role.includes('WATCHER')"
             text-color="white"
             label="Изменить"
             unelevated
@@ -144,7 +148,11 @@
             dense
           />
           <q-btn
-            v-if="isCustomer && !_creationMode"
+            v-if="
+              isCustomer &&
+              !_creationMode &&
+              !currentUser?.role.includes('WATCHER')
+            "
             text-color="white"
             label="Удалить"
             unelevated
@@ -155,7 +163,7 @@
           />
 
           <q-btn
-            v-if="_removeMenuActive"
+            v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')"
             text-color="white"
             label="Удалить"
             unelevated
@@ -222,6 +230,7 @@ export default {
     },
     _approvementMenuActive: {
       get() {
+        if (this.currentUser?.role.includes("WATCHER")) return false;
         return (
           !this._creationMode &&
           this.selected &&
@@ -317,7 +326,7 @@ export default {
     },
     buildRoute() {
       return {
-        orderTime: this.orderTime,
+        orderTime: new Date() > this.orderTime ? new Date() : this.orderTime,
         departurePointName: this.departurePointName,
         isEmergency: this._orderIsEmergency,
         transportId: this.selectedTransportId,

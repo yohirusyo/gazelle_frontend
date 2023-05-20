@@ -32,7 +32,9 @@
     </template>
     <template v-slot:header-cell-driver="props">
       <q-th :props="props">
-        {{ props.col.label }}
+        {{ props.col.label }} ({{ _transports.length }}/{{
+          _allTransportsLength
+        }})
         <DriverFilter v-model="driverFilter" />
       </q-th>
     </template>
@@ -93,8 +95,8 @@ export default {
             if (driverY == null) return -1;
             return driverX > driverY ? 1 : driverY > driverX ? -1 : 0;
           } else if (sortBy == "status") {
-            const statusX = this.getStatusById(x.statusId).description;
-            const statusY = this.getStatusById(y.statusId).description;
+            const statusX = this.getStatusById(x.statusId).order;
+            const statusY = this.getStatusById(y.statusId).order;
             return statusX > statusY ? 1 : statusY > statusX ? -1 : 0;
           }
         });
@@ -211,12 +213,18 @@ export default {
   computed: {
     ...mapState("current", ["onlyFree", "onlyWithDrivers"]),
     ...mapState("status", ["statuses"]),
+    ...mapState("transport", ["transports"]),
     ...mapGetters("transport", ["getByOnlyFreeFilter"]),
     ...mapGetters("status", ["getStatusById"]),
     ...mapState("current", ["currentUser"]),
     freeStatuses: {
       get() {
         return this.statuses.filter((s) => s.isBusy == false);
+      },
+    },
+    _allTransportsLength: {
+      get() {
+        return this.transports.filter((t) => t.isLocal == this.isLocal).length;
       },
     },
     _transports: {
