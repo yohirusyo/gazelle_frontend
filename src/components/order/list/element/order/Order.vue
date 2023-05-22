@@ -8,6 +8,7 @@
     <q-td key="expand" :props="props">
       <SwitcherRouteShow
         v-model="_modelValue"
+        :routeId="props.row.id"
         v-if="order.id == order.parentOrder && props.row.orders.length != 1"
       />
       <div

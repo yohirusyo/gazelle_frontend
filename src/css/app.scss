@@ -207,17 +207,7 @@ input[type="number"] {
 }
 
 .ended-order {
-  position: relative;
+  background-color: rgba(128, 128, 128, 0.181) !important;
 }
 
-.ended-order::after {
-  position: absolute;
-  height: 2px;
-  content: "";
-  top: 50%;
-  bottom: 50%;
-  right: 5px;
-  left: 5px;
-  border: 1px solid grey;
-}
 

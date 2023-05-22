@@ -81,7 +81,7 @@ module.exports = configure(function (ctx) {
       useFilenameHashes: true,
       env: {
         API:
-          ctx.dev 
+          ctx.dev && false
             ? {
                 atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
                 mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
