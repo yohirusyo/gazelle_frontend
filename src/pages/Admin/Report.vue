@@ -105,7 +105,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import dayjs from "dayjs";
-import duration from 'dayjs/plugin/duration';
+import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -147,8 +147,13 @@ export default {
           callback: this.operator,
         },
         Статус: {
-          field: "order.isDeleted",
-          callback: (val) => (!val ? "Завершен" : "Удален"),
+          callback: (val) => {
+            return val.isDeleted || val.order.isDeleted
+              ? `Удален / ${val.deletedByFullname}`
+              : val.order.isRequest && val.order.isDeclined
+              ? `Отклонен / ${val.deletedByFullname}`
+              : "Завершен";
+          },
         },
         "Наименование груза": {
           field: "order.name",
@@ -316,10 +321,15 @@ export default {
         {
           name: "isDeleted",
           required: true,
-          label: "Номер заказа",
+          label: "Статус",
           align: "left",
-          field: (row) => row.order.isDeleted,
-          format: (val) => (!val ? "Завершен" : "Удален"),
+          field: (row) => row,
+          format: (val) =>
+            val.isDeleted || val.order.isDeleted
+              ? `Удален / ${val.deletedByFullname}`
+              : val.order.isRequest && val.order.isDeclined
+              ? `Отклонен / ${val.deletedByFullname}`
+              : "Завершен" /* (!val ? "Завершен" : "Удален") */,
           sortable: true,
         },
         {

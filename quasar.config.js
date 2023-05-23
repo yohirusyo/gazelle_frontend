@@ -80,13 +80,12 @@ module.exports = configure(function (ctx) {
       },
       useFilenameHashes: true,
       env: {
-        API:
-          ctx.dev && false
-            ? {
-                atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
-                mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
-              }
-            : { atu: "taxi.mmk.ru:3125", mmkmetiz: "taxi.mmk.ru:3126" },
+        API: ctx.dev
+          ? {
+              atu: /* "taxi.mmk.ru:3125", */ "localhost:3125",
+              mmkmetiz: /* "taxi.mmk.ru:3125", */ "localhost:3126",
+            }
+          : { atu: "taxi.mmk.ru:3125", mmkmetiz: "taxi.mmk.ru:3126" },
       },
     },
 
