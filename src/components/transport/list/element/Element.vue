@@ -30,9 +30,15 @@
     <q-td key="time">
       <q-chip
         class="q-ma-none"
-        :class="_isBusyMoreThan1Hour ? 'bg-red text-white' : ''"
+        :class="
+          driver?.isOnLunch
+            ? 'bg-orange'
+            : _isBusyMoreThan1Hour
+            ? 'bg-red text-white'
+            : ''
+        "
       >
-        {{ duration }}
+        {{ !!transport.withDriverSince ? duration : "Без водителя" }}
       </q-chip>
     </q-td>
   </q-tr>
@@ -81,6 +87,11 @@ export default {
         return this.getTransportById(this.id);
       },
     },
+    driver: {
+      get() {
+        return this.getDriverById(this.transport.driverId);
+      },
+    },
     _isNotDisabled() {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
@@ -117,7 +128,11 @@ export default {
     formatPlace,
     formatTransportNumber,
     updateStatus() {
-      const start = dayjs(this.transport?.statusChangedAt);
+      const start = dayjs(
+        this.driver && this.driver.isOnLunch === true
+          ? this.driver.onLunchSince
+          : this.transport?.statusChangedAt
+      );
       const diff = dayjs().diff(start);
       if (
         dayjs.duration(diff).asHours() >= 1 &&
@@ -137,7 +152,11 @@ export default {
       }
     },
     updateDuration() {
-      const start = dayjs(this.transport?.statusChangedAt);
+      const start = dayjs(
+        this.driver && this.driver.isOnLunch === true
+          ? this.driver.onLunchSince
+          : this.transport?.statusChangedAt
+      );
       const diff = dayjs().diff(start) < 0 ? 0 : dayjs().diff(start);
       if (dayjs.duration(diff).asDays() >= 1) {
         this.duration = dayjs.utc(diff).format("DDд. HH:mm");
@@ -168,6 +187,11 @@ export default {
         this.updateStatus();
       this.updateDuration();
     }, 1000 * 60);
+  },
+  watch: {
+    "driver.isOnLunch"() {
+      this.updateDuration();
+    },
   },
 };
 </script>

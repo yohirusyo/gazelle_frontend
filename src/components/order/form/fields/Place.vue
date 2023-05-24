@@ -1,6 +1,6 @@
 <template>
   <ISelect
-    :options="places"
+    :options="filteredPlaces"
     v-model="_modelValue"
     :labelFn="(item) => item.name"
     :label="label"
@@ -22,6 +22,11 @@ export default {
       },
       set(val) {
         this.$emit("update:modelValue", val);
+      },
+    },
+    filteredPlaces: {
+      get() {
+        return this.places.filter((p) => !p.isDeleted);
       },
     },
   },

@@ -326,7 +326,10 @@ export default {
     },
     buildRoute() {
       return {
-        orderTime: new Date() > this.orderTime ? new Date() : this.orderTime,
+        orderTime:
+          !this._creationMode && new Date() > this.orderTime
+            ? new Date()
+            : this.orderTime,
         departurePointName: this.departurePointName,
         isEmergency: this._orderIsEmergency,
         transportId: this.selectedTransportId,

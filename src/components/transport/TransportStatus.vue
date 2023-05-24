@@ -1,5 +1,6 @@
 <template>
-  <q-chip :class="_isFreeMoreThan15Minutes ? 'bg-green text-white' : ''">
+  <q-chip class="bg-orange" v-if="driver?.isOnLunch"> Обед </q-chip>
+  <q-chip :class="_isFreeMoreThan15Minutes ? 'bg-green text-white' : ''" v-else>
     {{ getStatusById(transport?.statusId)?.isBusy ? "Занят" : "Свободен" }}
     <q-tooltip>
       {{ getStatusById(transport?.statusId)?.description }}
@@ -16,18 +17,24 @@ import {
   formatTransportNumber,
 } from "src/helpers/formatters";
 import dayjs from "dayjs";
-import duration from 'dayjs/plugin/duration';
+import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 export default {
   name: "TransportStatus",
   props: ["transportId"],
   computed: {
     ...mapGetters("status", ["getStatusById"]),
-    ...mapGetters('transport', ['getTransportById']),
+    ...mapGetters("transport", ["getTransportById"]),
+    ...mapGetters("user", ["getDriverById"]),
     transport: {
       get() {
         return this.getTransportById(this.transportId);
-      }
+      },
+    },
+    driver: {
+      get() {
+        return this.getDriverById(this.transport.driverId);
+      },
     },
   },
   methods: {
@@ -67,6 +74,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

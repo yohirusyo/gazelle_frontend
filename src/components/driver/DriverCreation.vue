@@ -108,11 +108,17 @@
               ]"
               autocomplete="off"
             />
+            <q-checkbox
+              v-model="_isOnLunch"
+              label="Обед"
+              dense
+              class="q-pa-md"
+            />
           </div>
         </q-scroll-area>
       </div>
       <div class="row q-pb-md" v-if="!_creationMode">
-          <q-btn
+        <q-btn
           text-color="white"
           label="Сбросить пароль"
           unelevated
@@ -143,7 +149,7 @@
           no-caps
           dense
         />
-      
+
         <q-btn
           v-if="!_creationMode"
           text-color="white"
@@ -199,6 +205,7 @@ export default {
         middlename: this._middlename,
         phoneNumber: this._phoneNumber,
         workingPhoneNumber: this._workingPhoneNumber,
+        isOnLunch: this._isOnLunch,
         login: this._login,
       });
       this.$refs.form.reset();
@@ -222,6 +229,7 @@ export default {
       this._phoneNumber = null;
       this._workingPhoneNumber = null;
       this._login = null;
+      this._isOnLunch = false;
       this.$emit("done");
       this.clearDriver();
     },
@@ -233,6 +241,7 @@ export default {
         this._phoneNumber = this.driver.phoneNumber;
         this._workingPhoneNumber = this.driver.workingPhoneNumber;
         this._login = this.driver.login;
+        this._isOnLunch = this.driver.isOnLunch;
         this._creationMode = false;
       } else {
         this._creationMode = true;
@@ -248,6 +257,7 @@ export default {
       _workingPhoneNumber: null,
       _login: null,
       _creationMode: true,
+      _isOnLunch: false,
     };
   },
   mounted() {
