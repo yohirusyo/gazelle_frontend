@@ -1,9 +1,18 @@
 import dayjs from "dayjs";
 
-export const getSortedHistory = (state) => (onlyMy) => {
-  const stateHistory = /* onlyMy
-    ? state.history.filter((o) => o.orders[0].customerId == onlyMy)
-    :  */state.history;
+export const getSortedHistory = (state) => (checkActive, date) => {
+
+  let stateHistory = checkActive
+    ? state.history.filter((m) => {
+      return (m.isRequest == false && m.isDone == false) ||
+        (m.isRequest == true && m.isDone == false && m.isApproved == true) || m.isRequest
+    })
+    : state.history
+
+  stateHistory = stateHistory.filter((m) => {
+    return date.from <= m.group && m.group <= date.to
+  })
+  
   return stateHistory;
 };
 
