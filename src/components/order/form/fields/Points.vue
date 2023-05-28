@@ -85,6 +85,12 @@ export default {
               length: point.cargo.length,
               height: point.cargo.height,
               weight: point.cargo.weight,
+              // cargoReciever: {
+              //   phoneNumber: point.cargo.cargoReciever.phoneNumber,
+              //   fullname: point.cargo.cargoReciever.fullname,
+              //   subdivision: point.cargo.cargoReciever.subdivision,
+              //   mvz: point.cargo.cargoReciever.mvz,
+              // },
             },
           };
         }
@@ -114,6 +120,12 @@ export default {
           length: null,
           height: null,
           weight: null,
+          cargoReciever: {
+            phoneNumber: null,
+            fullname: null,
+            subdivision: null,
+            mvz: null,
+          },
         },
       };
       if (!!firstPoint && !this.isEditMode) {
@@ -134,6 +146,12 @@ export default {
             length: firstPoint.cargo.length,
             height: firstPoint.cargo.height,
             weight: firstPoint.cargo.weight,
+            cargoReciever: {
+              phoneNumber: firstPoint.cargo.cargoReciever.phoneNumber,
+              fullname: firstPoint.cargo.cargoReciever.fullname,
+              subdivision: firstPoint.cargo.cargoReciever.subdivision,
+              mvz: firstPoint.cargo.cargoReciever.mvz,
+            },
           },
         });
       } else {

@@ -58,7 +58,7 @@ export default {
     ]),
     ...mapState("current", ["hoveredTransportId"]),
     ...mapState("current", ["currentUser"]),
-    ...mapGetters("status", ["getStatusById"]),
+    ...mapGetters("status", ["getStatusById", "getBusyStatusesCodes"]),
     _orderList: {
       get() {
         // const filtered = this.filteredOrders({
@@ -104,12 +104,7 @@ export default {
       if (this.hoveredTransportId == null) {
         this._hoveredOrder = null;
       } else {
-        const busyStatuses = [
-          "ACCEPTED",
-          "ENTRY_TO_CUSTOMER",
-          "ENTRY_TO_DESTINATION",
-          "EXIT_TO_DESTINATION",
-        ];
+        const busyStatuses = this.getBusyStatusesCodes();
         const fOrders = this.orders.filter((route) => {
           return route.orders.some(
             (order) => order.transportId == this.hoveredTransportId

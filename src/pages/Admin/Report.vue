@@ -191,16 +191,28 @@ export default {
           field: "entryToDestinationFact",
           callback: this.HHmm,
         },
-        Подразделение: {
-          field: "order.customer.subdivision",
-          callback: this.regular,
-        },
         Ответственный: {
           field: "order.customer.fullname",
           callback: this.regular,
         },
-        Телефон: {
+        "Подразделение (отв.)": {
+          field: "order.customer.subdivision",
+          callback: this.regular,
+        },
+        "Телефон  (отв.)": {
           field: "order.customer.phoneNumber",
+          callback: this.regular,
+        },
+        Грузополучатель: {
+          field: "order.cargoReciever.fullname",
+          callback: this.regular,
+        },
+        "Подразделение (груз.)": {
+          field: "order.cargoReciever.subdivision",
+          callback: this.regular,
+        },
+        "Телефон  (груз.)": {
+          field: "order.cargoReciever.phoneNumber",
           callback: this.regular,
         },
         "Место отправления": {
@@ -240,7 +252,7 @@ export default {
           callback: this.regular,
         },
         "Тип траспорта": {
-          field: "transportNumber",
+          field: "transportType",
           callback: this.regular,
         },
         Номер: {
@@ -414,15 +426,6 @@ export default {
           sortable: true,
         },
         {
-          name: "customerSubdivision",
-          required: true,
-          label: "Подразделение",
-          align: "left",
-          field: (row) => row.order.customer.subdivision,
-          format: this.regular,
-          sortable: true,
-        },
-        {
           name: "customerFullname",
           required: true,
           label: "Ответственный",
@@ -432,11 +435,47 @@ export default {
           sortable: true,
         },
         {
+          name: "customerSubdivision",
+          required: true,
+          label: "Подразделение (отв.)",
+          align: "left",
+          field: (row) => row.order.customer.subdivision,
+          format: this.regular,
+          sortable: true,
+        },
+        {
           name: "customerPhoneNumber",
           required: true,
-          label: "Телефон",
+          label: "Телефон (отв.)",
           align: "left",
           field: (row) => row.order.customer.phoneNumber,
+          format: this.regular,
+          sortable: true,
+        },
+        {
+          name: "cargoRecieverFullname",
+          required: true,
+          label: "Грузополучатель",
+          align: "left",
+          field: (row) => row.order.cargoReciever?.fullname,
+          format: this.regular,
+          sortable: true,
+        },
+        {
+          name: "cargoRecieverSubdivision",
+          required: true,
+          label: "Подразделение (груз.)",
+          align: "left",
+          field: (row) => row.order.cargoReciever?.subdivision,
+          format: this.regular,
+          sortable: true,
+        },
+        {
+          name: "cargoRecieverPhoneNumber",
+          required: true,
+          label: "Телефон (груз.)",
+          align: "left",
+          field: (row) => row.order.cargoReciever?.phoneNumber,
           format: this.regular,
           sortable: true,
         },
@@ -674,7 +713,7 @@ export default {
       return dayjs(val).format("HH:mm");
     },
     regular(val) {
-      if (this.checkNull(val)) return null;
+      if (this.checkNull(val)) return '-';
       return val;
     },
     operator(val) {

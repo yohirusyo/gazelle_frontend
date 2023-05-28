@@ -28,12 +28,7 @@ export const subdivisions = (state, getters, rootState) => {
 export const filteredOrders =
   (state, getters, rootState, rootGetters) =>
   ({ subdivisions }) => {
-    const busyStatuses = [
-      "ACCEPTED",
-      "ENTRY_TO_CUSTOMER",
-      "ENTRY_TO_DESTINATION",
-      "EXIT_TO_DESTINATION",
-    ];
+    const busyStatuses = rootGetters["status/getBusyStatusesCodes"]();
     return state.orders
       .filter((o) => {
         if (o.parentOrder != o.id && o.parentOrder != null) return false;

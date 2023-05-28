@@ -45,10 +45,7 @@ export default {
     updateStatus() {
       const start = dayjs(this.transport?.statusChangedAt);
       const diff = dayjs().diff(start);
-      if (
-        dayjs.duration(diff).asMinutes() >= 15 &&
-        this.getStatusById(this.transport?.statusId)?.code == "FREE"
-      ) {
+      if (this.getStatusById(this.transport?.statusId)?.code == "FREE") {
         this._isFreeMoreThan15Minutes = true;
       } else {
         this._isFreeMoreThan15Minutes = false;

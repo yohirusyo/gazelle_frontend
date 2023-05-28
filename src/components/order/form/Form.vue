@@ -370,6 +370,19 @@ export default {
         isNew: this.copyMode ? true : point.isNew,
         existingId: this.copyMode ? null : point.existingId,
         forDelete: this.copyMode ? false : point.forDelete,
+        cargoRecieverPhoneNumber: point.cargo.withCargo
+          ? point.cargo.cargoReciever.phoneNumber
+          : null,
+        cargoRecieverFullname: point.cargo.withCargo
+          ? point.cargo.cargoReciever.fullname
+          : null,
+        cargoRecieverSubdivision: point.cargo.withCargo
+          ? point.cargo.cargoReciever.subdivision
+          : null,
+        cargoRecieverMvz: point.cargo.withCargo
+          ? point.cargo.cargoReciever.mvz
+          : null,
+        scenario: point.cargo.withCargo && point.cargo.weight >= 60 ? 2 : 1,
       };
     },
     async onApprove() {
@@ -484,6 +497,7 @@ export default {
 
         this.points = this.selected.orders.map((o, index) => {
           const contact = this.getContactById(o.contactId);
+          const cargoReciever = this.getCustomerById(o.cargoRecieverId);
           return {
             id: this.copyMode ? index : o.priority,
             isNew: false,
@@ -508,6 +522,12 @@ export default {
               length: o.length,
               height: o.height,
               weight: o.weight,
+              cargoReciever: {
+                phoneNumber: cargoReciever?.phoneNumber ?? null,
+                fullname: cargoReciever?.fullname ?? null,
+                subdivision: cargoReciever?.subdivision ?? null,
+                mvz: cargoReciever?.mvz ?? null,
+              },
             },
             existingId: o.id,
           };

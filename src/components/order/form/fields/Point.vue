@@ -42,6 +42,18 @@
       v-model="_cargo"
       :withoutPassengers="!_passenger.withPassengers"
     />
+    <CustomerSelect
+      v-if="_withCargo"
+      :phoneNumber="_cargoRecieverPhoneNumber"
+      :fullname="_cargoRecieverFullname"
+      :subdivision="_cargoRecieverSubdivision"
+      :mvz="_cargoRecieverMvz"
+      @update:phoneNumber="(val) => (_cargoRecieverPhoneNumber = val)"
+      @update:fullname="(val) => (_cargoRecieverFullname = val)"
+      @update:subdivision="(val) => (_cargoRecieverSubdivision = val)"
+      @update:mvz="(val) => (_cargoRecieverMvz = val)"
+      :notRequired="true"
+    />
     <ContactSelect
       :fullname="_contactFullname"
       :phoneNumber="_contactPhoneNumber"
@@ -57,6 +69,7 @@ import PlaceSelect from "./Place.vue";
 import PassengersBlock from "./Passengers.vue";
 import CargoBlock from "./Cargo.vue";
 import ContactSelect from "./Contact.vue";
+import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import { mapState } from "vuex";
 export default {
   props: ["modelValue", "label", "isSolo", "index", "isFirst"],
@@ -66,6 +79,7 @@ export default {
     PassengersBlock,
     CargoBlock,
     ContactSelect,
+    CustomerSelect,
   },
   methods: {
     onRemoveCombinedOrder(id) {
@@ -127,9 +141,51 @@ export default {
         this.$emit("update:modelValue", { ...this.modelValue, cargo: val });
       },
     },
+    _withCargo: {
+      get() {
+        return this.modelValue.cargo.withCargo;
+      },
+    },
     _forDelete: {
       get() {
         return !!this._modelValue.forDelete;
+      },
+    },
+
+    _cargoRecieverPhoneNumber: {
+      get() {
+        return this._cargo.cargoReciever.phoneNumber;
+      },
+      set(val) {
+        this._cargo.cargoReciever.phoneNumber = val;
+        this.$emit("update:modelValue", { ...this.modelValue });
+      },
+    },
+    _cargoRecieverFullname: {
+      get() {
+        return this._cargo.cargoReciever.fullname;
+      },
+      set(val) {
+        this._cargo.cargoReciever.fullname = val;
+        this.$emit("update:modelValue", { ...this.modelValue });
+      },
+    },
+    _cargoRecieverSubdivision: {
+      get() {
+        return this._cargo.cargoReciever.subdivision;
+      },
+      set(val) {
+        this._cargo.cargoReciever.subdivision = val;
+        this.$emit("update:modelValue", { ...this.modelValue });
+      },
+    },
+    _cargoRecieverMvz: {
+      get() {
+        return this._cargo.cargoReciever.mvz;
+      },
+      set(val) {
+        this._cargo.cargoReciever.mvz = val;
+        this.$emit("update:modelValue", { ...this.modelValue });
       },
     },
   },

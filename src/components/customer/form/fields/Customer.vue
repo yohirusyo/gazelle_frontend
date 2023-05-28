@@ -14,7 +14,7 @@
         _mvz = item.mvz;
       }
     "
-    :required="true"
+    :required="!notRequired"
   />
   <ISelect
     :options="subdivisions"
@@ -27,7 +27,7 @@
         _mvz = item.mvz;
       }
     "
-    :required="true"
+    :required="!notRequired"
   />
   <q-input
     v-model="_mvz"
@@ -52,8 +52,12 @@
     label-color="grey"
     label="Телефон"
     mask="+7 (###) ### ## ##"
-    lazy-rules
-    :rules="[(val) => (val !== null && val !== '') || 'Обязательное поле!']"
+    :lazy-rules="!notRequired"
+    :rules="
+      !notRequired
+        ? [(val) => (val !== null && val !== '') || 'Обязательное поле!']
+        : null
+    "
     autocomplete="off"
   />
 </template>
@@ -62,7 +66,7 @@
 import ISelect from "components/base/ISelect.vue";
 import { mapState, mapGetters } from "vuex";
 export default {
-  props: ["phoneNumber", "fullname", "subdivision", "mvz"],
+  props: ["phoneNumber", "fullname", "subdivision", "mvz", "notRequired"],
   computed: {
     ...mapState("customer", ["customers"]),
     ...mapGetters("customer", ["subdivisions"]),
