@@ -170,6 +170,16 @@ export default {
       }
     },
   },
+  watch: {
+    _selectedDate() {
+      if (typeof this._selectedDate == "string") {
+        this._selectedDate = {
+          from: this._selectedDate,
+          to: this._selectedDate,
+        };
+      }
+    },
+  },
 };
 </script>
 
