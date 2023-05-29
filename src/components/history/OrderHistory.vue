@@ -129,7 +129,7 @@ export default {
   async mounted() {
     await this.requestHistory();
     await this.subscribeHistorySockets();
-    this.height = this.$refs.history.clientHeight;
+    this.height = this.$refs.history.clientHeight - 65;
     this._selectedDate = {
       from: dayjs().format("DD.MM.YYYY"),
       to: dayjs().format("DD.MM.YYYY"),
@@ -167,6 +167,16 @@ export default {
       } else {
         this.$emit("routeSelected", item);
         this.$emit("routeCopy", true);
+      }
+    },
+  },
+  watch: {
+    _selectedDate() {
+      if (typeof this._selectedDate == "string") {
+        this._selectedDate = {
+          from: this._selectedDate,
+          to: this._selectedDate,
+        };
       }
     },
   },
