@@ -95,8 +95,8 @@ export default {
             if (driverY == null) return -1;
             return driverX > driverY ? 1 : driverY > driverX ? -1 : 0;
           } else if (sortBy == "status") {
-            const statusX = this.getStatusById(x.statusId).order;
-            const statusY = this.getStatusById(y.statusId).order;
+            const statusX = this.getStatusById(x.statusId).globalOrder;
+            const statusY = this.getStatusById(y.statusId).globalOrder;
             return statusX > statusY ? 1 : statusY > statusX ? -1 : 0;
           }
         });
