@@ -53,6 +53,7 @@
       @update:subdivision="(val) => (_cargoRecieverSubdivision = val)"
       @update:mvz="(val) => (_cargoRecieverMvz = val)"
       :notRequired="true"
+      customLabel="Грузополучатель"
     />
     <ContactSelect
       :fullname="_contactFullname"

@@ -5,7 +5,7 @@
     :labelFn="
       (item) => `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
     "
-    label="Ответственный"
+    :label="customLabel ? customLabel : 'Ответственный'"
     @selected="
       (item) => {
         _fullname = item.fullname;
@@ -66,7 +66,14 @@
 import ISelect from "components/base/ISelect.vue";
 import { mapState, mapGetters } from "vuex";
 export default {
-  props: ["phoneNumber", "fullname", "subdivision", "mvz", "notRequired"],
+  props: [
+    "phoneNumber",
+    "fullname",
+    "subdivision",
+    "mvz",
+    "notRequired",
+    "customLabel",
+  ],
   computed: {
     ...mapState("customer", ["customers"]),
     ...mapGetters("customer", ["subdivisions"]),
