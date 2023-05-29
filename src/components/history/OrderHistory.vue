@@ -129,7 +129,7 @@ export default {
   async mounted() {
     await this.requestHistory();
     await this.subscribeHistorySockets();
-    this.height = this.$refs.history.clientHeight;
+    this.height = this.$refs.history.clientHeight - 65;
     this._selectedDate = {
       from: dayjs().format("DD.MM.YYYY"),
       to: dayjs().format("DD.MM.YYYY"),
