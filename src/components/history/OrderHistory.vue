@@ -25,8 +25,8 @@
                 flat
                 @click="
                   this.getSortedHistory(this._activeOrder, {
-                    from: this.getUnixDate(this._selectedDate?.from),
-                    to: this.getUnixDate(this._selectedDate?.to),
+                    from: this.getDateForFilter(this._selectedDate?.from),
+                    to: this.getDateForFilter(this._selectedDate?.to),
                   })
                 "
               />
@@ -86,7 +86,7 @@ export default {
     HistoryElement,
   },
   computed: {
-    ...mapGetters("orderHistory", ["getSortedHistory"]),
+    ...mapGetters("orderHistory", ["getSortedHistory", "getMinSelectedDate", "getMaxSelectedDate"]),
     ...mapState("current", ["currentUser"]),
     _isOnlyMy: {
       get() {
@@ -111,8 +111,8 @@ export default {
     getOrderHistory: {
       get() {
         return this.getSortedHistory(this._activeOrder, {
-          from: this.getUnixDate(this._selectedDate?.from),
-          to: this.getUnixDate(this._selectedDate?.to),
+          from: this.getDateForFilter(this._selectedDate?.from),
+          to: this.getDateForFilter(this._selectedDate?.to),
         });
       },
     },
@@ -131,8 +131,8 @@ export default {
     await this.subscribeHistorySockets();
     this.height = this.$refs.history.clientHeight - 65;
     this._selectedDate = {
-      from: dayjs().format("DD.MM.YYYY"),
-      to: dayjs().format("DD.MM.YYYY"),
+      from: dayjs(this.getMinSelectedDate(dayjs())).format("DD.MM.YYYY"),
+      to: dayjs(this.getMaxSelectedDate(dayjs())).format("DD.MM.YYYY"),
     };
     dayjs.extend(customParseFormat);
   },
@@ -144,7 +144,7 @@ export default {
     ]),
     ...mapMutations("current", ["setRequest"]),
     dayjs,
-    getUnixDate(date) {
+    getDateForFilter(date) {
       return dayjs(date, "DD.MM.YYYY").format("YYYY-MM-DD");
     },
     editElement(item) {
