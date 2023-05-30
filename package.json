@@ -19,11 +19,11 @@
     "socket.io-client": "^4.6.1",
     "sortablejs": "^1.15.0",
     "vue": "^3.0.0",
-    "vue-json-excel3": "0.0.7",
     "vue-router": "^4.0.0",
     "vue-yandex-maps": "^0.12.7",
     "vuex": "^4.0.1",
     "vuex-extensions": "^4.0.0",
+    "xlsx-js-style": "^1.2.0",
     "ymaps": "^0.2.1"
   },
   "devDependencies": {

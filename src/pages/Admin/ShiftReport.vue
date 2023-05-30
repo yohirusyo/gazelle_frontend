@@ -6,22 +6,16 @@
         :class="!$q.screen.xs ? 'q-gutter-x-md row' : 'q-gutter-y-md column'"
         ref="header"
       >
-        <download-excel
-          :data="getFilteredShiftStats()"
-          :fields="fields"
-          :name="`(Смены) Отчет ${dayjs().format('DD.MM.YYYY HH:mm')}.xls`"
-          class="col row q-ma-none"
-        >
-          <q-btn
-            text-color="white"
-            label="Экспорт в excel"
-            icon="las la-file-excel"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-          />
-        </download-excel>
+        <q-btn
+          text-color="white"
+          label="Экспорт в excel"
+          icon="las la-file-excel"
+          unelevated
+          class="col bg-white text-black border-none"
+          flat
+          no-caps
+          @click="createExcel"
+        />
         <q-btn
           text-color="white"
           :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
@@ -75,6 +69,7 @@
           v-model:selected="_selectedRow"
           selection="multiple"
           style="height: 100%"
+          table-class="report-table"
         />
       </div>
     </div>
@@ -90,6 +85,7 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+import { getexcel } from "src/helpers/excel";
 export default {
   name: "ShiftReport",
   components: {
@@ -107,64 +103,6 @@ export default {
       width: 0,
       pagination: {
         rowsPerPage: 0,
-      },
-      fields: {
-        Водитель: {
-          field: "driverFullname",
-          callback: this.regular,
-        },
-        ТС: {
-          field: "transportNumber",
-          callback: this.regular,
-        },
-        "Начало смены": {
-          field: "startShift",
-          callback: this.HHmm,
-        },
-        "Конец смены": {
-          field: "endShift",
-          callback: this.HHmmORCurrent,
-        },
-        "Количество заявок": {
-          field: "orderQuantity",
-          callback: this.regular,
-        },
-        "Пробег по заявкам": {
-          field: "routeLength",
-          callback: this.kilometersWithoutKM,
-        },
-        "Пробег без заявок": {
-          field: "withoutRouteLength",
-          callback: this.kilometersWithoutKM,
-        },
-        "Суммарное время до принятия заявки": {
-          field: "summaryTimeBeforeAccepted",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время до прибытия к заказчику": {
-          field: "summaryTimeEntryToCustomer",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время загрузки": {
-          field: "summaryLoadingTime",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время в движении": {
-          field: "summaryDriveTime",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время разгрузки": {
-          field: "summaryUnloadingTime",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время без заявок": {
-          field: "freeTime",
-          callback: this.secondsDuration,
-        },
-        "Суммарное время по заявкам": {
-          field: "summaryAll",
-          callback: this.secondsDuration,
-        },
       },
       columns: [
         {
@@ -357,6 +295,13 @@ export default {
     },
     optionsFn(date) {
       return date >= this.getShiftMinDate() && date <= this.getShiftMaxDate();
+    },
+    createExcel() {
+      getexcel(
+        document.querySelector(".report-table > table"),
+        "Отчет",
+        `(Смены) Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}`
+      );
     },
   },
   async mounted() {

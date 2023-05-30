@@ -6,22 +6,16 @@
         :class="!$q.screen.xs ? 'q-gutter-x-md row' : 'q-gutter-y-md column'"
         ref="header"
       >
-        <download-excel
-          :data="getFilteredOperatorShiftStats()"
-          :fields="fields"
-          :name="`(Диспетчеры) Отчет ${dayjs().format('DD.MM.YYYY HH:mm')}.xls`"
-          class="col row q-ma-none"
-        >
-          <q-btn
-            text-color="white"
-            label="Экспорт в excel"
-            icon="las la-file-excel"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-          />
-        </download-excel>
+        <q-btn
+          text-color="white"
+          label="Экспорт в excel"
+          icon="las la-file-excel"
+          unelevated
+          class="col bg-white text-black border-none"
+          flat
+          no-caps
+          @click="createExcel"
+        />
         <q-btn
           text-color="white"
           :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
@@ -75,6 +69,7 @@
           v-model:selected="_selectedRow"
           selection="multiple"
           style="height: 100%"
+          table-class="report-table"
         />
       </div>
     </div>
@@ -84,10 +79,13 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { Loading } from "quasar";
 import ISelect from "components/base/ISelect.vue";
+import { getexcel } from "src/helpers/excel";
 
 export default {
   name: "OperatorShiftReport",
@@ -102,32 +100,6 @@ export default {
       width: 0,
       pagination: {
         rowsPerPage: 0,
-      },
-      fields: {
-        Дата: {
-          field: "createdAt",
-          callback: this.DDMMYYYY,
-        },
-        Диспетчер: {
-          field: "operatorFullname",
-          callback: this.regular,
-        },
-        ТС: {
-          field: "transport.transportNumber",
-          callback: this.regular,
-        },
-        "Количество заявок": {
-          field: "orderQuantity",
-          callback: this.regular,
-        },
-        'Времени в статусе "Занят"': {
-          field: "summaryBusyTime",
-          callback: this.secondsDuration,
-        },
-        'Времени в статусе "Не занят"': {
-          field: "summaryNotBusyTime",
-          callback: this.secondsDuration,
-        },
       },
       columns: [
         {
@@ -219,6 +191,13 @@ export default {
       return (
         date >= this.getOperatorShiftMinDate() &&
         date <= this.getOperatorShiftMaxDate()
+      );
+    },
+    createExcel() {
+      getexcel(
+        document.querySelector(".report-table > table"),
+        "Отчет",
+        `(Диспетчеры) Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}`
       );
     },
   },

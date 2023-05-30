@@ -1,6 +1,5 @@
 import { boot } from "quasar/wrappers";
 import io from "socket.io-client";
-import JsonExcel from "vue-json-excel3";
 import "dayjs/locale/ru";
 const initConnection = () => {
   if (!localStorage.getItem("connection")) {
@@ -26,7 +25,6 @@ const changeSocketConnection = () => {
 
 export default boot(async ({ app }) => {
   app.config.globalProperties.$socket = socketio;
-  app.component("downloadExcel", JsonExcel);
 });
 
 export { socketio, changeSocketConnection };
