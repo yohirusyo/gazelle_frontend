@@ -169,6 +169,10 @@
               label="Идентификатор Автограф (GUID)"
               autocomplete="off"
               class="col"
+              lazy-rules
+              :rules="[
+                (val) => (val !== null && val !== '') || 'Обязательное поле!',
+              ]"
             />
           </div>
         </q-scroll-area>
