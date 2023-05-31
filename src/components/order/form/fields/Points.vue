@@ -85,12 +85,12 @@ export default {
               length: point.cargo.length,
               height: point.cargo.height,
               weight: point.cargo.weight,
-              // cargoReciever: {
-              //   phoneNumber: point.cargo.cargoReciever.phoneNumber,
-              //   fullname: point.cargo.cargoReciever.fullname,
-              //   subdivision: point.cargo.cargoReciever.subdivision,
-              //   mvz: point.cargo.cargoReciever.mvz,
-              // },
+              cargoReciever: {
+                phoneNumber: point.cargo.cargoReciever.phoneNumber,
+                fullname: point.cargo.cargoReciever.fullname,
+                subdivision: point.cargo.cargoReciever.subdivision,
+                mvz: point.cargo.cargoReciever.mvz,
+              },
             },
           };
         }
