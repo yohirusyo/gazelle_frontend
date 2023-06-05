@@ -3,14 +3,19 @@
     <q-form
       @submit="onSubmit"
       @reset="resetForm"
-      class="col column justify-between q-pa-md"
+      class="col column justify-between"
+      :class="$q.screen.xs ? 'q-pl-xs q-py-xs' : 'q-pa-md'"
       ref="form"
     >
       <div v-if="selected" class="text-center">
         Номер маршрута {{ selected.id }}
       </div>
       <div class="col row">
-        <q-scroll-area class="col">
+        <q-scroll-area
+          class="col"
+          :visible="$q.screen.xs"
+          :class="$q.screen.xs ? 'q-pr-lg' : ''"
+        >
           <div class="column col q-gutter-y-md">
             <CustomerSelect
               v-if="!isCustomer"

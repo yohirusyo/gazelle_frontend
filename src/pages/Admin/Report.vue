@@ -557,6 +557,24 @@ export default {
         //   format: this.regular,
         //   sortable: true,
         // },
+        {
+          name: "cargoSenderLimit",
+          required: true,
+          label: "Лимит грузоотправителя",
+          align: "left",
+          field: (row) => row.cargoSenderLimit,
+          format: this.regular,
+          sortable: true,
+        },
+        {
+          name: "cargoRecieverLimit",
+          required: true,
+          label: "Лимит грузополучателя",
+          align: "left",
+          field: (row) => row.cargoRecieverLimit,
+          format: this.regular,
+          sortable: true,
+        },
 
         ////////////////////////////
       ],
