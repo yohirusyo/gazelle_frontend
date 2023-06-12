@@ -12,7 +12,7 @@
       </div>
 
       <div class="col-3 text-right">
-        {{ myHierarchy?.monthFactLimit }}
+        {{ month?.fact }}
       </div>
     </div>
 
@@ -22,16 +22,15 @@
         {{ usedLimitPercentage }}
       </div>
       <div class="col-3 text-right">
-        {{ myHierarchy?.monthUsed }}
+        {{ month?.used }}
       </div>
     </div>
-
     <div
       class="row q-ml-xl today-limit q-py-sm q-px-md q-mb-sm limit-unit items-center"
     >
       <div class="col-9">Сегодня</div>
       <div class="col-3 text-right">
-        {{ myManagement?.limits[0]?.daylimits[0]?.used }}
+        {{ day?.used }}
       </div>
     </div>
 
@@ -47,9 +46,9 @@
 
     <Average
       :isMinutes="myManagement?.isMinutes"
-      :used="myHierarchy?.monthUsed"
+      :used="month?.used"
       :unused="unusedLimit"
-      :today="myHierarchy?.dayLimitUsed"
+      :today="day?.used"
     />
   </div>
 </template>
@@ -67,40 +66,37 @@ export default {
     };
   },
   computed: {
+    day: {
+      get() {
+        return this.month?.daylimits[0];
+      },
+    },
+    month: {
+      get() {
+        return this.myManagement?.limits[0];
+      },
+    },
     monthLimitPercentage: {
       get() {
-        return `${(
-          (this.myHierarchy?.monthFactLimit /
-            this.myHierarchy?.monthPlanLimit) *
-          100
-        ).toFixed(1)}%`;
+        return `${((this.month?.fact / this.month?.plan) * 100).toFixed(1)}%`;
       },
     },
     usedLimitPercentage: {
       get() {
-        return `${(
-          (this.myHierarchy?.monthUsed / this.myHierarchy?.monthPlanLimit) *
-          100
-        ).toFixed(1)}%`;
+        return `${((this.month?.used / this.month?.plan) * 100).toFixed(1)}%`;
       },
     },
     unusedLimit: {
       get() {
-        return (
-          this.myHierarchy?.monthFactLimit - this.myHierarchy?.monthUsed
-        ).toFixed(2);
+        return (this.month?.fact - this.month?.used).toFixed(2);
       },
     },
     unusedLimitPercentage: {
       get() {
-        return `${(
-          (this.unusedLimit / this.myHierarchy?.monthPlanLimit) *
-          100
-        ).toFixed(1)}%`;
+        return `${((this.unusedLimit / this.month?.plan) * 100).toFixed(1)}%`;
       },
     },
     ...mapGetters("management", ["myManagement"]),
-    ...mapGetters("hierarchy", ["myHierarchy"]),
   },
 };
 </script>
