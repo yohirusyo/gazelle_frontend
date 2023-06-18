@@ -86,7 +86,11 @@ export default {
     HistoryElement,
   },
   computed: {
-    ...mapGetters("orderHistory", ["getSortedHistory", "getMinSelectedDate", "getMaxSelectedDate"]),
+    ...mapGetters("orderHistory", [
+      "getSortedHistory",
+      "getMinSelectedDate",
+      "getMaxSelectedDate",
+    ]),
     ...mapState("current", ["currentUser"]),
     _isOnlyMy: {
       get() {

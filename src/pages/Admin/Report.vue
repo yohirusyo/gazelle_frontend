@@ -1,94 +1,75 @@
 <template>
-  <q-page class="row" ref="page">
-    <div class="col column">
-      <div
-        class="col col-shrink justify-center items-stretch q-ma-sm"
-        :class="!$q.screen.xs ? 'q-gutter-x-md row' : 'q-gutter-y-md column'"
-        ref="header"
-      >
-        <q-btn
-          text-color="white"
-          label="Экспорт в excel"
-          icon="las la-file-excel"
-          unelevated
-          class="col bg-white text-black border-none"
-          flat
-          no-caps
-          @click="createExcel"
-        />
-        <ISelect
-          :options="statsSubidivisions"
-          v-model="_selectedSubdivision"
-          :labelFn="(item) => item"
-          label="Подразделение"
-          @selected="(val) => (_selectedSubdivision = val)"
-          class="col text-black border-none"
-        />
-        <ISelect
-          :options="driversFullnames"
-          v-model="_selectedDriverFullname"
-          :labelFn="(item) => item"
-          label="Ф.И.О. водителя"
-          @selected="(val) => (_selectedDriverFullname = val)"
-          class="col text-black border-none"
-          flat
-        />
-        <q-btn
-          text-color="white"
-          :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
-          unelevated
-          class="col bg-white text-black border-none"
-          flat
-          no-caps
-        >
-          <q-popup-proxy transition-show="scale" transition-hide="scale">
-            <q-date
-              v-model="_selectedDate"
-              mask="DD.MM.YYYY"
-              minimal
-              :options="optionsFn"
-              range
-            >
-              <div class="row items-center justify-end">
-                <q-btn
-                  v-close-popup
-                  label="Применить"
-                  color="primary"
-                  flat
-                  @click="requestOrderStats(_selectedDate)"
-                />
-                <q-btn v-close-popup label="Закрыть" color="primary" flat />
-              </div>
-            </q-date>
-          </q-popup-proxy>
-        </q-btn>
+  <q-page>
+    <div class="column fit">
+      <div class="col col-shrink">
+        <div class="row">
+          <q-btn
+            text-color="white"
+            label="Экспорт в excel"
+            icon="las la-file-excel"
+            unelevated
+            class="col bg-white text-black border-none"
+            flat
+            no-caps
+            @click="createExcel"
+          />
+          <ISelect
+            :options="statsSubidivisions"
+            v-model="_selectedSubdivision"
+            :labelFn="(item) => item"
+            label="Подразделение"
+            @selected="(val) => (_selectedSubdivision = val)"
+            class="col text-black border-none"
+          />
+          <ISelect
+            :options="driversFullnames"
+            v-model="_selectedDriverFullname"
+            :labelFn="(item) => item"
+            label="Ф.И.О. водителя"
+            @selected="(val) => (_selectedDriverFullname = val)"
+            class="col text-black border-none"
+            flat
+          />
+          <q-btn
+            text-color="white"
+            :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
+            unelevated
+            class="col bg-white text-black border-none"
+            flat
+            no-caps
+          >
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-date
+                v-model="_selectedDate"
+                mask="DD.MM.YYYY"
+                minimal
+                :options="optionsFn"
+                range
+              >
+                <div class="row items-center justify-end">
+                  <q-btn
+                    v-close-popup
+                    label="Применить"
+                    color="primary"
+                    flat
+                    @click="requestOrderStats(_selectedDate)"
+                  />
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-btn>
+        </div>
       </div>
-      <div
-        class="col"
-        ref="table"
-        id="table"
-        :style="`height: ${height}px; width: ${width}px`"
-      >
-        <q-table
+      <div class="col">
+        <VScrolltable
           :rows="
             getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
           "
-          flat
-          dense
-          table-header-class="bg-white"
-          square
-          separator="cell"
           :columns="columns"
-          hide-bottom
-          class="my-sticky-header-table"
-          virtual-scroll
-          v-model:pagination="pagination"
-          :rows-per-page-options="[0]"
-          row-key="id"
-          v-model:selected="_selectedRow"
-          selection="multiple"
-          table-class="report-table"
-          style="height: 100%"
+          rowKey="orderId"
+          :report="true"
+          id="report-table"
         />
       </div>
     </div>
@@ -106,11 +87,12 @@ import { Loading, Dialog } from "quasar";
 import ISelect from "components/base/ISelect.vue";
 import MapOrder from "components/report/Map.vue";
 import { getexcel } from "src/helpers/excel";
-
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "Report",
   components: {
     ISelect,
+    VScrolltable,
   },
   data() {
     return {
@@ -637,7 +619,7 @@ export default {
     },
     createExcel() {
       getexcel(
-        document.querySelector(".report-table > table"),
+        document.querySelector("#report-table > div > div > table"),
         "Отчет",
         `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}`
       );
@@ -646,10 +628,10 @@ export default {
   async mounted() {
     Loading.show();
 
-    this.height =
-      // parseInt(this.$refs.page.$el.style.minHeight) -
-      this.$refs.page.$el.clientHeight - this.$refs.header.clientHeight - 17;
-    this.width = this.$refs.page.$el.clientWidth;
+    // this.height =
+    //   // parseInt(this.$refs.page.$el.style.minHeight) -
+    //   this.$refs.page.$el.clientHeight - this.$refs.header.clientHeight - 17;
+    // this.width = this.$refs.page.$el.clientWidth;
     await this.requestOrderStatsDates();
     this._selectedDate = {
       from: dayjs().format("DD.MM.YYYY"),

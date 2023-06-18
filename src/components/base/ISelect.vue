@@ -24,13 +24,10 @@
     dense
     autocomplete="off"
     :flat="flat"
+    :readonly="readonly"
   >
     <template v-slot:option="{ index, opt, itemProps, itemEvents }">
-      <q-item
-        v-bind="itemProps"
-        v-on="itemEvents"
-        @click="selected(index)"
-      >
+      <q-item v-bind="itemProps" v-on="itemEvents" @click="selected(index)">
         <q-item-section>
           <q-item-label>{{ opt }}</q-item-label>
         </q-item-section>
@@ -38,9 +35,15 @@
     </template>
     <template v-slot:append>
       <q-icon
-        v-if="_modelValue"
+        v-if="_modelValue && !readonly && !noWrite"
         name="cancel"
         @click.stop.prevent="setModel(null)"
+        class="cursor-pointer"
+      />
+      <q-icon
+        v-if="_modelValue && noWrite"
+        name="cancel"
+        @click.stop.prevent="clearSelected"
         class="cursor-pointer"
       />
     </template>
@@ -50,7 +53,16 @@
 <script>
 export default {
   name: "ISelect",
-  props: ["modelValue", "options", "labelFn", "label", "required", "flat"],
+  props: [
+    "modelValue",
+    "options",
+    "labelFn",
+    "label",
+    "required",
+    "flat",
+    "noWrite",
+    "readonly",
+  ],
   data() {
     return {
       filter: "",
@@ -82,18 +94,22 @@ export default {
       });
     },
     updateValue(event) {
+      console.log("updateValue");
       this.$emit("update:modelValue", event.target.value);
     },
     setModel(value) {
+      console.log("setModel", this.noWrite);
+      if (this.noWrite) return;
       this.$emit("update:modelValue", value);
     },
     selected(index) {
       this.$emit("selected", this._filteredValues[index]);
     },
+    clearSelected() {
+      this.$emit("selected", null);
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

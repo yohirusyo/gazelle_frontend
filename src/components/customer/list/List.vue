@@ -1,34 +1,20 @@
 <template>
-  <q-table
-    :rows="customers"
-    :columns="columns"
-    row-key="id"
-    wrap-cells
-    virtual-scroll
-    :rows-per-page-options="[0]"
-    hide-bottom
-    style="height: 100%"
-    ref="scroll"
-    flat
-    class="my-sticky-header-table"
-    dense
-    table-header-class="bg-white"
-    square
-    separator="cell"
-  >
+  <VScrolltable :rows="customers" :columns="columns" row-key="id">
     <template v-slot:body="props">
       <CustomerListElement :id="props.row.id" @onSelected="onSelected" />
     </template>
-  </q-table>
+  </VScrolltable>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import CustomerListElement from "./Element.vue";
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "CustomerList",
   components: {
     CustomerListElement,
+    VScrolltable,
   },
   props: ["height", "selected"],
   methods: {

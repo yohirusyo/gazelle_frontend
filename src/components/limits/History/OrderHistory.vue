@@ -1,19 +1,8 @@
 <template>
-  <q-table
+  <VScrolltable
     :rows="history"
     :columns="myManagement?.isMinutes ? minutesColumns : kilometersColumns"
     row-key="owner"
-    wrap-cells
-    virtual-scroll
-    :rows-per-page-options="[0]"
-    hide-bottom
-    ref="scroll"
-    flat
-    class="my-sticky-header-table col"
-    dense
-    table-header-class="bg-white"
-    square
-    separator="cell"
     v-model:expanded="expanded"
   >
     <template v-slot:header="props">
@@ -57,13 +46,17 @@
         <q-td v-if="!myManagement?.isMinutes">{{ order.limitKilo }}</q-td>
       </q-tr>
     </template>
-  </q-table>
+  </VScrolltable>
 </template>
 
 <script>
 import { api } from "src/boot/axios";
 import { mapGetters, mapState } from "vuex";
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
+  components: {
+    VScrolltable,
+  },
   data() {
     return {
       history: [],

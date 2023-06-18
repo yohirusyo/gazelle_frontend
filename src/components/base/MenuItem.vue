@@ -49,7 +49,7 @@
       class="col column"
       :class="$q.screen.xs ? '' : 'menu-scroll-area '"
       keep-alive
-      :style="`height: ${height}px; ${
+      :style="` ${
         !$q.screen.xs
           ? 'border: 1px solid rgba(0, 0, 0, 0.12);'
           : '  background: rgba(173, 216, 230, 0.1)'
@@ -130,9 +130,7 @@ export default {
       this.tab = "main";
     },
   },
-  async mounted() {
-    this.height = this.$refs.tabs.$el.clientHeight - 2;
-  },
+  async mounted() {},
   watch: {
     modelValue(newModelValue) {
       if (!!newModelValue) {

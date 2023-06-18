@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     setPlace(item) {
-      this.$emit("update:modelValue", item.name);
+      this.$emit("update:modelValue", item?.name);
     },
   },
 };

@@ -1,21 +1,5 @@
 <template>
-  <q-table
-    :rows="drivers"
-    :columns="columns"
-    row-key="time"
-    virtual-scroll
-    :rows-per-page-options="[0]"
-    hide-bottom
-    style="height: 100%"
-    ref="scroll"
-    wrap-cells
-    flat
-    class="my-sticky-header-table"
-    dense
-    table-header-class="bg-white"
-    square
-    separator="cell"
-  >
+  <VScrolltable :rows="drivers" :columns="columns" row-key="time">
     <template v-slot:body="props">
       <q-tr :props="props" @click="setDriver(props.row)" class="text-center">
         <q-td key="fullname" :props="props" class="pre">
@@ -41,16 +25,20 @@
         </q-td>
       </q-tr>
     </template>
-  </q-table>
+  </VScrolltable>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "DriverList",
   props: ["col", "height"],
   computed: {
     ...mapState("user", ["drivers"]),
+  },
+  components: {
+    VScrolltable,
   },
   methods: {
     ...mapMutations("current", ["setDriver"]),

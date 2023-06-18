@@ -8,7 +8,7 @@
         v-model="_name"
         :labelFn="(item) => item.name"
         label="Наименование груза"
-        @selected="(val) => (_name = val.name)"
+        @selected="(val) => (_name = val?.name)"
         :required="true"
         class="q-mb-md"
       />

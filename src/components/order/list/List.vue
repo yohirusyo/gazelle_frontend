@@ -1,22 +1,5 @@
 <template>
-  <q-table
-    :rows="_orderList"
-    :columns="columns"
-    row-key="id"
-    wrap-cells
-    virtual-scroll
-    :rows-per-page-options="[0]"
-    hide-bottom
-    style="height: 100%"
-    ref="scroll"
-    flat
-    class="my-sticky-header-table"
-    dense
-    table-header-class="bg-white"
-    square
-    separator="cell"
-    id="order-list"
-  >
+  <VScrolltable :rows="_orderList" :columns="columns" row-key="id" ref="scroll">
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
@@ -30,7 +13,7 @@
         :yesterdayTime="_yesterdayTime"
       />
     </template>
-  </q-table>
+  </VScrolltable>
 </template>
 
 <script>
@@ -42,12 +25,14 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "OrderList",
   props: ["col", "height", "twoHoursToStart"],
   components: {
     RouteElement,
     CustomerFilter,
+    VScrolltable,
   },
   computed: {
     ...mapState("order", ["orders", "hovered", "selectedCustomers"]),

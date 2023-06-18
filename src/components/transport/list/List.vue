@@ -1,22 +1,9 @@
 <template>
-  <q-table
+  <VScrolltable
     :rows="_transports"
     :columns="currentUser?.role.includes('WATCHER') ? watchercolumns : columns"
     row-key="id"
-    wrap-cells
-    virtual-scroll
-    :rows-per-page-options="[0]"
-    hide-bottom
-    style="height: 100%"
-    ref="scroll"
-    flat
-    class="my-sticky-header-table"
-    dense
-    table-header-class="bg-white"
-    square
-    separator="cell"
-    :sort-method="customSort"
-    binary-state-sort
+    :sortMethod="customSort"
   >
     <template v-slot:header-cell-type="props">
       <q-th :props="props">
@@ -45,7 +32,7 @@
         @onSelected="onSelected"
       />
     </template>
-  </q-table>
+  </VScrolltable>
 </template>
 
 <script>
@@ -54,6 +41,7 @@ import TransportListElement from "./element/Element.vue";
 import TypeFilter from "./element/filters/Type.vue";
 import TransportNumberFilter from "./element/filters/TransportNumber.vue";
 import DriverFilter from "./element/filters/Driver.vue";
+import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "TransportList",
   components: {
@@ -61,6 +49,7 @@ export default {
     TransportNumberFilter,
     TypeFilter,
     DriverFilter,
+    VScrolltable,
   },
   props: ["col", "height", "selected", "isLocal"],
   methods: {

@@ -8,13 +8,14 @@
     :label="customLabel ? customLabel : 'Ответственный'"
     @selected="
       (item) => {
-        _fullname = item.fullname;
-        _subdivision = item.subdivision;
-        _phoneNumber = item.phoneNumber;
-        _mvz = item.mvz;
+        _fullname = item?.fullname;
+        _subdivision = item?.subdivision;
+        _phoneNumber = item?.phoneNumber;
+        _mvz = item?.mvz;
       }
     "
     :required="!notRequired"
+    :noWrite="noWrite"
   />
   <ISelect
     :options="subdivisions"
@@ -23,11 +24,12 @@
     label="Подразделение"
     @selected="
       (item) => {
-        _subdivision = item.name;
-        _mvz = item.mvz;
+        _subdivision = item?.name;
+        _mvz = item?.mvz;
       }
     "
     :required="!notRequired"
+    :readonly="noWrite"
   />
   <q-input
     v-model="_mvz"
@@ -40,6 +42,7 @@
     label-color="grey"
     label="МВЗ"
     autocomplete="off"
+    :readonly="noWrite"
   />
   <q-input
     v-model="_phoneNumber"
@@ -59,6 +62,7 @@
         : null
     "
     autocomplete="off"
+    :readonly="noWrite"
   />
 </template>
 
@@ -73,6 +77,7 @@ export default {
     "mvz",
     "notRequired",
     "customLabel",
+    "noWrite",
   ],
   computed: {
     ...mapState("customer", ["customers"]),

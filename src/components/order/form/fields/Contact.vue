@@ -6,8 +6,8 @@
     label="Контактное лицо"
     @selected="
       (val) => {
-        _contactFullname = val.fullname;
-        _contactPhoneNumber = val.phoneNumber;
+        _contactFullname = val?.fullname;
+        _contactPhoneNumber = val?.phoneNumber;
       }
     "
   />

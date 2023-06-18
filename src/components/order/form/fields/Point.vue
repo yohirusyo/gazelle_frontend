@@ -54,6 +54,7 @@
       @update:mvz="(val) => (_cargoRecieverMvz = val)"
       :notRequired="true"
       customLabel="Грузополучатель"
+      :noWrite="true"
     />
     <ContactSelect
       :fullname="_contactFullname"

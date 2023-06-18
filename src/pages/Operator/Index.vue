@@ -23,11 +23,11 @@
 <script>
 import Order from "src/components/order/Component.vue";
 import Transport from "src/components/transport/TransportComponent.vue";
-import { shortConnectionName } from "src/helpers/formatters.js"
+import { shortConnectionName } from "src/helpers/formatters.js";
 export default {
-  components: { Order, Transport }, 
+  components: { Order, Transport },
   methods: {
-    shortConnectionName
-  }
+    shortConnectionName,
+  },
 };
 </script>

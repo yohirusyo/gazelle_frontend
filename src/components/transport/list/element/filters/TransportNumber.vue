@@ -1,5 +1,5 @@
 <template>
-  <q-btn icon="las la-filter" size="0.7rem" dense flat>
+  <q-btn icon="las la-filter" size="0.7rem" dense flat @click.stop>
     <q-menu persistent>
       <q-list style="min-width: 100px">
         <q-item
