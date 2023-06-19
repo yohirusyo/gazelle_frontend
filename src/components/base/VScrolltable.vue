@@ -9,7 +9,7 @@
       :columns="columns"
       :row-key="rowKey ?? 'id'"
       wrap-cells
-      virtual-scroll
+      :virtual-scroll="!report"
       :rows-per-page-options="[0]"
       hide-bottom
       class="my-sticky-header-table table-inner"
