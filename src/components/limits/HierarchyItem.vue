@@ -7,6 +7,7 @@
         @submit="onSubmit"
         @reset="resetForm"
         class="col-3 row items-start q-mt-md"
+        v-if="!myHierarchy?.isSubdivision"
       >
         <q-input
           v-model="updateValue"
@@ -32,6 +33,7 @@
           </template>
         </q-input>
       </q-form>
+      <div v-else class="col-3 ">{{ updateValue }}</div>
       <div class="col-2 text-center">{{ item?.dayLimitUsed }}</div>
     </div>
     <div class="col column q-mx-md" v-if="filteredRequests.length != 0">

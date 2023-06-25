@@ -62,6 +62,12 @@
                   : null
               "
             />
+            <q-checkbox
+              v-model="_isSubdivision"
+              label="Управление по подразделению"
+              dense
+              class="q-pa-md"
+            />
             <q-select
               v-model="_bossId"
               type="text"
@@ -77,6 +83,22 @@
               :option-value="(item) => item.id"
               clearable
               autocomplete="off"
+              :readonly="_isSubdivision"
+            />
+            <q-select
+              v-model="_subdivision"
+              type="text"
+              square
+              outlined
+              hide-bottom-space
+              hide-hint
+              dense
+              label-color="grey"
+              label="Подразделение"
+              :options="_subdivisions"
+              clearable
+              autocomplete="off"
+              :readonly="!_isSubdivision"
             />
           </div>
         </q-scroll-area>
@@ -139,7 +161,7 @@ export default {
   computed: {
     ...mapState("current", ["management"]),
     ...mapState("customer", ["customers"]),
-    ...mapGetters("customer", ["getCustomerById"]),
+    ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("hierarchy", ["getManagementRequests"]),
     __operatingSpeedVariable: {
       get() {
@@ -148,6 +170,11 @@ export default {
       set(val) {
         const valWithoutCommaNumberToFixed = val.toFixed(2);
         this._operatingSpeedVariable = +valWithoutCommaNumberToFixed;
+      },
+    },
+    _subdivisions: {
+      get() {
+        return this.subdivisions.map((s) => s.name);
       },
     },
   },
@@ -165,7 +192,9 @@ export default {
         defaultLimit: this._defaultLimit,
         operatingSpeedVariable: this.__operatingSpeedVariable,
         isMinutes: this._isMinutes,
-        bossId: this._bossId.id,
+        bossId: this._isSubdivision ? null : this._bossId.id,
+        subdivision: this._isSubdivision ? this._subdivision : null,
+        isSubdivision: this._isSubdivision,
       });
       this.$refs.form.reset();
     },
@@ -176,7 +205,9 @@ export default {
         defaultLimit: this._defaultLimit,
         operatingSpeedVariable: this.__operatingSpeedVariable,
         isMinutes: this._isMinutes,
-        bossId: this._bossId.id,
+        bossId: this._isSubdivision ? null : this._bossId.id,
+        subdivision: this._isSubdivision ? this._subdivision : null,
+        isSubdivision: this._isSubdivision,
       });
       this.$refs.form.reset();
     },
@@ -194,16 +225,21 @@ export default {
       this._defaultLimit = null;
       this._isMinutes = false;
       this.__operatingSpeedVariable = 0;
+      this._subdivision = null;
+      this._isSubdivision = false;
       this._bossId = null;
       this.$emit("done");
       this.setManagement(null);
     },
     async loadData() {
       if (this.management) {
+        console.log(this.management);
         this._name = this.management.name;
         this._defaultLimit = this.management.defaultLimit;
         this._isMinutes = this.management.isMinutes;
         this.__operatingSpeedVariable = this.management.operatingSpeedVariable;
+        this._subdivision = this.management.subdivision;
+        this._isSubdivision = this.management.isSubdivision;
         this._bossId = this.getCustomerById(this.management.bossId);
         await this.getManagementLimitRequests({ id: this.management.id });
         this._creationMode = false;
@@ -222,6 +258,8 @@ export default {
       _operatingSpeedVariable: null,
       _isMinutes: false,
       _bossId: null,
+      _subdivision: null,
+      _isSubdivision: false,
       _creationMode: true,
       filter: "",
     };

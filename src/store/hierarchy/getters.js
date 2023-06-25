@@ -1,6 +1,16 @@
 export const myWorkers = (state, getters, rootState) =>
-  state.hierarchy?.filter((h) => h.bossId == rootState.current.currentUser.id);
+  state.hierarchy?.filter(
+    (h) =>
+      h.bossId == rootState.current.currentUser.id ||
+      (h.subdivision == rootState.current.currentUser.subdivision &&
+        h.ownerId != rootState.current.currentUser.id)
+  );
+
 export const myHierarchy = (state, getters, rootState) => {
+  const subdivisionHierarchy = state.hierarchy.find(
+    (h) => h.subdivision == rootState.current.currentUser.subdivision
+  );
+  if (subdivisionHierarchy) return subdivisionHierarchy;
   const ownerHierarchy = state.hierarchy?.find(
     (h) => h.ownerId == rootState.current.currentUser.id
   );
