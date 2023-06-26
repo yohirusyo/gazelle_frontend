@@ -37,8 +37,12 @@ export const getManagementRequests = (state) => (managementId) => {
   return state.managementRequests[managementId];
 };
 
-export const myUnusedLimit = (state, getters, rootState) => {
+export const myUnusedLimit = (state, getters, rootState, rootGetters) => {
   const myHierarchy = getters.myHierarchy;
+  if (myHierarchy?.isSubdivision) {
+    const myManagement = rootGetters["management/myManagement"]?.limits[0];
+    return myManagement?.plan - myManagement?.used;
+  }
   const spendedToWorkers = getters.spendedToWorkers;
   return (
     myHierarchy?.monthFactLimit - myHierarchy?.monthUsed - spendedToWorkers

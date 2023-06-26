@@ -33,11 +33,15 @@
 import OrderHistory from "src/components/history/OrderHistory.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import OrderForm from "src/components/order/form/Form.vue";
+import { mapActions } from "vuex";
 export default {
   components: {
     OrderHistory,
     MenuItemV2,
     OrderForm,
+  },
+  async mounted() {
+    await this.requestMyManagement();
   },
   computed: {
     _route: {
@@ -64,6 +68,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions("management", ["requestMyManagement"]),
     setRoute(route) {
       this._route = route;
     },
