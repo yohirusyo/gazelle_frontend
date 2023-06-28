@@ -43,7 +43,7 @@
 import { mapActions } from "vuex";
 import Owner from "./Owner.vue";
 import Percentage from "./Percentage.vue";
-import Hierarchy from "./Hierarchy.vue";
+import Hierarchy from "./hierarchy/Hierarchy.vue";
 import LimitRequests from "./LimitRequests.vue";
 import History from "./History/History.vue";
 import OrderHistory from "./History/OrderHistory.vue";

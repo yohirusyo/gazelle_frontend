@@ -1,5 +1,5 @@
 <template>
-    <div class="text-h4">{{ currentUser.fullname }}</div>
+    <div class="text-h4">{{ currentUser?.fullname }}</div>
     <div>{{ myManagement?.name }}</div>
 </template>
 

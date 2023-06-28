@@ -22,7 +22,7 @@
         {{ usedLimitPercentage }}
       </div>
       <div class="col-3 text-right">
-        {{ month?.used }}
+        {{ month?.used?.toFixed(2) }}
       </div>
     </div>
     <div

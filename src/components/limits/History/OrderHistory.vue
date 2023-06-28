@@ -29,7 +29,7 @@
           toMinutes(props.row.fine)
         }}</q-td>
         <q-td key="limitKilo" v-if="!myManagement?.isMinutes">{{
-          props.row.limitKilo
+          (props.row.limitKilo / 1000).toFixed(1)
         }}</q-td>
       </q-tr>
       <q-tr
@@ -43,7 +43,9 @@
           toMinutes(order.limitMin)
         }}</q-td>
         <q-td v-if="myManagement?.isMinutes">{{ toMinutes(order.fine) }}</q-td>
-        <q-td v-if="!myManagement?.isMinutes">{{ order.limitKilo }}</q-td>
+        <q-td v-if="!myManagement?.isMinutes">{{
+          (order.limitKilo / 1000).toFixed(1)
+        }}</q-td>
       </q-tr>
     </template>
   </VScrolltable>
@@ -186,7 +188,6 @@ export default {
         }
       }
       orders.sort((a, b) => {
-        console.warn(this.currentUser);
         if (a.owner === this.currentUser.fullname) return -1;
         if (b.owner === this.currentUser.fullname) return 1;
         return 0;
