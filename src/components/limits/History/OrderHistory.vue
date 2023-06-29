@@ -1,13 +1,20 @@
 <template>
-  <VScrolltable
-    :rows="history"
-    :columns="myManagement?.isMinutes ? minutesColumns : kilometersColumns"
-    row-key="owner"
-    v-model:expanded="expanded"
-  >
+  <VScrolltable :rows="history" :columns="myManagement?.isMinutes ? minutesColumns : kilometersColumns" row-key="owner"
+    v-model:expanded="expanded">
     <template v-slot:header="props">
       <q-tr :props="props">
-        <q-th auto-width />
+        <q-th auto-width>
+          <q-icon name="calendar_month" color="black" size="sm">
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-date v-model="_selectedDate" mask="YYYYMMDD" minimal range>
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Применить" color="primary" flat @click="sortFetchOrders(_selectedDate)" />
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-icon>
+        </q-th>
 
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
           {{ col.label }}
@@ -32,12 +39,7 @@
           (props.row.limitKilo / 1000).toFixed(1)
         }}</q-td>
       </q-tr>
-      <q-tr
-        v-show="props.expand"
-        :props="props"
-        v-for="order of props.row.orders"
-        :key="order.id"
-      >
+      <q-tr v-show="props.expand" :props="props" v-for="order of props.row.orders" :key="order.id">
         <q-td colspan="3">Номер заявки: {{ order.id }} </q-td>
         <q-td v-if="myManagement?.isMinutes">{{
           toMinutes(order.limitMin)
@@ -61,6 +63,7 @@ export default {
   },
   data() {
     return {
+      _selectedDate: null,
       history: [],
       expanded: [],
       fine: 15 * 60000,
@@ -126,6 +129,16 @@ export default {
     ...mapGetters("management", ["myManagement"]),
     ...mapState("current", ["currentUser"]),
   },
+  watch: {
+    _selectedDate() {
+      if (typeof this._selectedDate == "string") {
+        this._selectedDate = {
+          from: this._selectedDate,
+          to: this._selectedDate,
+        };
+      }
+    },
+  },
   methods: {
     toMinutes(time) {
       if (!time) return "0.00";
@@ -159,32 +172,40 @@ export default {
       );
       return this.parseNumber(item.driveTime) + loadingTime + unloadingTime;
     },
-    async fetchOrders() {
+    sortFetchOrders(date) {
+      this.fetchOrders(date)
+    },
+    async fetchOrders(date) {
       const { data } = await api.get("/order/hierarchy/orders");
       const orders = [];
+
       for (const d of data) {
-        const order = {
-          id: d.order.id,
-          fine: this.getTimeFine(d),
-          limitMin: this.getLimitMin(d),
-          limitKilo: this.parseNumber(d.order.routeLength),
-        };
-        const elem = orders.find((h) => h.owner == d.order.customer.fullname);
-        if (elem) {
-          elem.orderCount++;
-          elem.fine += order.fine;
-          elem.limitKilo += this.parseNumber(order.limitKilo);
-          elem.limitMin += order.limitMin;
-          elem.orders.push(order);
-        } else {
-          orders.push({
-            owner: d.order.customer.fullname,
-            orderCount: 1,
-            fine: order.fine,
-            limitMin: order.limitMin,
-            limitKilo: this.parseNumber(order.limitKilo),
-            orders: [order],
-          });
+        const orderDate = d.order.orderTime.split('T')[0].split('-').join("")
+        if (!date || (date.from <= orderDate && orderDate <= date.to)) {
+
+          const order = {
+            id: d.order.id,
+            fine: this.getTimeFine(d),
+            limitMin: this.getLimitMin(d),
+            limitKilo: this.parseNumber(d.order.routeLength),
+          };
+          const elem = orders.find((h) => h.owner == d.order.customer.fullname);
+          if (elem) {
+            elem.orderCount++;
+            elem.fine += order.fine;
+            elem.limitKilo += this.parseNumber(order.limitKilo);
+            elem.limitMin += order.limitMin;
+            elem.orders.push(order);
+          } else {
+            orders.push({
+              owner: d.order.customer.fullname,
+              orderCount: 1,
+              fine: order.fine,
+              limitMin: order.limitMin,
+              limitKilo: this.parseNumber(order.limitKilo),
+              orders: [order],
+            });
+          }
         }
       }
       orders.sort((a, b) => {
@@ -197,3 +218,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.q-date__navigation {
+  display: none !important;
+}
+</style>
