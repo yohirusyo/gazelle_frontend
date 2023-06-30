@@ -1,7 +1,9 @@
 <template>
-  <VScrolltable :rows="history" :columns="myManagement?.isMinutes ? minutesColumns : kilometersColumns" row-key="owner"
+  <q-table wrap-cells hide-bottom :rows-per-page-options="[0]" table-header-class="bg-white" separator="cell" class="my-sticky-header-table" dense flat
+    square :rows="history" :columns="myManagement?.isMinutes ? minutesColumns : kilometersColumns" row-key="owner"
     v-model:expanded="expanded">
     <template v-slot:header="props">
+
       <q-tr :props="props">
         <q-th auto-width>
           <q-icon name="calendar_month" color="black" size="sm">
@@ -50,7 +52,7 @@
         }}</q-td>
       </q-tr>
     </template>
-  </VScrolltable>
+  </q-table>
 </template>
 
 <script>
@@ -61,6 +63,7 @@ export default {
   components: {
     VScrolltable,
   },
+  props: ['item'],
   data() {
     return {
       _selectedDate: null,
@@ -123,7 +126,9 @@ export default {
     };
   },
   async mounted() {
-    this.fetchOrders();
+    if (this.item) {
+      this.fetchOrders({ item: this.item });
+    } else this.fetchOrders({});
   },
   computed: {
     ...mapGetters("management", ["myManagement"]),
@@ -173,13 +178,14 @@ export default {
       return this.parseNumber(item.driveTime) + loadingTime + unloadingTime;
     },
     sortFetchOrders(date) {
-      this.fetchOrders(date)
+      this.fetchOrders({ date: date, item: this.item })
     },
-    async fetchOrders(date) {
-      const { data } = await api.get("/order/hierarchy/orders");
+    async fetchOrders({ date, item }) {
+      console.log({ date, item });
+      const { data } = await api.get(item ? `/order/hierarchy/orders/${item}?managementId=${item}` : "/order/hierarchy/orders/");
       const orders = [];
-
       for (const d of data) {
+
         const orderDate = d.order.orderTime.split('T')[0].split('-').join("")
         if (!date || (date.from <= orderDate && orderDate <= date.to)) {
 
