@@ -6,8 +6,8 @@
         @click="setManagement(props.row)"
         class="text-center"
       >
-        <q-td>
-          <q-checkbox v-model="props.expand"></q-checkbox>
+        <q-td auto-width>
+          <q-checkbox v-model="props.expand" dense></q-checkbox>
         </q-td>
 
         <q-td key="name" :props="props">

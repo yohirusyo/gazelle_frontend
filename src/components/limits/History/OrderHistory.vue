@@ -9,7 +9,7 @@
     dense
     flat
     square
-    :rows="history"
+    :rows="_history"
     :columns="_isMinutes ? minutesColumns : kilometersColumns"
     row-key="owner"
     v-model:expanded="expanded"
@@ -21,22 +21,24 @@
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-date v-model="_selectedDate" mask="YYYYMMDD" minimal range>
                 <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Применить"
-                    color="primary"
-                    flat
-                    @click="sortFetchOrders(_selectedDate)"
-                  />
+                  <q-btn v-close-popup label="Применить" color="primary" flat />
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-icon>
         </q-th>
-
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
-          {{ col.label }}
+          <div class="row items-center justify-center">
+            <span class="col">{{ col.label }}</span>
+            <q-checkbox
+              v-if="col.name == 'limitKilo'"
+              v-model="showCargoReciever"
+              dense
+              class="col"
+              label="Лимит грузополучателя"
+            />
+          </div>
         </q-th>
       </q-tr>
     </template>
@@ -141,6 +143,9 @@ export default {
       history: [],
       expanded: [],
       fine: 15 * 60000,
+      showCargoReciever: true,
+      _customerIds: [],
+      _orders: [],
       minutesColumns: [
         {
           name: "customer",
@@ -197,9 +202,7 @@ export default {
     };
   },
   async mounted() {
-    if (this.item) {
-      this.fetchOrders({ item: this.item });
-    } else this.fetchOrders({});
+    this.fetchOrders();
   },
   computed: {
     ...mapGetters("management", ["myManagement"]),
@@ -214,6 +217,53 @@ export default {
         return this.item
           ? this.operatingSpeedVariable
           : this.myManagement?.operatingSpeedVariable;
+      },
+    },
+    _history: {
+      get() {
+        const orders = [];
+        for (const d of this._orders) {
+          const orderDate = d.order.orderTime.split("T")[0].split("-").join("");
+          if (
+            !this._selectedDate ||
+            (this._selectedDate.from <= orderDate &&
+              orderDate <= this._selectedDate.to)
+          ) {
+            const kiloData = this.getKilos(d, this._customerIds);
+            if (!this.showCargoReciever && kiloData.cargoReciever) continue;
+            const order = {
+              id: d.order.id,
+              fine: this.getTimeFine(d),
+              limitMin: this.getLimitMin(d),
+              limitKilo: kiloData,
+            };
+            const elem = orders.find(
+              (h) => h.owner == d.order.customer.fullname
+            );
+            if (elem) {
+              elem.orderCount++;
+              elem.fine += order.fine;
+              elem.limitKilo += kiloData.limit;
+              elem.limitMin += order.limitMin;
+              elem.orders.push(order);
+            } else {
+              orders.push({
+                owner: d.order.customer.fullname,
+                orderCount: 1,
+                fine: order.fine,
+                limitMin: order.limitMin,
+                limitKilo: kiloData.limit,
+                orders: [order],
+              });
+            }
+          }
+        }
+        orders.sort((a, b) => {
+          if (a.owner === this.currentUser.fullname) return -1;
+          if (b.owner === this.currentUser.fullname) return 1;
+          return 0;
+        });
+        return orders;
       },
     },
   },
@@ -293,7 +343,6 @@ export default {
         Math.round(limit.afterLoadingWaitingTime * 100) / 100;
       limit.unloadingWaiting = Math.round(limit.unloadingWaiting * 100) / 100;
       limit.unloadingTime = Math.round(limit.unloadingTime * 100) / 100;
-      // console.log(limit);
       return limit;
     },
     getTimeFine(item) {
@@ -316,50 +365,12 @@ export default {
       );
       return this.parseNumber(item.driveTime) + loadingTime + unloadingTime;
     },
-    sortFetchOrders(date) {
-      this.fetchOrders({ date: date, item: this.item });
-    },
-    async fetchOrders({ date, item }) {
+    async fetchOrders() {
       const { data } = await api.get(
-        item ? `/order/hierarchy/orders/${item}` : "/order/hierarchy/orders/"
+        `/order/hierarchy/orders/${this.item ? this.item : ""}`
       );
-      console.log(data);
-      const orders = [];
-      for (const d of data.orders) {
-        const orderDate = d.order.orderTime.split("T")[0].split("-").join("");
-        if (!date || (date.from <= orderDate && orderDate <= date.to)) {
-          const kiloData = this.getKilos(d, data.customerIds);
-          const order = {
-            id: d.order.id,
-            fine: this.getTimeFine(d),
-            limitMin: this.getLimitMin(d),
-            limitKilo: kiloData,
-          };
-          const elem = orders.find((h) => h.owner == d.order.customer.fullname);
-          if (elem) {
-            elem.orderCount++;
-            elem.fine += order.fine;
-            elem.limitKilo += kiloData.limit;
-            elem.limitMin += order.limitMin;
-            elem.orders.push(order);
-          } else {
-            orders.push({
-              owner: d.order.customer.fullname,
-              orderCount: 1,
-              fine: order.fine,
-              limitMin: order.limitMin,
-              limitKilo: kiloData.limit,
-              orders: [order],
-            });
-          }
-        }
-      }
-      orders.sort((a, b) => {
-        if (a.owner === this.currentUser.fullname) return -1;
-        if (b.owner === this.currentUser.fullname) return 1;
-        return 0;
-      });
-      this.history = orders;
+      this._orders = data.orders;
+      this._customerIds = data.customerIds;
     },
   },
 };
