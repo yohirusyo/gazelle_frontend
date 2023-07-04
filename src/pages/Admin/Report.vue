@@ -159,8 +159,11 @@ export default {
           label: "Расстояние",
           align: "right",
           field: (row) =>
-            row.order.routeLength != null && row.order.routeLength != 0
-              ? `${(row.order.routeLength / 1000).toFixed(1)}км`
+            row.order.routeLength != null
+              ? `${(
+                  (row.order.routeLength < 100 && row.order.routeLength != 0 ? 100 : row.order.routeLength) /
+                  1000
+                ).toFixed(1)}км`
               : null,
           sortable: true,
         },
