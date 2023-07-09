@@ -135,7 +135,7 @@ export default {
       );
       const diff = dayjs().diff(start);
       if (
-        dayjs.duration(diff).asHours() >= 1 &&
+        dayjs.duration(diff).asMinutes() >= 30 &&
         this.getStatusById(this.transport?.statusId)?.isBusy
       ) {
         this._isBusyMoreThan1Hour = true;

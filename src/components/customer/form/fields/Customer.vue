@@ -5,7 +5,7 @@
     :labelFn="
       (item) => `${item.fullname} ( ${item.subdivision} ) ${item.phoneNumber}`
     "
-    :label="customLabel ? customLabel : 'Ответственный'"
+    :label="customLabel ? customLabel : 'Ответственный (заказчик)'"
     @selected="
       (item) => {
         _fullname = item?.fullname;
