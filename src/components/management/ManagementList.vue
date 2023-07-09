@@ -1,11 +1,13 @@
 <template>
   <VScrolltable :rows="managements" :columns="columns" row-key="name">
     <template v-slot:body="props">
-
-      <q-tr :props="props" @click="setManagement(props.row)" class="text-center">
-
-        <q-td>
-          <q-checkbox v-model="props.expand"></q-checkbox>
+      <q-tr
+        :props="props"
+        @click="setManagement(props.row)"
+        class="text-center"
+      >
+        <q-td auto-width>
+          <q-checkbox v-model="props.expand" dense></q-checkbox>
         </q-td>
 
         <q-td key="name" :props="props">
@@ -24,9 +26,13 @@
           {{ formatCustomer(getCustomerById(props.row.bossId)) }}
         </q-td>
       </q-tr>
-      <q-tr v-if="props.expand" >
+      <q-tr v-if="props.expand">
         <q-td colspan="6">
-          <OrderHistory :item="props.row.id"/>
+          <OrderHistory
+            :item="props.row.id"
+            :operatingSpeedVariable="props.row.operatingSpeedVariable"
+            :isMinutes="props.row.isMinutes"
+          />
         </q-td>
       </q-tr>
     </template>
@@ -42,7 +48,7 @@ import OrderHistory from "../limits/History/OrderHistory.vue";
 export default {
   components: {
     VScrolltable,
-    OrderHistory
+    OrderHistory,
   },
   props: ["col", "height"],
   methods: {
@@ -101,7 +107,6 @@ export default {
     ...mapState("management", ["managements"]),
     ...mapGetters("customer", ["getCustomerById"]),
   },
-
 };
 </script>
 
