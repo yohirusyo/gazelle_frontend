@@ -161,9 +161,12 @@ export default {
           field: (row) =>
             row.order.routeLength != null
               ? `${(
-                  (row.order.routeLength < 100 && row.order.routeLength != 0 ? 100 : row.order.routeLength) /
-                  1000
-                ).toFixed(1)}км`
+                  (row.order.routeLength < 100 && row.order.routeLength != 0
+                    ? 100
+                    : row.order.routeLength) / 1000
+                )
+                  .toFixed(1)
+                  .replace(".", ",")}`
               : null,
           sortable: true,
         },
@@ -547,7 +550,7 @@ export default {
           required: true,
           label: "Лимит грузоотправителя",
           align: "left",
-          field: (row) => row.cargoSenderLimit,
+          field: (row) => row.cargoSenderLimit?.toFixed(2)?.replace(".", ","),
           format: this.regular,
           sortable: true,
         },
@@ -556,7 +559,7 @@ export default {
           required: true,
           label: "Лимит грузополучателя",
           align: "left",
-          field: (row) => row.cargoRecieverLimit,
+          field: (row) => row.cargoRecieverLimit?.toFixed(2)?.replace(".", ","),
           format: this.regular,
           sortable: true,
         },

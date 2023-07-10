@@ -13,8 +13,8 @@
         <q-td key="name" :props="props">
           {{ props.row.name }}
         </q-td>
-        <q-td key="planMonthLimit" :props="props">
-          {{ props.row.limits[0].plan }}
+        <q-td key="usedMonthLimit" :props="props">
+          {{ round(props.row.limits[0].used) }}
         </q-td>
         <q-td key="factMonthLimit" :props="props">
           {{ props.row.limits[0].fact }}
@@ -54,6 +54,9 @@ export default {
   methods: {
     ...mapMutations("current", ["setManagement"]),
     formatCustomer,
+    round(num) {
+      return Math.round(num * 100) / 100;
+    },
   },
   data() {
     return {
@@ -73,9 +76,9 @@ export default {
           sortable: false,
         },
         {
-          name: "planMonthLimit",
+          name: "usedMonthLimit",
           required: true,
-          label: "Плановый месячный лимит",
+          label: "Израсходованный месячный лимит",
           align: "center",
           sortable: false,
         },
