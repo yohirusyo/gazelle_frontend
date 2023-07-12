@@ -166,7 +166,7 @@ export default {
                     : row.order.routeLength) / 1000
                 )
                   .toFixed(1)
-                  .replace(".", ",")}`
+                  /* .replace(".", ",") */}`
               : null,
           sortable: true,
         },
@@ -550,7 +550,7 @@ export default {
           required: true,
           label: "Лимит грузоотправителя",
           align: "left",
-          field: (row) => row.cargoSenderLimit?.toFixed(2)?.replace(".", ","),
+          field: (row) => row.cargoSenderLimit?.toFixed(2)/* ?.replace(".", ",") */,
           format: this.regular,
           sortable: true,
         },
@@ -559,7 +559,7 @@ export default {
           required: true,
           label: "Лимит грузополучателя",
           align: "left",
-          field: (row) => row.cargoRecieverLimit?.toFixed(2)?.replace(".", ","),
+          field: (row) => row.cargoRecieverLimit?.toFixed(2)/* ?.replace(".", ",") */,
           format: this.regular,
           sortable: true,
         },

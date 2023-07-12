@@ -329,12 +329,13 @@ export default {
     onCancel() {
       this.resetForm();
     },
-    buildRoute() {
+    buildRoute(ignoreDateTime = false) {
       return {
-        orderTime:
-          !this._creationMode && new Date() > this.orderTime
-            ? new Date()
-            : this.orderTime,
+        orderTime: ignoreDateTime
+          ? this.orderTime
+          : !this._creationMode && new Date() > this.orderTime
+          ? new Date()
+          : this.orderTime,
         departurePointName: this.departurePointName,
         isEmergency: this._orderIsEmergency,
         transportId: this.selectedTransportId,
@@ -395,7 +396,7 @@ export default {
       if (this.checkAlerts()) return;
       await this.updateRoute({
         id: this.selected.id,
-        ...this.buildRoute(),
+        ...this.buildRoute(true),
         isApproved: true,
         isDeclined: false,
       });
