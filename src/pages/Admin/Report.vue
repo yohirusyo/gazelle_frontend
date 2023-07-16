@@ -292,7 +292,7 @@ export default {
           required: true,
           label: "Время прибытия в место назначения",
           align: "left",
-          field: (row) => row.exitToDestinationFact,
+          field: (row) => row.entryToDestinationFact,
           format: this.HHmm,
           sortable: true,
         },
