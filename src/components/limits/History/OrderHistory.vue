@@ -44,11 +44,14 @@
     </template>
     <template v-slot:body="props">
       <q-tr :props="props">
-        <q-td auto-width>
+        <q-td auto-width v-if="!props.row.isTotal">
           <q-checkbox v-model="props.expand" dense />
         </q-td>
+        <q-td v-else colspan="2" auto-width> Итого </q-td>
 
-        <q-td key="customer">{{ props.row.owner }}</q-td>
+        <q-td key="customer" v-if="!props.row.isTotal">{{
+          props.row.owner
+        }}</q-td>
         <q-td key="orderCount">{{ props.row.orderCount }}</q-td>
         <q-td key="limitMin" v-if="_isMinutes">{{
           toMinutes(props.row.limitMin)
@@ -205,7 +208,7 @@ export default {
     this.fetchOrders();
   },
   computed: {
-    ...mapGetters("management", ["myManagement"]),
+    ...mapGetters("management", ["myManagement", "getManagementById"]),
     ...mapState("current", ["currentUser"]),
     _isMinutes: {
       get() {
@@ -219,9 +222,24 @@ export default {
           : this.myManagement?.operatingSpeedVariable;
       },
     },
+    _management: {
+      get() {
+        return this.item
+          ? this.getManagementById(this.item)
+          : this.myManagement;
+      },
+    },
     _history: {
       get() {
         const orders = [];
+        const total = {
+          orderCount: 0,
+          fine: 0,
+          limitMin: 0,
+          limitKilo: 0,
+          orders: [],
+          isTotal: true,
+        };
         for (const d of this._orders) {
           const orderDate = d.order.orderTime.split("T")[0].split("-").join("");
           if (
@@ -236,6 +254,7 @@ export default {
               fine: this.getTimeFine(d),
               limitMin: this.getLimitMin(d),
               limitKilo: kiloData,
+              isTotal: false,
             };
             const elem = orders.find(
               (h) => h.owner == d.order.customer.fullname
@@ -256,6 +275,10 @@ export default {
                 orders: [order],
               });
             }
+            total.orderCount++;
+            total.fine += order.fine || 0;
+            total.limitKilo += order.limitKilo.limit || 0;
+            total.limitMin += order.limitMin || 0;
           }
         }
         orders.sort((a, b) => {
@@ -263,6 +286,7 @@ export default {
           if (b.owner === this.currentUser.fullname) return 1;
           return 0;
         });
+        orders.push(total);
         return orders;
       },
     },

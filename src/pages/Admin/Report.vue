@@ -288,7 +288,7 @@ export default {
           sortable: true,
         },
         {
-          name: "exitToDestination",
+          name: "entryToDestinationFact",
           required: true,
           label: "Время прибытия в место назначения",
           align: "left",
