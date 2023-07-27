@@ -17,8 +17,9 @@
             <img src="favicon.ico" />
           </q-avatar>
         </div>
-        <div v-if="!$q.screen.xs" class="col text-h5">
-          <div class="q-pl-md">{{ сonnectionName() }}</div>
+        <div class="col text-h5 row items-center">
+          <div class="q-pl-md" v-if="!$q.screen.xs">{{ сonnectionName() }}</div>
+          <LimitWarning />
         </div>
         <div
           class="q-pr-sm text-center col col-shrink column justify-center items-end"
@@ -196,9 +197,12 @@ import { Loading } from "quasar";
 import { formatRole } from "src/helpers/formatters.js";
 import { getConnection, api } from "src/boot/axios";
 import { сonnectionName } from "src/helpers/formatters";
+import LimitWarning from "src/components/limits/LimitWarning.vue";
 export default {
   name: "MainLayout",
-  components: {},
+  components: {
+    LimitWarning,
+  },
   data() {
     return {
       drawer: false,
