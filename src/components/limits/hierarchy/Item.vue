@@ -40,7 +40,7 @@
       <div v-else class="col-3">{{ updateValue }}</div>
     </q-td>
     <q-td key="departurePoint" :props="props">
-      {{ props.row?.dayLimitUsed }}</q-td
+      {{ props.row?.dayLimitUsed.toFixed(2) }}</q-td
     >
   </q-tr>
   <q-tr v-if="filteredRequests.length != 0">
@@ -81,7 +81,7 @@ export default {
     percentage: {
       get() {
         return `${(
-          (this.props.row.monthFactLimit / this.myHierarchy.monthFactLimit) *
+          (this.props.row.dayLimitUsed / this.myHierarchy.monthFactLimit) *
           100
         ).toFixed(2)} %`;
       },

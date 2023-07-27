@@ -45,18 +45,10 @@ export default {
         {
           name: "percentage",
           required: true,
-          label: "Процент от общего",
+          label: "Процент от общего за сегодня",
           align: "center",
           sortable: false,
         },
-        {
-          name: "monthPlanLimit",
-          required: true,
-          label: "Плановый лимит",
-          align: "center",
-          sortable: false,
-        },
-
         {
           name: "departurePoint",
           required: true,
@@ -64,6 +56,7 @@ export default {
           align: "center",
           sortable: false,
         },
+
       ],
     };
   },
