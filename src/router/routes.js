@@ -77,7 +77,7 @@ const routes = [
         path: "map",
         component: () => import("src/pages/Operator/Map.vue"),
         meta: {
-          roles: ["ADMIN", "OPERATOR"],
+          roles: ["ADMIN", "OPERATOR", "CUSTOMER"],
           requiresAuth: true,
         },
       },
@@ -118,9 +118,6 @@ const routes = [
       requiresAuth: true,
     },
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/Error404.vue"),

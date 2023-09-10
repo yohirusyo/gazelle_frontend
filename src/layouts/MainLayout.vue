@@ -130,10 +130,7 @@
             to="/map"
             flat
             dense
-            v-if="
-              !currentUser?.role.includes('WATCHER') &&
-              currentUser?.role != 'CUSTOMER'
-            "
+            v-if="!currentUser?.role.includes('WATCHER')"
           >
             <q-tooltip> Карта </q-tooltip>
           </q-btn>
