@@ -1,21 +1,14 @@
 <template>
-  <q-table
-    wrap-cells
-    hide-bottom
-    :rows-per-page-options="[0]"
-    table-header-class="bg-white"
-    separator="cell"
-    class="my-sticky-header-table"
-    dense
-    flat
-    square
-    :rows="_history"
-    :columns="_isMinutes ? minutesColumns : kilometersColumns"
-    row-key="owner"
-    v-model:expanded="expanded"
-  >
+
+  <q-table wrap-cells hide-bottom :rows-per-page-options="[0]" table-header-class="bg-white" separator="cell"
+    class="my-sticky-header-table" dense flat square :rows="_history"
+    :columns="_isMinutes ? minutesColumns : kilometersColumns" row-key="owner" v-model:expanded="expanded">
+
     <template v-slot:header="props">
+  <q-th class="text-center" colspan="4" auto-width> {{ _selectedDate ? toDate(_selectedDate?.from) + " - " + toDate(_selectedDate?.to) : "" }} </q-th>
+
       <q-tr :props="props">
+
         <q-th auto-width>
           <q-icon name="calendar_month" color="black" size="sm">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -31,13 +24,8 @@
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
           <div class="row items-center justify-center">
             <span class="col">{{ col.label }}</span>
-            <q-checkbox
-              v-if="col.name == 'limitKilo'"
-              v-model="showCargoReciever"
-              dense
-              class="col"
-              label="Лимит грузополучателя"
-            />
+            <q-checkbox v-if="col.name == 'limitKilo'" v-model="showCargoReciever" dense class="col"
+              label="Лимит грузополучателя" />
           </div>
         </q-th>
       </q-tr>
@@ -63,12 +51,7 @@
           props.row.limitKilo.toFixed(2)
         }}</q-td>
       </q-tr>
-      <q-tr
-        v-show="props.expand"
-        :props="props"
-        v-for="order of props.row.orders"
-        :key="order.id"
-      >
+      <q-tr v-show="props.expand" :props="props" v-for="order of props.row.orders" :key="order.id">
         <q-td :colspan="_isMinutes ? 3 : 2">Заявка: {{ order.id }} </q-td>
         <q-td v-if="_isMinutes">{{ toMinutes(order.limitMin) }}</q-td>
         <q-td v-if="_isMinutes">{{ toMinutes(order.fine) }}</q-td>
@@ -132,6 +115,8 @@
 </template>
 
 <script>
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { api } from "src/boot/axios";
 import { mapGetters, mapState } from "vuex";
 import VScrolltable from "src/components/base/VScrolltable.vue";
@@ -302,6 +287,10 @@ export default {
     },
   },
   methods: {
+    toDate(val) {
+      dayjs.extend(customParseFormat)
+      return dayjs(val).format('DD.MM.YYYY')
+    },
     toMinutes(time) {
       if (!time) return "0.00";
       return (time / 60000).toFixed(2);

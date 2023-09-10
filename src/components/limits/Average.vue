@@ -6,13 +6,13 @@
         <span class="col" :class="$q.screen.xs ? '' : 'text-h4'">
           {{ averageUsed.toFixed(0) }}</span
         >
-        <span class="col"> {{ averageUsedLimit }}</span>
+        <!-- <span class="col"> {{ averageUsedLimit }}</span> -->
       </div>
       <div class="col unused-limit q-pa-md row items-center border-sm">
         <span class="col" :class="$q.screen.xs ? '' : 'text-h4'">
           {{ averageUnused.toFixed(0) }}</span
         >
-        <span class="col"> {{ averageUnusedLimit }}</span>
+        <!-- <span class="col"> {{ averageUnusedLimit }}</span> -->
       </div>
     </div>
   </div>
