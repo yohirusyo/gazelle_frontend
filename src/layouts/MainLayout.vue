@@ -53,7 +53,7 @@
             to="/admin"
             flat
             dense
-            v-if="currentUser?.role == 'ADMIN' && !$q.screen.xs"
+            v-if="currentUser?.role == 'ADMIN' || currentUser?.role.includes('WATCHER')"
           >
             <q-tooltip> Панель администратора </q-tooltip>
           </q-btn>

@@ -101,7 +101,7 @@ const routes = [
         path: "admin",
         component: () => import("src/pages/Admin/Admin.vue"),
         meta: {
-          roles: ["ADMIN"],
+          roles: ["ADMIN", "WATCHER_WITH_REPORTS", "WATCHER"],
           requiresAuth: true,
         },
       },

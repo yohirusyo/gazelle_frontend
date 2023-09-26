@@ -1,25 +1,11 @@
 <template>
-  <div class="column q-gutter-y-sm q-ma-none" id="points-list">
-    <Point
-      :modelValue="point"
-      v-for="(point, index) of points"
-      :key="point.id"
-      @update:modelValue="changePointProps"
-      :index="index"
-      :isFirst="index === 0"
-      :isSolo="points.length === 0"
-      @remove="remove"
-      @restore="restore"
-    />
+  <div class="column q-gutter-y-sm q-ma-none points" id="points-list">
+    <Point :modelValue="point" v-for="(point, index) of points" :key="point.id" @update:modelValue="changePointProps"
+      :index="index" :isFirst="index === 0" :isSolo="points.length === 0" @remove="remove" @restore="restore" />
     <div class="row justify-center">
-      <q-btn
-        text-color="white"
-        label="Добавить место назначения"
-        unelevated
-        class="border-none bg-blue-4 col"
-        @click="addPoint"
-        dense
-      />
+      <q-toggle v-model="toggle" @update:model-value="changeSortable"></q-toggle>
+      <q-btn text-color="white" label="Добавить место назначения" unelevated class="border-none bg-blue-4 col"
+        @click="addPoint" dense />
     </div>
   </div>
 </template>
@@ -47,9 +33,40 @@ export default {
     return {
       _points: [],
       id: 0,
+      toggle: true,
+      sortable: null
     };
   },
   methods: {
+    initSortable() {
+      const element = document.querySelector("#points-list");
+      const self = this;
+      this.sortable = Sortable.create(element, {
+        onEnd(event) {
+          self.$nextTick(() => {
+            const firstPoint = self.points[event.oldIndex];
+            self.points[event.oldIndex] = self.points[event.newIndex];
+            self.points[event.newIndex] = firstPoint;
+          });
+        },
+      });
+    },
+
+    destroySortable() {
+      if (this.sortable !== null) {
+        this.sortable.destroy();
+        this.sortable = null;
+      }
+    },
+
+    changeSortable(val) {
+      if (val === false) {
+        this.destroySortable();
+      } else {
+        this.initSortable();
+      }
+    },
+
     remove(id) {
       const point = this.points.find((p) => p.id === id);
       if (point.isNew || !this.isEditMode) {
@@ -168,17 +185,18 @@ export default {
   },
   mounted() {
     this.initPoints();
-    const element = document.querySelector("#points-list");
-    const self = this;
-    const sortable = Sortable.create(element, {
-      onEnd(event) {
-        self.$nextTick(() => {
-          const firstPoint = self.points[event.oldIndex];
-          self.points[event.oldIndex] = self.points[event.newIndex];
-          self.points[event.newIndex] = firstPoint;
-        });
-      },
-    });
+    this.changeSortable(true)
+    // const element = document.querySelector("#points-list");
+    // const self = this;
+    // const sortable = Sortable.create(element, {
+    //   onEnd(event) {
+    //     self.$nextTick(() => {
+    //       const firstPoint = self.points[event.oldIndex];
+    //       self.points[event.oldIndex] = self.points[event.newIndex];
+    //       self.points[event.newIndex] = firstPoint;
+    //     });
+    //   },
+    // });
   },
   watch: {
     points(val) {
