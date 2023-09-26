@@ -3,7 +3,7 @@
     <template v-slot:body="props">
       <q-tr
         :props="props"
-        @click="setManagement(props.row)"
+        @click="!currentUser?.role.includes('WATCHER') ? setManagement(props.row) : '' "
         class="text-center"
       >
         <q-td auto-width>
@@ -109,6 +109,7 @@ export default {
   computed: {
     ...mapState("management", ["managements"]),
     ...mapGetters("customer", ["getCustomerById"]),
+    ...mapState("current", ["currentUser"]),
   },
 };
 </script>
