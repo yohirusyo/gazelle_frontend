@@ -1,11 +1,32 @@
 <template>
   <div class="column q-gutter-y-sm q-ma-none points" id="points-list">
-    <Point :modelValue="point" v-for="(point, index) of points" :key="point.id" @update:modelValue="changePointProps"
-      :index="index" :isFirst="index === 0" :isSolo="points.length === 0" @remove="remove" @restore="restore" />
+    <Point
+      :modelValue="point"
+      v-for="(point, index) of points"
+      :key="index"
+      @update:modelValue="changePointProps"
+      :index="index"
+      :isFirst="index === 0"
+      :isSolo="points.length === 0"
+      :isLast="index === points.length-1"
+      @remove="remove"
+      @restore="restore"
+      @elUp="elUp"
+      @elDown="elDown"
+    />
     <div class="row justify-center">
-      <q-toggle v-model="toggle" @update:model-value="changeSortable"></q-toggle>
-      <q-btn text-color="white" label="Добавить место назначения" unelevated class="border-none bg-blue-4 col"
-        @click="addPoint" dense />
+      <!-- <q-toggle
+        v-model="toggle"
+        @update:model-value="changeSortable"
+      ></q-toggle> -->
+      <q-btn
+        text-color="white"
+        label="Добавить место назначения"
+        unelevated
+        class="border-none bg-blue-4 col"
+        @click="addPoint"
+        dense
+      />
     </div>
   </div>
 </template>
@@ -34,38 +55,52 @@ export default {
       _points: [],
       id: 0,
       toggle: true,
-      sortable: null
+      sortable: null,
     };
   },
   methods: {
-    initSortable() {
-      const element = document.querySelector("#points-list");
-      const self = this;
-      this.sortable = Sortable.create(element, {
-        onEnd(event) {
-          self.$nextTick(() => {
-            const firstPoint = self.points[event.oldIndex];
-            self.points[event.oldIndex] = self.points[event.newIndex];
-            self.points[event.newIndex] = firstPoint;
-          });
-        },
-      });
-    },
-
-    destroySortable() {
-      if (this.sortable !== null) {
-        this.sortable.destroy();
-        this.sortable = null;
+    elUp(index) {
+      if (index != 0) {
+        let prev = this.points[index - 1];
+        this.points[index - 1] = this.points[index];
+        this.points[index] = prev;
       }
     },
-
-    changeSortable(val) {
-      if (val === false) {
-        this.destroySortable();
-      } else {
-        this.initSortable();
+    elDown(index) {
+      if (index != this.points.length-1) {
+        let next = this.points[index + 1];
+        this.points[index + 1] = this.points[index];
+        this.points[index] = next;
       }
     },
+    // initSortable() {
+    //   const element = document.querySelector("#points-list");
+    //   const self = this;
+    //   this.sortable = Sortable.create(element, {
+    //     onEnd(event) {
+    //       self.$nextTick(() => {
+    //         const firstPoint = self.points[event.oldIndex];
+    //         self.points[event.oldIndex] = self.points[event.newIndex];
+    //         self.points[event.newIndex] = firstPoint;
+    //       });
+    //     },
+    //   });
+    // },
+
+    // destroySortable() {
+    //   if (this.sortable !== null) {
+    //     this.sortable.destroy();
+    //     this.sortable = null;
+    //   }
+    // },
+
+    // changeSortable(val) {
+    //   if (val === false) {
+    //     this.destroySortable();
+    //   } else {
+    //     this.initSortable();
+    //   }
+    // },
 
     remove(id) {
       const point = this.points.find((p) => p.id === id);
@@ -185,7 +220,7 @@ export default {
   },
   mounted() {
     this.initPoints();
-    this.changeSortable(true)
+    // this.changeSortable(true);
     // const element = document.querySelector("#points-list");
     // const self = this;
     // const sortable = Sortable.create(element, {

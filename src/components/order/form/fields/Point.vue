@@ -14,17 +14,6 @@
         class="col"
       />
       <q-btn
-        v-if="!isSolo && !isFirst && !_forDelete"
-        class="q-ml-sm"
-        text-color="red"
-        unelevated
-        icon="close"
-        flat
-        @click="onRemoveCombinedOrder(_modelValue.id)"
-      >
-        <q-tooltip> Удалить точку из маршрута </q-tooltip>
-      </q-btn>
-      <q-btn
         v-if="!isSolo && !isFirst && !!_forDelete"
         class="q-ml-sm"
         text-color="red"
@@ -36,12 +25,50 @@
         <q-tooltip> Отменить удаление точки из маршрута </q-tooltip>
       </q-btn>
     </div>
+    <div class="row">
+      <div class="column">
+        <PassengersBlock
+          v-model="_passenger"
+          :isZeroCargo="!_cargo.withCargo"
+        />
+        <CargoBlock
+          v-model="_cargo"
+          :withoutPassengers="!_passenger.withPassengers"
+        />
+      </div>
 
-    <PassengersBlock v-model="_passenger" :isZeroCargo="!_cargo.withCargo" />
-    <CargoBlock
-      v-model="_cargo"
-      :withoutPassengers="!_passenger.withPassengers"
-    />
+      <div class="column col-1">
+        <q-btn
+          flat
+          color="primary"
+          icon="arrow_upward"
+          @click="elUp(index)"
+          size="sm"
+          v-if="!isFirst"
+        />
+        <q-btn
+          flat
+          color="primary"
+          icon="arrow_downward"
+          @click="elDown(index)"
+          size="sm"
+          v-if="!isLast"
+        />
+      </div>
+      <div class="col-1"> <q-btn
+        v-if="!isSolo && !isFirst && !_forDelete"
+        class="q-ml-sm"
+        text-color="red"
+        unelevated
+        icon="close"
+        flat
+        @click="onRemoveCombinedOrder(_modelValue.id)"
+      >
+        <q-tooltip> Удалить точку из маршрута </q-tooltip>
+      </q-btn></div>
+     
+    </div>
+
     <CustomerSelect
       v-if="_withCargo"
       :phoneNumber="_cargoRecieverPhoneNumber"
@@ -74,7 +101,7 @@ import ContactSelect from "./Contact.vue";
 import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import { mapState } from "vuex";
 export default {
-  props: ["modelValue", "label", "isSolo", "index", "isFirst"],
+  props: ["modelValue", "label", "isSolo", "index", "isFirst", "isLast"],
   components: {
     ISelect,
     PlaceSelect,
@@ -89,6 +116,12 @@ export default {
     },
     onRestoreCombinedOrder(id) {
       this.$emit("restore", id);
+    },
+    elUp(index) {
+      this.$emit("elUp", index);
+    },
+    elDown(index) {
+      this.$emit("elDown", index);
     },
   },
   computed: {
