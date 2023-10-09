@@ -25,8 +25,8 @@
         <q-tooltip> Отменить удаление точки из маршрута </q-tooltip>
       </q-btn>
     </div>
-    <div class="row">
-      <div class="column">
+    <div class="row items-center justify-between">
+      <div class="column col-10">
         <PassengersBlock
           v-model="_passenger"
           :isZeroCargo="!_cargo.withCargo"
@@ -37,6 +37,18 @@
         />
       </div>
 
+     
+      <div class="col-1"> <q-btn
+        v-if="!isSolo && !isFirst && !_forDelete"
+        class="q-mr-sm"
+        text-color="red"
+        unelevated
+        icon="close"
+        flat
+        @click="onRemoveCombinedOrder(_modelValue.id)"
+      >
+        <q-tooltip> Удалить точку из маршрута </q-tooltip>
+      </q-btn></div>
       <div class="column col-1">
         <q-btn
           flat
@@ -55,20 +67,8 @@
           v-if="!isLast"
         />
       </div>
-      <div class="col-1"> <q-btn
-        v-if="!isSolo && !isFirst && !_forDelete"
-        class="q-ml-sm"
-        text-color="red"
-        unelevated
-        icon="close"
-        flat
-        @click="onRemoveCombinedOrder(_modelValue.id)"
-      >
-        <q-tooltip> Удалить точку из маршрута </q-tooltip>
-      </q-btn></div>
-     
     </div>
-
+    
     <CustomerSelect
       v-if="_withCargo"
       :phoneNumber="_cargoRecieverPhoneNumber"
