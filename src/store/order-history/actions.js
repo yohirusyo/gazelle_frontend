@@ -1,8 +1,12 @@
 import { api } from "boot/axios";
 import { socketio } from "boot/socketio";
 
-export async function requestHistory({ commit }) {
-  return api.get(`/order/customer-orders/new`).then(({ data }) => {
+export async function requestHistory({ commit }, filter) {
+  return api.get(`/order/customer-orders/new`, {
+    params: {
+      filter
+    }
+  }).then(({ data }) => {
     commit("set", data);
   });
 }

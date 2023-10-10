@@ -1,7 +1,7 @@
 <template>
   <div class="col bg-accent" ref="history">
     <div class="row col-12 q-pa-sm">
-      <q-checkbox class="bg-white q-mr-sm" v-model="activeOrdersCheck">
+      <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
         <q-tooltip anchor="center left" self="center right">
           Только активные
         </q-tooltip>
@@ -23,12 +23,7 @@
                 label="Применить"
                 color="primary"
                 flat
-                @click="
-                  this.getSortedHistory(this._activeOrder, {
-                    from: this.getDateForFilter(this._selectedDate?.from),
-                    to: this.getDateForFilter(this._selectedDate?.to),
-                  })
-                "
+                @click="getOrderHistory()"
               />
               <q-btn v-close-popup label="Закрыть" color="primary" flat />
             </div>
@@ -37,7 +32,7 @@
       </q-btn>
     </div>
 
-    <q-virtual-scroll :style="`height: ${height}px`" :items="getOrderHistory">
+    <q-virtual-scroll :style="`height: ${height}px`" :items="history">
       <template v-slot="{ item }">
         <div
           class="q-px-lg bg-white q-mb-sm sticky-item"
@@ -92,6 +87,7 @@ export default {
       "getMaxSelectedDate",
     ]),
     ...mapState("current", ["currentUser"]),
+    ...mapState("orderHistory", ["history"]),
     _isOnlyMy: {
       get() {
         return !!this.onlyMy;
@@ -102,22 +98,6 @@ export default {
         } else {
           this.onlyMy = null;
         }
-      },
-    },
-    activeOrdersCheck: {
-      get() {
-        return this._activeOrder;
-      },
-      set(val) {
-        this._activeOrder = !this._activeOrder;
-      },
-    },
-    getOrderHistory: {
-      get() {
-        return this.getSortedHistory(this._activeOrder, {
-          from: this.getDateForFilter(this._selectedDate?.from),
-          to: this.getDateForFilter(this._selectedDate?.to),
-        });
       },
     },
   },
@@ -131,7 +111,7 @@ export default {
     };
   },
   async mounted() {
-    await this.requestHistory();
+    await this.requestHistory({});
     await this.subscribeHistorySockets();
     this.height = this.$refs.history.clientHeight - 65;
     this._selectedDate = {
@@ -148,9 +128,7 @@ export default {
     ]),
     ...mapMutations("current", ["setRequest"]),
     dayjs,
-    getDateForFilter(date) {
-      return dayjs(date, "DD.MM.YYYY").format("YYYY-MM-DD");
-    },
+    async searchHistory() {},
     editElement(item) {
       if (
         this.currentUser.id == item.orders[0].customerId &&
@@ -173,6 +151,15 @@ export default {
         this.$emit("routeCopy", true);
       }
     },
+    async getOrderHistory() {
+      await this.requestHistory({
+        from: new Date(dayjs(this._selectedDate?.from, "DD.MM.YYYY")),
+        to: new Date(dayjs(this._selectedDate?.to, "DD.MM.YYYY")+ ( 3600 * 1000 * 24)),
+        onlyActiveOrderFlag: this._activeOrder,
+      });
+      await this.subscribeHistorySockets();
+      this.height = this.$refs.history.clientHeight - 65;
+    },
   },
   watch: {
     _selectedDate() {
@@ -182,6 +169,9 @@ export default {
           to: this._selectedDate,
         };
       }
+    },
+    _activeOrder() {
+      this.getOrderHistory();
     },
   },
 };
