@@ -8,6 +8,7 @@
       </q-checkbox>
 
       <q-btn
+        :disabled="_activeOrder"
         text-color="white"
         :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
         unelevated
@@ -34,6 +35,7 @@
 
     <q-virtual-scroll :style="`height: ${height}px`" :items="history">
       <template v-slot="{ item }">
+
         <div
           class="q-px-lg bg-white q-mb-sm sticky-item"
           v-if="item.head"
@@ -41,6 +43,7 @@
         >
           {{ dayjs(item.createdAt).locale("ru").format("D MMM, dddd") }}
         </div>
+      
         <div
           class="bg-white q-pa-sm column q-mb-sm"
           radius="md"
