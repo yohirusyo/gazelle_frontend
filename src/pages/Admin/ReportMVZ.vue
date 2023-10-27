@@ -3,43 +3,15 @@
     <div class="column fit" style="flex-wrap: nowrap !important">
       <div class="col col-shrink">
         <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
-          <q-input
-            outlined
-            label="Введите сумму за единицу"
-            class="col"
-            flat
-            dense
-            type="number"
-            v-model="sum"
-          ></q-input>
-          <q-btn
-            text-color="white"
-            label="Экспорт в excel"
-            icon="las la-file-excel"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-            @click="createExcel"
-          />
-          <q-btn
-            text-color="white"
-            :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-          >
+          <q-input outlined label="Введите сумму за единицу" class="col" flat dense type="number" v-model="sum"></q-input>
+          <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
+            class="col bg-white text-black border-none" flat no-caps @click="createExcel" />
+          <q-btn text-color="white" :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`" unelevated
+            class="col bg-white text-black border-none" flat no-caps>
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
                 <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Применить"
-                    color="primary"
-                    flat
-                    @click="requestMvzStats(_selectedDate)"
-                  />
+                  <q-btn v-close-popup label="Применить" color="primary" flat @click="requestMvzStats(_selectedDate)" />
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
               </q-date>
@@ -48,15 +20,9 @@
         </div>
       </div>
       <div class="col">
-        <VScrolltable
-          :rows="calculateMvzLimits(sum)"
-          :report="false"
-          :columns="columns"
-          rowKey="mvz"
-          id="report-table"
-        />
+        <VScrolltable :rows="calculateMvzLimits(sum)" :report="false" :columns="columns" rowKey="mvz" id="report-table" />
 
-        <table ref="export" style="border-collapse: collapse">
+        <table ref="export" style="border-collapse: collapse; display: none">
           <tr></tr>
           <tr>
             <td colspan="6">
@@ -93,7 +59,7 @@
               </tr>
               <tr>
                 <td colspan="2">{{ toFixedFunc(el.limit) }}</td>
-                <td colspan="2">{{ toFixedFunc(el.sum) }}</td>
+                <td>{{ toFixedFunc(el.sum) }}</td>
               </tr>
             </div>
           </div>
@@ -167,6 +133,8 @@ export default {
     createExcel() {
       let excel = this.$refs.export;
       const ws = XLSX.utils.table_to_sheet(excel, { raw: true });
+
+      // Определение ширины ячекеек
       ws["!cols"] = [
         { wch: 12 },
         { wch: 12 },
@@ -176,7 +144,33 @@ export default {
         { wch: 24 },
         { wch: 24 },
       ];
-      let cells1 = ["A2", "A4", "A5", "A6"];
+      // Стиль бордера для ячейки
+      const border = {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      }
+      // Функция для вывода итого, со своими стилями
+      const lastIndex = ws[Object.keys(ws)[Object.keys(ws).length - 1]].substr(-2);
+      const cells4 = [`A${lastIndex}`, `B${lastIndex}`, `C${lastIndex}`];
+      cells4.forEach((cell) => {
+        ws[cell].s = {
+          font: {
+            name: "Calibri",
+            sz: 11,
+            bold: true,
+          },
+          fill: {
+            fgColor: { rgb: "BFBFBF" },
+          },
+          border
+        };
+      });
+
+
+      // Определение ячеек и стилей для текста над таблицей
+      const cells1 = ["A2", "A4", "A5", "A6"];
       cells1.forEach((cell) => {
         ws[cell].s = {
           font: {
@@ -185,9 +179,35 @@ export default {
           },
         };
       });
-      let cells2 = ["A8", "C8"];
+
+      // Цикл для создания border и пустых ячеек для этого
+      for (let i = 8; i < lastIndex; i++) {
+        ws[`A${i}`].s = {
+          border
+        };
+
+        ws[`B${i}`] = {
+          s: {
+            border
+          },
+          v: '',
+          t: 's'
+        },
+
+          ws[`C${i}`] ? ws[`C${i}`].s = { border } : ws[`C${i}`] = {
+            s: {
+              border
+            },
+            v: '',
+            t: 's'
+          }
+      }
+
+      // Создание стилей для шапки таблицы
+      const cells2 = ["A8", "C8"];
       cells2.forEach((cell) => {
         ws[cell].s = {
+          border,
           font: {
             name: "Verdana",
             sz: 9,
@@ -195,8 +215,21 @@ export default {
           },
         };
       });
-      let cells3 = ["A9", "A11", "A13", "A15", "A17", "A19", "A21", "A25", "A27", "A29", "A31", "A33"];
 
+      // Функция для создания стилей ячеек с начальной точки и по количеству МВЗ
+      const startingCellMvz = "A9"; // Начальная точка
+
+      const cellCountMvz = this.calculateMvzLimits(this.sum).length - 1; // Количество МВЗ (без итого)
+
+      const [startColumn, startRow] = startingCellMvz.match(/[A-Z]+|[0-9]+/g); // Деления ячейки на букву и число
+
+      // Создание массива ячеек
+      const cells3 = Array.from({ length: cellCountMvz }, (_, index) => {
+        const nextRow = parseInt(startRow) + index * 2;
+        return `${startColumn}${nextRow}`;
+      });
+
+      // Определение стилей ячеек МВЗ
       cells3.forEach((cell) => {
         if (Object.keys(ws).includes(cell)) {
           ws[cell].s = {
@@ -208,42 +241,19 @@ export default {
             fill: {
               fgColor: { rgb: "BFBFBF" },
             },
+            border: border
           };
         }
       });
-      const lastIndex =
-        ws[Object.keys(ws)[Object.keys(ws).length - 1]].substr(-2);
-      let cells4 = [`A${lastIndex}`, `B${lastIndex}`, `C${lastIndex}`];
-      cells4.forEach((cell) => {
-        ws[cell].s = {
-          font: {
-            name: "Calibri",
-            sz: 11,
-            bold: true,
-          },
-            fill: {
-              fgColor: { rgb: "BFBFBF" },
-            },
-        };
-      });
-      //       let cells5 = ["A8", "C8"]; // B8 не видит
-      // cells5.forEach((cell) => {
-      //   ws[cell].s = {
-      //     border: {
-      //       top: { style: "thin", color: {rgb: "000000"} },
-      //       bottom: { style: "thin", color: {rgb: "000000"} },
-      //       left: { style: "thin", color: {rgb: "000000"} },
-      //       right: { style: "thin", color: {rgb: "000000"} }
-      //     }
-      //   };
-      // });
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Отчет по мвз");
       XLSX.writeFile(wb, `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}.xlsx`);
     },
+
     toFixedFunc(el) {
       return String(Number(el.toFixed(2))).replace(".", ",");
     },
+
     formatDate(val) {
       dayjs.extend(customParseFormat);
       dayjs.locale("ru");
