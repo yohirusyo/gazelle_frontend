@@ -3,6 +3,7 @@ export default function () {
     orderStats: [],
     min: null,
     max: null,
-    mvzStats: []
+    mvzStats: [],
+    excelData: [],
   };
 }
