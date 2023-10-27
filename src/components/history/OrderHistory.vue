@@ -3,11 +3,12 @@
     <div class="row col-12 q-pa-sm">
       <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
         <q-tooltip anchor="center left" self="center right">
-          Только активные
+          Только активные за все время
         </q-tooltip>
       </q-checkbox>
 
       <q-btn
+        :disabled="_activeOrder"
         text-color="white"
         :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
         unelevated
@@ -34,35 +35,38 @@
 
     <q-virtual-scroll :style="`height: ${height}px`" :items="history">
       <template v-slot="{ item }">
-        <div
-          class="q-px-lg bg-white q-mb-sm sticky-item"
-          v-if="item.head"
-          style="font-size: 1.1rem"
-        >
-          {{ dayjs(item.createdAt).locale("ru").format("D MMM, dddd") }}
-        </div>
-        <div
-          class="bg-white q-pa-sm column q-mb-sm"
-          radius="md"
-          @click="editElement(item)"
-        >
-          <div class="row justify-between">
-            <div class="q-ml-md text-grey">Маршрут № {{ item.id }}</div>
-            <div>
-              <q-btn
-                dense
-                flat
-                icon="lar la-copy"
-                @click.stop.prevent="copyElement(item)"
-              />
-            </div>
+        <div>
+          <div
+            class="q-px-lg bg-white q-mb-sm sticky-item"
+            v-if="item.head"
+            style="font-size: 1.1rem"
+          >
+            {{ dayjs(item.createdAt).locale("ru").format("D MMM, dddd") }}
           </div>
 
-          <HistoryElement
-            v-for="order of item.orders"
-            :key="order.id"
-            :order="order"
-          />
+          <div
+            class="bg-white q-pa-sm column q-mb-sm"
+            radius="md"
+            @click="editElement(item)"
+          >
+            <div class="row justify-between">
+              <div class="q-ml-md text-grey">Маршрут № {{ item.id }}</div>
+              <div>
+                <q-btn
+                  dense
+                  flat
+                  icon="lar la-copy"
+                  @click.stop.prevent="copyElement(item)"
+                />
+              </div>
+            </div>
+
+            <HistoryElement
+              v-for="order of item.orders"
+              :key="order.id"
+              :order="order"
+            />
+          </div>
         </div>
       </template>
     </q-virtual-scroll>
@@ -154,7 +158,9 @@ export default {
     async getOrderHistory() {
       await this.requestHistory({
         from: new Date(dayjs(this._selectedDate?.from, "DD.MM.YYYY")),
-        to: new Date(dayjs(this._selectedDate?.to, "DD.MM.YYYY")+ ( 3600 * 1000 * 24)),
+        to: new Date(
+          dayjs(this._selectedDate?.to, "DD.MM.YYYY") + 3600 * 1000 * 24
+        ),
         onlyActiveOrderFlag: this._activeOrder,
       });
       await this.subscribeHistorySockets();
