@@ -14,3 +14,9 @@ export async function requestOrderStatsDates({ commit }) {
     commit("setMinMax", data);
   });
 }
+
+export async function requestMvzStats({commit}, {from, to}) {
+  return api.get(`order/mvz?from=${from}&to=${to}`).then(({ data }) => {
+    commit("setMvz", data);
+  });
+}

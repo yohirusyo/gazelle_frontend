@@ -9,7 +9,6 @@
         <q-td auto-width>
           <q-checkbox v-model="props.expand" dense></q-checkbox>
         </q-td>
-       {{ props.row }}
         <q-td key="name" :props="props">
           {{ props.row.name }}
         </q-td>

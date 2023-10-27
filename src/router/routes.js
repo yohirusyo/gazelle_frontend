@@ -66,6 +66,14 @@ const routes = [
         },
       },
       {
+        path: "report-mvz",
+        component: () => import("src/pages/Admin/ReportMVZ.vue"),
+        meta: {
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: "transport",
         component: () => import("src/pages/Operator/Transport.vue"),
         meta: {

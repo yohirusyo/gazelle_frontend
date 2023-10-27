@@ -30,7 +30,7 @@
     >
       <div class="col-9">Сегодня</div>
       <div class="col-3 text-right">
-        {{ day?.used }}
+        {{ day?.used.toFixed(2) }}
       </div>
     </div>
 

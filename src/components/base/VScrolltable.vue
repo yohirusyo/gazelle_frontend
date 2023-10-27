@@ -23,7 +23,7 @@
       separator="cell"
       :sort-method="sortMethod"
       binary-state-sort
-      :selection="report ? 'multiple' : null"
+      :selection="report ? 'multiple' : report == false  ? 'none' : null"
       v-model:selected="selected"
       :selected-rows-label="getSelectedString"
     >

@@ -119,9 +119,7 @@ function delete_cols(ws, start_col, ncols) {
 const getexcel = (element, sheetName, name) => {
   // Extract Data (create a workbook object from the table)
   const ws = XLSX.utils.table_to_sheet(element);
-
   var sizes = XLSX.utils.decode_range(ws["!ref"]);
-
   deleteRow(ws, 1);
   delete_cols(ws, 0, 1);
 
@@ -141,7 +139,6 @@ const getexcel = (element, sheetName, name) => {
           horizontal: "left",
         },
       };
-      console.log(ws[key]);
     }
   }
 
