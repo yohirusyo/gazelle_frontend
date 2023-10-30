@@ -52,7 +52,7 @@
           </tr>
 
           <!-- всё, кроме итого -->
-          <div v-for="(el, index) of excelData" :key="index">
+          <div v-for="(el, index) of calculateMvzLimits(sum)" :key="index">
             <div v-if="el.mvz != `Итого` && el.mvz != `null`">
               <tr>
                 <td colspan="3">{{ el.mvz }}</td>
@@ -65,7 +65,7 @@
           </div>
 
           <!-- только итого -->
-          <div v-for="(el, index) of excelData" :key="index">
+          <div v-for="(el, index) of calculateMvzLimits(sum)" :key="index">
             <div v-if="el.mvz == `Итого`">
               <tr>
                 <td>{{ el.mvz }}</td>
@@ -251,7 +251,7 @@ export default {
     },
 
     toFixedFunc(el) {
-      return String(Number(el.toFixed(2))).replace(".", ",");
+      return String(Number(el?.toFixed(2))).replace(".", ",");
     },
 
     formatDate(val) {

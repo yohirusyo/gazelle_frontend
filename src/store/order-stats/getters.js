@@ -33,12 +33,16 @@ export const getFilteredStats = (state) => (fullname, subdivision) => {
 
 export const calculateMvzLimits = (state) => (sum) => {
   let stats = state.mvzStats;
+  let fullLimit = Object.keys(stats).filter((key) => !key.includes('null')).map((mvz) => {
+    const limit = stats[mvz];
+    return { limit: limit};
+  }).reduce((acc, item) => acc + item.limit, 0);
+
   const tempStats = Object.keys(stats).filter((key) => !key.includes('null')).map((mvz) => {
     const limit = stats[mvz];
-    return { mvz, limit: limit, sum: limit * sum };
+    return { mvz, limit: limit, sum: (limit / fullLimit) * sum };
   });
   const tempStat = { mvz: 'Итого', limit: tempStats.reduce((acc, item) => acc + item.limit, 0), sum: tempStats.reduce((acc, item) => acc + item.sum, 0) }
   tempStats.push(tempStat)
-  state.excelData = tempStats;
   return tempStats
 }
