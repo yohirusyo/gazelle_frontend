@@ -110,16 +110,17 @@ export default {
     return {
       height: 0,
       onlyMy: null,
-      _activeOrder: false,
+      _activeOrder: true,
       _selectedDate: null,
     };
   },
   async mounted() {
-    await this.requestHistory({});
+    await this.requestHistory({onlyActiveOrderFlag: this._activeOrder,});
     await this.subscribeHistorySockets();
     this.height = this.$refs.history.clientHeight - 65;
+    console.log(dayjs(this.getMinSelectedDate(dayjs())).subtract(1, 'weeks').format("DD.MM.YYYY"))
     this._selectedDate = {
-      from: dayjs(this.getMinSelectedDate(dayjs())).format("DD.MM.YYYY"),
+      from: dayjs(this.getMaxSelectedDate(dayjs())).subtract(1, 'weeks').format("DD.MM.YYYY"),
       to: dayjs(this.getMaxSelectedDate(dayjs())).format("DD.MM.YYYY"),
     };
     dayjs.extend(customParseFormat);
@@ -132,7 +133,6 @@ export default {
     ]),
     ...mapMutations("current", ["setRequest"]),
     dayjs,
-    async searchHistory() {},
     editElement(item) {
       if (
         this.currentUser.id == item.orders[0].customerId &&
