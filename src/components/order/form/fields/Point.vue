@@ -39,7 +39,7 @@
 
      
       <div class="col-1"> <q-btn
-        v-if="!isSolo && !isFirst && !_forDelete"
+        v-if="!isSolo && !isFirst && !_forDelete && _modelValue.isNew"
         class="q-mr-sm"
         text-color="red"
         unelevated
@@ -56,7 +56,7 @@
           icon="arrow_upward"
           @click="elUp(index)"
           size="sm"
-          v-if="!isFirst"
+          v-if="!isFirst && _modelValue.isNew && index > initPointsLength"
         />
         <q-btn
           flat
@@ -64,7 +64,7 @@
           icon="arrow_downward"
           @click="elDown(index)"
           size="sm"
-          v-if="!isLast"
+          v-if="!isLast && _modelValue.isNew && index >= initPointsLength"
         />
       </div>
     </div>
@@ -101,7 +101,7 @@ import ContactSelect from "./Contact.vue";
 import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import { mapState } from "vuex";
 export default {
-  props: ["modelValue", "label", "isSolo", "index", "isFirst", "isLast"],
+  props: ["modelValue", "label", "isSolo", "index", "isFirst", "isLast", "initPointsLength"],
   components: {
     ISelect,
     PlaceSelect,

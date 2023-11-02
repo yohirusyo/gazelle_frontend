@@ -9,6 +9,7 @@
       :isFirst="index === 0"
       :isSolo="points.length === 0"
       :isLast="index === points.length-1"
+      :initPointsLength="initPointsLength"
       @remove="remove"
       @restore="restore"
       @elUp="elUp"
@@ -56,6 +57,7 @@ export default {
       id: 0,
       toggle: true,
       sortable: null,
+      initPointsLength: 0
     };
   },
   methods: {
@@ -216,10 +218,11 @@ export default {
         this.addPoint();
       }
       this.id = this.points.length + 1;
+      this.initPointsLength = this.points.length;
     },
   },
-  mounted() {
-    this.initPoints();
+  async mounted() {
+    await this.initPoints();
     // this.changeSortable(true);
     // const element = document.querySelector("#points-list");
     // const self = this;
