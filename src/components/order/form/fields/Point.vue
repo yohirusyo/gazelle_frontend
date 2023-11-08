@@ -36,10 +36,9 @@
           :withoutPassengers="!_passenger.withPassengers"
         />
       </div>
-
      
       <div class="col-1"> <q-btn
-        v-if="!isSolo && !isFirst && !_forDelete && _modelValue.isNew"
+        v-if="!isSolo && !isFirst && !_forDelete && ((_modelValue.statusId == 1 || _modelValue.statusId == 2) || _modelValue.isNew)"
         class="q-mr-sm"
         text-color="red"
         unelevated
@@ -50,13 +49,17 @@
         <q-tooltip> Удалить точку из маршрута </q-tooltip>
       </q-btn></div>
       <div class="column col-1">
+        <!-- {{index}}
+        {{points[0].statusId}}
+        {{_modelValue.statusId == 8}} -->
+
         <q-btn
           flat
           color="primary"
           icon="arrow_upward"
           @click="elUp(index)"
           size="sm"
-          v-if="!isFirst && _modelValue.isNew && index > initPointsLength"
+          v-if="!isFirst && (((_modelValue.isNew || copyMode) || (_modelValue.statusId == 1 || _modelValue.statusId == 2)) && (points[index-1]?.statusId == 1 || points[index-1]?.statusId == 2 || points[index-1]?.statusId == null))"
         />
         <q-btn
           flat
@@ -64,7 +67,7 @@
           icon="arrow_downward"
           @click="elDown(index)"
           size="sm"
-          v-if="!isLast && _modelValue.isNew && index >= initPointsLength"
+          v-if="!isLast && ((_modelValue.isNew || copyMode) || (_modelValue.statusId == 1 || _modelValue.statusId == 2))"
         />
       </div>
     </div>
@@ -101,7 +104,7 @@ import ContactSelect from "./Contact.vue";
 import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import { mapState } from "vuex";
 export default {
-  props: ["modelValue", "label", "isSolo", "index", "isFirst", "isLast", "initPointsLength"],
+  props: ["modelValue", "label", "isSolo", "index", "isFirst", "isLast", "initPointsLength", "copyMode", "points"],
   components: {
     ISelect,
     PlaceSelect,

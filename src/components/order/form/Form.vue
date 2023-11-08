@@ -36,6 +36,7 @@
 
             <PointsConstructor
               v-model="points"
+              :copyMode="copyMode"
               :isEditMode="!!selected && !copyMode"
             />
 
@@ -506,6 +507,7 @@ export default {
           const cargoReciever = this.getCustomerById(o.cargoRecieverId);
           return {
             id: this.copyMode ? index : o.priority,
+            statusId: o.statusId,
             isNew: false,
             destinationName: this.getPlaceById(o.destinationId).name,
             passenger: {

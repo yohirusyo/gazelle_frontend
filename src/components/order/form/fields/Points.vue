@@ -10,10 +10,12 @@
       :isSolo="points.length === 0"
       :isLast="index === points.length-1"
       :initPointsLength="initPointsLength"
+      :points="points"
       @remove="remove"
       @restore="restore"
       @elUp="elUp"
       @elDown="elDown"
+      :copyMode="copyMode"
     />
     <div class="row justify-center">
       <!-- <q-toggle
@@ -37,7 +39,7 @@ import Point from "./Point.vue";
 import Sortable from "sortablejs";
 
 export default {
-  props: ["modelValue", "isEditMode"],
+  props: ["modelValue", "isEditMode", "copyMode"],
   components: {
     Point,
   },
