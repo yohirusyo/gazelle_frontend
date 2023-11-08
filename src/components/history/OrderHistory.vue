@@ -1,11 +1,11 @@
 <template>
   <div class="col bg-accent" ref="history">
     <div class="row col-12 q-pa-sm">
-      <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
+      <!-- <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
         <q-tooltip anchor="center left" self="center right">
           Только активные за все время
         </q-tooltip>
-      </q-checkbox>
+      </q-checkbox> -->
 
       <q-btn
         :disabled="_activeOrder"
@@ -110,7 +110,7 @@ export default {
     return {
       height: 0,
       onlyMy: null,
-      _activeOrder: true,
+      _activeOrder: false,
       _selectedDate: null,
     };
   },
