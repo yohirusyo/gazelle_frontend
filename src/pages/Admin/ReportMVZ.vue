@@ -3,7 +3,7 @@
     <div class="column fit" style="flex-wrap: nowrap !important">
       <div class="col col-shrink">
         <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
-          <q-input outlined label="Введите сумму за единицу" class="col" flat dense type="number" v-model="sum"></q-input>
+          <q-input outlined label="Введите общую сумму" class="col" flat dense type="number" v-model="sum"></q-input>
           <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
             class="col bg-white text-black border-none" flat no-caps @click="createExcel" />
           <q-btn text-color="white" :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`" unelevated
