@@ -8,5 +8,6 @@ export function setMinMax(state, minMax) {
 }
 
 export function setMvz(state, mvzStats) {
+  delete mvzStats[3830200];
   state.mvzStats = mvzStats
 }
