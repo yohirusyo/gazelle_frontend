@@ -40,7 +40,7 @@
             {{ modelValue ? "Редактирование" : "Создание" }}
           </q-tooltip>
         </q-tab>
-        <slot name="menu" v-if="!currentUser?.role.includes('WATCHER')" />
+        <slot name="menu" v-if="!currentUser?.role.includes('WATCHER') || currentUser?.role.includes('WATCHER_WITH_REPORTS')" />
       </q-tabs>
     </div>
 
