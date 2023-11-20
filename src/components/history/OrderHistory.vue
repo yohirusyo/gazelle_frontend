@@ -1,31 +1,18 @@
 <template>
   <div class="col bg-accent" ref="history">
     <div class="row col-12 q-pa-sm">
-      <!-- <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
+      <q-checkbox class="bg-white q-mr-sm" v-model="_activeOrder">
         <q-tooltip anchor="center left" self="center right">
           Только активные за все время
         </q-tooltip>
-      </q-checkbox> -->
+      </q-checkbox>
 
-      <q-btn
-        :disabled="_activeOrder"
-        text-color="white"
-        :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
-        unelevated
-        class="col bg-white text-black border-none"
-        flat
-        no-caps
-      >
+      <q-btn :disabled="_activeOrder" text-color="white" :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
+        unelevated class="col bg-white text-black border-none" flat no-caps>
         <q-popup-proxy transition-show="scale" transition-hide="scale">
           <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
             <div class="row items-center justify-end">
-              <q-btn
-                v-close-popup
-                label="Применить"
-                color="primary"
-                flat
-                @click="getOrderHistory()"
-              />
+              <q-btn v-close-popup label="Применить" color="primary" flat @click="getOrderHistory()" />
               <q-btn v-close-popup label="Закрыть" color="primary" flat />
             </div>
           </q-date>
@@ -36,36 +23,19 @@
     <q-virtual-scroll :style="`height: ${height}px`" :items="history">
       <template v-slot="{ item }">
         <div>
-          <div
-            class="q-px-lg bg-white q-mb-sm sticky-item"
-            v-if="item.head"
-            style="font-size: 1.1rem"
-          >
+          <div class="q-px-lg bg-white q-mb-sm sticky-item" v-if="item.head" style="font-size: 1.1rem">
             {{ dayjs(item.createdAt).locale("ru").format("D MMM, dddd") }}
           </div>
 
-          <div
-            class="bg-white q-pa-sm column q-mb-sm"
-            radius="md"
-            @click="editElement(item)"
-          >
+          <div class="bg-white q-pa-sm column q-mb-sm" radius="md" @click="editElement(item)">
             <div class="row justify-between">
               <div class="q-ml-md text-grey">Маршрут № {{ item.id }}</div>
               <div>
-                <q-btn
-                  dense
-                  flat
-                  icon="lar la-copy"
-                  @click.stop.prevent="copyElement(item)"
-                />
+                <q-btn dense flat icon="lar la-copy" @click.stop.prevent="copyElement(item)" />
               </div>
             </div>
 
-            <HistoryElement
-              v-for="order of item.orders"
-              :key="order.id"
-              :order="order"
-            />
+            <HistoryElement v-for="order of item.orders" :key="order.id" :order="order" />
           </div>
         </div>
       </template>
@@ -110,20 +80,24 @@ export default {
     return {
       height: 0,
       onlyMy: null,
-      _activeOrder: false,
+      _activeOrder: true,
       _selectedDate: null,
     };
   },
   async mounted() {
-    await this.requestHistory({onlyActiveOrderFlag: this._activeOrder,});
-    await this.subscribeHistorySockets();
-    this.height = this.$refs.history.clientHeight - 65;
-    console.log(dayjs(this.getMinSelectedDate(dayjs())).subtract(1, 'weeks').format("DD.MM.YYYY"))
     this._selectedDate = {
-      from: dayjs(this.getMaxSelectedDate(dayjs())).subtract(1, 'weeks').format("DD.MM.YYYY"),
-      to: dayjs(this.getMaxSelectedDate(dayjs())).format("DD.MM.YYYY"),
+      from: dayjs(dayjs()).subtract(1, 'weeks').format("DD.MM.YYYY"),
+      to: dayjs(dayjs()).format("DD.MM.YYYY"),
     };
     dayjs.extend(customParseFormat);
+    await this.requestHistory({
+      onlyActiveOrderFlag: this._activeOrder, from: new Date(dayjs(this._selectedDate?.from, "DD.MM.YYYY")),
+      to: new Date(
+        dayjs(this._selectedDate?.to, "DD.MM.YYYY") + 3600 * 1000 * 24
+      ),
+    });
+    await this.subscribeHistorySockets();
+    this.height = this.$refs.history.clientHeight - 65;
   },
 
   methods: {
