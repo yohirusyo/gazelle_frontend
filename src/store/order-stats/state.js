@@ -5,5 +5,6 @@ export default function () {
     max: null,
     mvzStats: [],
     excelData: [],
+    subdivisionStats: []
   };
 }

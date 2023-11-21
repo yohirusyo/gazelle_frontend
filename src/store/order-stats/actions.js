@@ -20,3 +20,9 @@ export async function requestMvzStats({commit}, {from, to}) {
     commit("setMvz", data);
   });
 }
+
+export async function requestSubdivisionStats({commit}, {from, to}) {
+  return api.get(`order/subdivision?from=${from}&to=${to}`).then(({ data }) => {
+    commit("setSubdivision", data);
+  });
+}
