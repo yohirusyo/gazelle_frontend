@@ -74,6 +74,14 @@ const routes = [
         },
       },
       {
+        path: "report-subdivision",
+        component: () => import("src/pages/Admin/SubdivisionReport.vue"),
+        meta: {
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: "transport",
         component: () => import("src/pages/Operator/Transport.vue"),
         meta: {

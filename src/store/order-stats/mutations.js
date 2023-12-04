@@ -11,3 +11,8 @@ export function setMvz(state, mvzStats) {
   delete mvzStats[3830200];
   state.mvzStats = mvzStats
 }
+
+export function setSubdivision(state, subdivisionStats) {
+  state.subdivisionStats = subdivisionStats
+}
+

@@ -186,6 +186,18 @@
           >
             <q-tooltip> Отчёт по МВЗ </q-tooltip>
           </q-btn>
+          <q-btn
+            icon="las la-book"
+            to="/report-subdivision"
+            flat
+            dense
+            v-if="
+              (currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS')
+            "
+          >
+            <q-tooltip> Отчёт по подразделеням </q-tooltip>
+          </q-btn>
         </div>
 
         <q-btn
