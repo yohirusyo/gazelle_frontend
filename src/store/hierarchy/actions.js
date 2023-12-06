@@ -3,7 +3,7 @@ import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
 import { requestHelper } from "src/helpers/loader";
 
-export async function requestMyHierarchy(context, ignore = false) {
+export async function requestMyHierarchy(context, ignore = false, rootState) {
   return requestHelper(
     context,
     async () => {
@@ -18,6 +18,9 @@ export async function requestMyHierarchy(context, ignore = false) {
         });
         socketio.on("hierarchy_update", (hierarchy) =>
           context.commit("update", hierarchy)
+        );
+        socketio.on("hierarchy_update", (hierarchy) =>
+          context.commit('customer/updateCustomerLimit', hierarchy, { root: true })
         );
         socketio.on("hierarchy_reset", (_) =>
           api.get(`management/hierarchy`).then(({ data }) => {

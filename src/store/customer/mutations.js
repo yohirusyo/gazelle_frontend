@@ -17,6 +17,14 @@ export function set(state, customers) {
   sort(state)
 }
 
+export function updateCustomerLimit(state, hierarchy) {
+  state.customers.forEach(function (e, index) {
+    if (e.managementId == hierarchy.managementId) {
+      state.customers[index].monthFactLimit = Number(hierarchy.monthFactLimit);
+      state.customers[index].monthPlanLimit = Number(hierarchy.monthPlanLimit);
+    }
+})
+}
 export function update(state, customer) {
   const index = state.customers.findIndex((o) => o.id == customer.id);
   state.customers[index] = customer;
