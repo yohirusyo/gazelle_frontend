@@ -40,7 +40,7 @@
               :isEditMode="!!selected && !copyMode"
             />
 
-            <DescriptionField v-model="description" />
+            <DescriptionField v-model="description" :emergensy="_orderIsEmergency"/>
 
             <OrderTimePicker v-model="orderTime" />
 
@@ -64,7 +64,7 @@
             /> -->
             <q-checkbox
               v-model="_orderIsEmergency"
-              label="Аварийная"
+              label="Аварийная (укажите причину аварийности в комментарии)"
               dense
               class="q-mb-md"
             />

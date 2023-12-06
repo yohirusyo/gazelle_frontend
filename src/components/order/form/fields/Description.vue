@@ -10,12 +10,17 @@
         label-color="grey"
         label="Комментарий"
         autocomplete="off"
+        :rules="
+        emergensy
+        ? [(val) => (val !== null && val !== '') || 'Обязательное поле!']
+        : []
+    "
     />
 </template>
 
 <script>
 export default {
-    props: ['modelValue', 'label'],
+    props: ['modelValue', 'label', 'emergensy'],
     computed: {
         _modelValue: {
             get() {
