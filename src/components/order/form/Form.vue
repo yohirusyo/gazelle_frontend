@@ -232,6 +232,7 @@ export default {
       },
       set(newVal) {
         this.setOrderIsEmergency(newVal);
+        this.description = null
       },
     },
     _approvementMenuActive: {

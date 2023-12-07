@@ -41,24 +41,54 @@
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-date
                 v-model="_selectedDate"
-                mask="DD.MM.YYYY"
+                mask="DD.MM.YYYY HH:mm"
                 minimal
                 :options="optionsFn"
                 range
               >
                 <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Применить"
-                    color="primary"
-                    flat
-                    @click="requestOrderStats(_selectedDate)"
-                  />
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-btn>
+          <q-separator vertical/>
+          <q-btn
+            text-color="white"
+            :label="`с ${HHmm(_selectedDate?.from)}`"
+            icon-right="schedule"
+            unelevated
+            class="col-shrink bg-white text-black border-none"
+            flat
+            no-caps
+          >
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-time v-model="_selectedDate.from" mask="DD.MM.YYYY HH:mm">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-btn>
+          <q-separator vertical/>
+          <q-btn
+            text-color="white"
+            :label="`по ${HHmm(_selectedDate?.to)}`"
+            icon-right="schedule"
+            unelevated
+            class="col-shrink bg-white text-black border-none"
+            flat
+            no-caps
+          >
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-time v-model="_selectedDate.to" mask="DD.MM.YYYY HH:mm">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-btn>
+          <q-btn icon="search" flat @click="requestOrderStats(_selectedDate)"></q-btn>
         </div>
       </div>
       <div class="col">
@@ -96,6 +126,7 @@ export default {
   },
   data() {
     return {
+      _tempDate: null,
       _selectedDate: null,
       _selectedSubdivision: null,
       _selectedDriverFullname: null,
@@ -160,13 +191,14 @@ export default {
           align: "right",
           field: (row) =>
             row.order.routeLength != null
-              ? `${(
-                  (row.order.routeLength < 100 && row.order.routeLength != 0
-                    ? 100
-                    : row.order.routeLength) / 1000
-                )
-                  .toFixed(1)
-                  /* .replace(".", ",") */}`
+              ? `${
+                  (
+                    (row.order.routeLength < 100 && row.order.routeLength != 0
+                      ? 100
+                      : row.order.routeLength) / 1000
+                  ).toFixed(1)
+                  /* .replace(".", ",") */
+                }`
               : null,
           sortable: true,
         },
@@ -550,7 +582,8 @@ export default {
           required: true,
           label: "Лимит грузоотправителя",
           align: "left",
-          field: (row) => row.cargoSenderLimit?.toFixed(2)/* ?.replace(".", ",") */,
+          field: (row) =>
+            row.cargoSenderLimit?.toFixed(2) /* ?.replace(".", ",") */,
           format: this.regular,
           sortable: true,
         },
@@ -559,7 +592,8 @@ export default {
           required: true,
           label: "Лимит грузополучателя",
           align: "left",
-          field: (row) => row.cargoRecieverLimit?.toFixed(2)/* ?.replace(".", ",") */,
+          field: (row) =>
+            row.cargoRecieverLimit?.toFixed(2) /* ?.replace(".", ",") */,
           format: this.regular,
           sortable: true,
         },
@@ -640,8 +674,8 @@ export default {
     // this.width = this.$refs.page.$el.clientWidth;
     await this.requestOrderStatsDates();
     this._selectedDate = {
-      from: dayjs().format("DD.MM.YYYY"),
-      to: dayjs().format("DD.MM.YYYY"),
+      from: dayjs().startOf("day").format("DD.MM.YYYY HH:mm"),
+      to: dayjs().endOf("day").format("DD.MM.YYYY HH:mm"),
     };
     await this.requestOrderStats(this._selectedDate);
     Loading.hide();
@@ -650,8 +684,12 @@ export default {
     _selectedDate() {
       if (typeof this._selectedDate == "string") {
         this._selectedDate = {
-          from: this._selectedDate,
-          to: this._selectedDate,
+          from: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
+            .startOf("day")
+            .format("DD.MM.YYYY HH:mm"),
+          to: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
+            .endOf("day")
+            .format("DD.MM.YYYY HH:mm"),
         };
       }
     },
