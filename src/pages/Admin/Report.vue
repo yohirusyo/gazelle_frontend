@@ -32,7 +32,9 @@
           />
           <q-btn
             text-color="white"
-            :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
+            :label="`с ${LabelDDMMYYYY(_selectedDate?.from)} по ${LabelDDMMYYYY(
+              _selectedDate?.to
+            )}`"
             unelevated
             class="col bg-white text-black border-none"
             flat
@@ -52,11 +54,10 @@
               </q-date>
             </q-popup-proxy>
           </q-btn>
-          <q-separator vertical/>
+          <q-separator vertical />
           <q-btn
             text-color="white"
-            :label="`с ${HHmm(_selectedDate?.from)}`"
-            icon-right="schedule"
+            :label="`с ${LabelHHmm(_selectedDate?.from)}`"
             unelevated
             class="col-shrink bg-white text-black border-none"
             flat
@@ -70,11 +71,10 @@
               </q-time>
             </q-popup-proxy>
           </q-btn>
-          <q-separator vertical/>
+          <q-separator vertical />
           <q-btn
             text-color="white"
-            :label="`по ${HHmm(_selectedDate?.to)}`"
-            icon-right="schedule"
+            :label="`по ${LabelHHmm(_selectedDate?.to)}`"
             unelevated
             class="col-shrink bg-white text-black border-none"
             flat
@@ -88,9 +88,15 @@
               </q-time>
             </q-popup-proxy>
           </q-btn>
-          <q-btn icon="search" flat @click="requestOrderStats(_selectedDate)"></q-btn>
+          <q-btn
+            icon="search"
+            label="сформировать"
+            flat
+            @click="requestOrderStats(_selectedDate)"
+          ></q-btn>
         </div>
       </div>
+      <q-separator></q-separator>
       <div class="col">
         <VScrolltable
           :rows="
@@ -110,7 +116,9 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import customParseFormat  from "dayjs/plugin/customParseFormat"
 dayjs.extend(duration);
+dayjs.extend(customParseFormat)
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { Loading, Dialog } from "quasar";
@@ -635,6 +643,14 @@ export default {
         .utc(dayjs.duration(val, "milliseconds").asMilliseconds())
         .format("HH:mm:ss");
     },
+    LabelDDMMYYYY(val) {
+      if (this.checkNull(val)) return null;
+      return dayjs(val, "DD.MM.YYYY HH:mm").format("DD.MM.YYYY");
+    },
+    LabelHHmm(val){
+      if (this.checkNull(val)) return null;
+      return dayjs(val, "DD.MM.YYYY HH:mm").format("HH:mm");
+    },
     DDMMYYYY(val) {
       if (this.checkNull(val)) return null;
       return dayjs(val).format("DD.MM.YYYY");
@@ -684,12 +700,8 @@ export default {
     _selectedDate() {
       if (typeof this._selectedDate == "string") {
         this._selectedDate = {
-          from: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
-            .startOf("day")
-            .format("DD.MM.YYYY HH:mm"),
-          to: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
-            .endOf("day")
-            .format("DD.MM.YYYY HH:mm"),
+          from: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm").startOf("day").format("DD.MM.YYYY HH:mm"),
+          to: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm").endOf("day").format("DD.MM.YYYY HH:mm")
         };
       }
     },
