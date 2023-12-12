@@ -13,29 +13,71 @@
             no-caps
             @click="createExcel"
           />
+          <q-separator vertical />
           <q-btn
             text-color="white"
-            :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
+            :label="`с ${LabelDDMMYYYY(_selectedDate?.from)} по ${LabelDDMMYYYY(
+              _selectedDate?.to
+            )}`"
             unelevated
             class="col bg-white text-black border-none"
             flat
             no-caps
           >
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
+              <q-date
+                v-model="_selectedDate"
+                mask="DD.MM.YYYY HH:mm"
+                minimal
+                :options="optionsFn"
+                range
+              >
                 <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Применить"
-                    color="primary"
-                    flat
-                    @click="requestSubdivisionStats(_selectedDate)"
-                  />
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-btn>
+          <q-separator vertical />
+          <q-btn
+            text-color="white"
+            :label="`с ${LabelHHmm(_selectedDate?.from)}`"
+            unelevated
+            class="col-shrink bg-white text-black border-none"
+            flat
+            no-caps
+          >
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-time v-model="_selectedDate.from" mask="DD.MM.YYYY HH:mm">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-btn>
+          <q-separator vertical />
+          <q-btn
+            text-color="white"
+            :label="`по ${LabelHHmm(_selectedDate?.to)}`"
+            unelevated
+            class="col-shrink bg-white text-black border-none"
+            flat
+            no-caps
+          >
+            <q-popup-proxy transition-show="scale" transition-hide="scale">
+              <q-time v-model="_selectedDate.to" mask="DD.MM.YYYY HH:mm">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Закрыть" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-btn>
+          <q-btn
+            icon="search"
+            label="сформировать"
+            flat
+            @click="requestSubdivisionStats(_selectedDate)"
+          ></q-btn>
         </div>
       </div>
       <q-table
@@ -54,6 +96,10 @@
 
 <script>
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
+
 import { mapActions, mapGetters, mapState } from "vuex";
 import * as XLSX from "xlsx-js-style";
 
@@ -113,6 +159,12 @@ export default {
     //   dayjs.locale("ru");
     //   return dayjs(val, "DD.MM.YYYY").format("DD MMMM YYYY");
     // },
+    LabelDDMMYYYY(val) {
+      return dayjs(val, "DD.MM.YYYY HH:mm").format("DD.MM.YYYY");
+    },
+    LabelHHmm(val) {
+      return dayjs(val, "DD.MM.YYYY HH:mm").format("HH:mm");
+    },
     createExcel() {
       let excel = document.querySelector("#report-table");
       const ws = XLSX.utils.table_to_sheet(excel, { raw: true });
@@ -142,7 +194,7 @@ export default {
         t: "s",
         v: `c ${this._selectedDate.from}`,
       };
-      
+
       ws["H2"] = {
         t: "s",
         v: `по ${this._selectedDate.to}`,
@@ -175,8 +227,8 @@ export default {
   },
   async mounted() {
     this._selectedDate = {
-      from: dayjs().format("DD.MM.YYYY"),
-      to: dayjs().format("DD.MM.YYYY"),
+      from: dayjs().startOf("day").format("DD.MM.YYYY HH:mm"),
+      to: dayjs().endOf("day").format("DD.MM.YYYY HH:mm"),
     };
     await this.requestSubdivisionStats(this._selectedDate);
   },
@@ -184,8 +236,12 @@ export default {
     _selectedDate() {
       if (typeof this._selectedDate == "string") {
         this._selectedDate = {
-          from: this._selectedDate,
-          to: this._selectedDate,
+          from: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
+            .startOf("day")
+            .format("DD.MM.YYYY HH:mm"),
+          to: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm")
+            .endOf("day")
+            .format("DD.MM.YYYY HH:mm"),
         };
       }
     },
