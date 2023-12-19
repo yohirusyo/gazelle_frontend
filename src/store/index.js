@@ -16,6 +16,8 @@ import userStats from './user-stats';
 import management from "./management";
 import hierarchy from "./hierarchy";
 import loading from "./loading";
+import limit from "./limit";
+
 
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
@@ -34,7 +36,8 @@ export default store(function (/* { ssrContext } */) {
       userStats,
       management,
       hierarchy,
-      loading
+      loading,
+      limit
     },
 
     // enable strict mode (adds overhead!)

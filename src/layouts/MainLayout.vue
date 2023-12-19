@@ -198,6 +198,18 @@
           >
             <q-tooltip> Отчёт по подразделеням </q-tooltip>
           </q-btn>
+          <q-btn
+            icon="settings"
+            to="/limit-page"
+            flat
+            dense
+            v-if="
+              (currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS')
+            "
+          >
+            <q-tooltip> Управление лимитами </q-tooltip>
+          </q-btn>
         </div>
 
         <q-btn

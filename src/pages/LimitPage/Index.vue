@@ -1,0 +1,150 @@
+<template>
+  <q-page class="column justify-beetwen">
+    <div class="column bg-white">
+      <q-select
+        :options="limitMonths"
+        v-model="_selectedMonth"
+        label="Месяц"
+        square
+        outlined
+        dense
+        @update:model-value="(val) => updateData(val)"
+        :option-label="(item) => monthLabel(item)"
+        class="col text-black border-none q-pa-sm"
+      />
+      <div v-if="_selectedMonth">
+        <div class="row">
+          <q-input
+            label="Плановый объем производства"
+            class="col text-black border-none q-pa-sm"
+            square
+            outlined
+            dense
+            hide-bottom-space
+            hide-hint
+            v-model="_productionPlanVolume"
+          />
+          <q-input
+            label="Фактичесий объем производства"
+            class="col text-black border-none q-pa-sm"
+            square
+            outlined
+            dense
+            hide-bottom-space
+            hide-hint
+            v-model="_productionFactVolume"
+          />
+        </div>
+        <div class="row">
+          <q-input
+            label="Плановая абонентская плата"
+            class="col text-black border-none q-pa-sm"
+            square
+            outlined
+            dense
+            hide-bottom-space
+            hide-hint
+            v-model="_planSubPay"
+          />
+          <q-input
+            label="Итоговая абонентская плата"
+            class="col text-black border-none q-pa-sm"
+            square
+            outlined
+            dense
+            hide-bottom-space
+            hide-hint
+            v-model="_factSubPay"
+          />
+        </div>
+        <LimitTable
+          :plan="_productionPlanVolume"
+          :year="year"
+          :month="month"
+        ></LimitTable>
+      </div>
+    </div>
+    <div class="row q-ma-sm absolute-bottom">
+      <q-btn
+        @click="saveData"
+        text-color="white"
+        label="Создать"
+        unelevated
+        class="border-none bg-blue-4 col"
+        type="submit"
+        no-caps
+        dense
+      />
+    </div>
+  </q-page>
+</template>
+
+<script>
+import LimitTable from "./LimitTable.vue";
+import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
+import dayjs from "dayjs";
+import objectSupport from "dayjs/plugin/objectSupport";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import _ from "lodash";
+
+dayjs.extend(localizedFormat);
+dayjs.extend(objectSupport);
+
+export default {
+  name: "limit-page",
+  components: {
+    LimitTable,
+  },
+  data() {
+    return {
+      month: null,
+      year: null,
+      _selectedMonth: null,
+      _productionPlanVolume: null,
+      _discount: null,
+      _productionFactVolume: null,
+    };
+  },
+  methods: {
+    ...mapActions("limit", ["getAllControlLimits", "postMonthLimit"]),
+    updateData(item) {
+      this._productionPlanVolume = item.productionPlanVolume;
+      this._productionFactVolume = item.productionFactVolume;
+      this._discount = item.discount;
+      this.month = item.month;
+      this.year = item.year;
+    },
+    saveData(){
+      this.postMonthLimit({ year: this.year, month: this.month , data: this.monthLimitSubdivisions})
+    },
+    monthLabel(item) {
+      return _.capitalize(
+        dayjs({ year: item.year, month: item.month })
+          .locale("ru")
+          .format("MMMM YYYY")
+      );
+    },
+  },
+  async mounted() {
+    this.getAllControlLimits();
+  },
+  computed: {
+    ...mapState("limit", ["controlLimits", "monthLimitSubdivisions"]),
+    limitMonths: {
+      get() {
+        return this.controlLimits;
+      },
+    },
+    _planSubPay: {
+      get() {
+        return (this._productionPlanVolume * 290 + 6709000) * this._discount;
+      },
+    },
+    _factSubPay: {
+      get() {
+        return (this._productionFactVolume * 290 + 6709000) * this._discount;
+      },
+    },
+  },
+};
+</script>

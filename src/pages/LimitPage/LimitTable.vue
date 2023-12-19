@@ -1,0 +1,214 @@
+<template>
+  <q-table
+    class="q-ma-sm"
+    separator="cell"
+    flat
+    bordered
+    dense
+    :rows-per-page-options="[0]"
+    hide-bottom
+    :rows="monthLimitSubdivisions"
+    :columns="columns"
+  >
+    <template v-slot:body="props">
+      <q-tr :props="props">
+        <q-td key="subdivsion" :props="props">{{
+          props.row.management.name
+        }}</q-td>
+        <q-td key="percentage" :props="props"
+          >{{ props.row.percentage }}
+          <q-popup-edit
+            v-model="props.row.percentage"
+            title="Изменить долю"
+            v-slot="scope"
+            class="bg-grey-2 text-center"
+          >
+            <q-input
+              type="number"
+              v-model="scope.value"
+              @update:model-value="val => Number(val)"
+              dense
+              autofocus
+              square
+              outlined
+              hide-bottom-space
+              hide-hint
+              :rules="[
+                (val) =>
+                  val <= Number(scope.initialValue) + _percentage ||
+                  `Введите число меньше, чем ${
+                    _percentage + Number(scope.initialValue)
+                  }`,
+              ]"
+            />
+            <q-btn
+              :disable="scope.value >= Number(scope.initialValue) + _percentage"
+              @click="setLimitSubdivision(scope, props, 'plan')"
+              text-color="white"
+              label="Изменить"
+              unelevated
+              class="border-none bg-blue-4 col q-mt-sm"
+              no-caps
+              dense
+            />
+            <q-btn
+              v-close-popup
+              popup-close
+              text-color="white"
+              label="Отменить"
+              unelevated
+              class="border-none bg-red-4 col q-mt-sm q-ml-sm"
+              no-caps
+              dense
+            />
+          </q-popup-edit>
+        </q-td>
+        <q-td key="limit" :props="props"
+          >{{ props.row.plan }}
+          <q-popup-edit
+            v-model="props.row.plan"
+            title="Изменить долю"
+            v-slot="scope"
+            class="bg-grey-2 text-center"
+          >
+            <q-input
+            @update:model-value="val => Number(val)"
+
+              type="number"
+              v-model="scope.value"
+              dense
+              autofocus
+              square
+              outlined
+              hide-bottom-space
+              hide-hint
+              :rules="[
+                (val) =>
+                  val <= Number(scope.initialValue) + _plan ||
+                  `Введите число меньше, чем ${
+                    _plan + Number(scope.initialValue)
+                  }`,
+              ]"
+            />
+            <q-btn
+              :disable="scope.value >= Number(scope.initialValue) + _plan"
+              @click="setLimitSubdivision(scope, props, 'percentage')"
+              text-color="white"
+              label="Изменить"
+              unelevated
+              class="border-none bg-blue-4 col q-mt-sm"
+              no-caps
+              dense
+            />
+            <q-btn
+              v-close-popup
+              popup-close
+              text-color="white"
+              label="Отменить"
+              unelevated
+              class="border-none bg-red-4 col q-mt-sm q-ml-sm"
+              no-caps
+              dense
+            />
+          </q-popup-edit>
+        </q-td>
+      </q-tr>
+    </template>
+    <template v-slot:bottom-row>
+      <q-tr>
+        <q-td class="text-center">Запас</q-td>
+        <q-td class="text-center">{{ _percentage.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ _plan.toFixed(2) }}</q-td>
+      </q-tr>
+      <q-tr>
+        <q-td class="text-center">Общий итог </q-td>
+        <q-td class="text-center">100</q-td>
+        <q-td class="text-center">{{ planVolume }}</q-td>
+      </q-tr>
+    </template>
+  </q-table>
+</template>
+
+<script>
+import { mapActions, mapMutations, mapState } from "vuex";
+
+import _ from "lodash";
+export default {
+  name: "limit-table",
+  components: {},
+  props: ["plan", "year", "month"],
+  data() {
+    return {
+      columns: [
+        {
+          name: "subdivsion",
+          required: true,
+          label: "Подразделение",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "percentage",
+          required: true,
+          label: "Доля",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "limit",
+          required: true,
+          label: "Лимит",
+          align: "center",
+          sortable: false,
+        },
+      ],
+    };
+  },
+  methods: {
+    ...mapActions("limit", ["getMonthLimitSubdivisions"]),
+    ...mapMutations("limit", ["setLimit"]),
+
+    setLimitSubdivision(scope, val, string) {
+      scope.set();
+      const rowKey = val.row[string];
+      const value = (rowKey / Number(scope.initialValue)) * scope.value;
+      this.setLimit({
+        value: Number(value),
+        id: val.row.id,
+        string,
+      });
+    },
+  },
+  async mounted() {
+    this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
+  },
+  computed: {
+    ...mapState("limit", ["monthLimitSubdivisions"]),
+    planVolume: {
+      get() {
+        return this.plan * 1.13;
+      },
+    },
+    _percentage: {
+      get() {
+        return (
+          100 -
+          _.sumBy(this.monthLimitSubdivisions, function (o) {
+            return Number(o.percentage);
+          })
+        );
+      },
+    },
+    _plan: {
+      get() {
+        return (
+          this.planVolume -
+          _.sumBy(this.monthLimitSubdivisions, function (o) {
+            return Number(o.plan);
+          })
+        );
+      },
+    },
+  },
+};
+</script>

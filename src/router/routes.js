@@ -122,6 +122,14 @@ const routes = [
         },
       },
       {
+        path: "limit-page",
+        component: () => import("src/pages/LimitPage/Index.vue"),
+        meta: {
+          roles: ["ADMIN", "WATCHER_WITH_REPORTS", "WATCHER"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: ":id/:copy?",
         component: () => import("pages/Index.vue"),
         meta: {
