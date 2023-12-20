@@ -15,9 +15,17 @@ export async function getMonthLimitSubdivisions(context, item) {
 }
 
 export async function postMonthLimit(context, item) {
-  console.log(item);
   return api
     .post(`control/monthlimits/${item.year}/${item.month}`, item.data)
+    .then(({ data }) => {
+      console.log(data);
+    });
+}
+
+export async function postEditControl(context, item) {
+  console.log(item);
+  return api
+    .post(`control/edit/${item.year}/${item.month}`, item.data)
     .then(({ data }) => {
       console.log(data);
     });

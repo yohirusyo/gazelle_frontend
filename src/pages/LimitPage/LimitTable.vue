@@ -26,7 +26,7 @@
             <q-input
               type="number"
               v-model="scope.value"
-              @update:model-value="val => Number(val)"
+              @update:model-value="(val) => Number(val)"
               dense
               autofocus
               square
@@ -72,8 +72,7 @@
             class="bg-grey-2 text-center"
           >
             <q-input
-            @update:model-value="val => Number(val)"
-
+              @update:model-value="(val) => Number(val)"
               type="number"
               v-model="scope.value"
               dense
