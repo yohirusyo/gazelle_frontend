@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column justify-beetwen">
+  <q-page class="column justify-beetwen bg-white">
     <div class="column bg-white">
       <q-select
         :options="limitMonths"
@@ -114,7 +114,7 @@
 
 <script>
 import LimitTable from "./LimitTable.vue";
-import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
+import { mapActions, mapState } from "vuex";
 import dayjs from "dayjs";
 import objectSupport from "dayjs/plugin/objectSupport";
 import localizedFormat from "dayjs/plugin/localizedFormat";
@@ -146,7 +146,6 @@ export default {
       "postEditControl",
     ]),
     updateData(item) {
-      console.log(item);
       this._productionPlanVolume = item.productionPlanVolume;
       this._productionFactVolume = item.productionFactVolume;
       this._realizationByHours = item.realizationByHours;

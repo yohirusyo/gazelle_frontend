@@ -12,5 +12,4 @@ export function setLimit(state, val) {
       item[val.string] = Number(val.value)
     }
   });
-  console.log(state);
 }

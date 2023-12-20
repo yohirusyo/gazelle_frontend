@@ -16,7 +16,7 @@
           props.row.management.name
         }}</q-td>
         <q-td key="percentage" :props="props"
-          >{{ props.row.percentage }}
+          >{{ toFixed(props.row.percentage) }}
           <q-popup-edit
             v-model="props.row.percentage"
             title="Изменить долю"
@@ -64,7 +64,7 @@
           </q-popup-edit>
         </q-td>
         <q-td key="limit" :props="props"
-          >{{ props.row.plan }}
+          >{{ toFixed(props.row.plan) }}
           <q-popup-edit
             v-model="props.row.plan"
             title="Изменить долю"
@@ -166,7 +166,11 @@ export default {
   methods: {
     ...mapActions("limit", ["getMonthLimitSubdivisions"]),
     ...mapMutations("limit", ["setLimit"]),
-
+    toFixed(val) {
+      if (val) {
+        return Number(val).toFixed(2);
+      }
+    },
     setLimitSubdivision(scope, val, string) {
       scope.set();
       const rowKey = val.row[string];
