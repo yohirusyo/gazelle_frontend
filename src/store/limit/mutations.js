@@ -10,6 +10,9 @@ export function setLimit(state, val) {
   state.monthLimitSubdivisions.forEach((item) => {
     if (item.id === val.id) {
       item[val.string] = Number(val.value)
+      if (val.string === 'percentage') {
+        item.fact = val.scope
+      }
     }
   });
 }

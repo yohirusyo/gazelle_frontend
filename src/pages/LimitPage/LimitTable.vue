@@ -179,6 +179,7 @@ export default {
         value: Number(value),
         id: val.row.id,
         string,
+        scope: scope.value
       });
     },
   },

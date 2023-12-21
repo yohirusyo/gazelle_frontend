@@ -22,6 +22,7 @@
               autocomplete="off"
             />
             <q-input
+              :disable="true"
               v-model="_defaultLimit"
               type="text"
               square
