@@ -144,8 +144,10 @@ export default {
       "getAllControlLimits",
       "postMonthLimit",
       "postEditControl",
+      "getMonthLimitSubdivisions"
     ]),
     updateData(item) {
+      this.getMonthLimitSubdivisions({ year: item.year, month: item.month });
       this._productionPlanVolume = item.productionPlanVolume;
       this._productionFactVolume = item.productionFactVolume;
       this._realizationByHours = item.realizationByHours;
