@@ -122,7 +122,7 @@
       <q-tr>
         <q-td class="text-center">Общий итог </q-td>
         <q-td class="text-center">100</q-td>
-        <q-td class="text-center">{{ planVolume }}</q-td>
+        <q-td class="text-center">{{ planVolume.toFixed(2) }}</q-td>
       </q-tr>
     </template>
   </q-table>
@@ -183,14 +183,14 @@ export default {
       });
     },
   },
-  async mounted() {
-    this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
-  },
+  // async mounted() {
+  //   this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
+  // },
   computed: {
     ...mapState("limit", ["monthLimitSubdivisions"]),
     planVolume: {
       get() {
-        return this.plan * 1.13;
+        return this.plan * 1.12607971119134;
       },
     },
     _percentage: {
