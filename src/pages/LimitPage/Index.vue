@@ -75,7 +75,7 @@
           v-model="_realizationByHours"
         />
         <q-input
-          label='Итоговая прибыл ООО "Автотранспортное управление"'
+          label='Итоговая прибыль ООО "Автотранспортное управление"'
           class="col text-black border-none q-pa-sm"
           square
           outlined
