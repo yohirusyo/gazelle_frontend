@@ -3,20 +3,29 @@ import { showNotifyResult } from "src/helpers/notification";
 import { socketio } from "boot/socketio";
 import { requestHelper } from 'src/helpers/loader';
 
-export async function requestManagements(context) {
+export async function requestManagements(context, {year, month}) {
   return requestHelper(
     context,
     async () => {
       try {
         ['management_update', 'management_delete'].forEach(socketio.removeAllListeners)
       } catch (error) { }
-      await api.get(`management`).then(({ data }) => {
+      await api.get(`management/${year}/${month}`).then(({ data }) => {
         context.commit("set", data);
       });
       socketio.on('management_update', management => context.commit("update", management))
       socketio.on("management_delete", id => context.commit("remove", id))
     }
   )
+}
+export async function requestChangeManagements(context, {year, month}) {
+  return api.get(`management/${year}/${month}`)
+    .then(({ data }) => {
+      context.commit("set", data);
+    })
+    .catch((err) => {
+      
+    });
 }
 
 export async function requestMyManagement(context) {
