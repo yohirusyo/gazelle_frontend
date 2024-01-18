@@ -52,7 +52,7 @@ export async function addRoute({ commit }, form) {
 }
 
 export async function updateRoute({ commit }, { id, ...form }) {
-  return api
+    return api
     .patch(`order/batch/${id}`, form)
     .then(({ data }) => {
       showNotifyResult(true, "Маршрут успешно изменен!");
@@ -124,9 +124,9 @@ export async function removeOrder({ commit }, { id }) {
     });
 }
 
-export async function removeRoute({ commit }, { id }) {
+export async function removeRoute({ commit }, { id, ...form }) {
   return api
-    .delete(`order/batch/${id}`)
+    .post(`order/batch/${id}`, form)
     .then((_) => {
       showNotifyResult(true, "Маршрут успешно удален!");
     })
