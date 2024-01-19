@@ -42,6 +42,10 @@
 
             <DescriptionField v-model="description" :emergensy="_orderIsEmergency"/>
 
+            <RemoveReasonField v-if="_removeMenuActive && !_creationMode" v-model="removeReason" :removeReason="_removeMenuActive"/>
+
+            <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason" :removeReason="_approvementMenuActive"/>
+            
             <OrderTimePicker v-model="orderTime" />
 
             <!-- <q-select
@@ -88,6 +92,7 @@
           />
 
           <q-btn
+          v-if="declineReason"
             text-color="white"
             label="Отклонить"
             unelevated
@@ -167,9 +172,9 @@
             no-caps
             dense
           />
-
+          
           <q-btn
-            v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')"
+            v-if="removeReason && !currentUser?.role.includes('WATCHER')"
             text-color="white"
             label="Удалить"
             unelevated
@@ -202,21 +207,25 @@ import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import PlaceSelect from "src/components/order/form/fields/Place.vue";
 import PointsConstructor from "src/components/order/form/fields/Points.vue";
 import DescriptionField from "src/components/order/form/fields/Description.vue";
+import RemoveReasonField from "./fields/RemoveReason.vue";
 import OrderTimePicker from "src/components/order/form/fields/Time.vue";
+import { ref } from 'vue';
 export default {
-  name: "OrderCreation",
+    name: "OrderCreation",
   props: ["selected", "isCustomer", "copyMode"],
   components: {
     CustomerSelect,
     PlaceSelect,
     PointsConstructor,
     DescriptionField,
+    RemoveReasonField,
     OrderTimePicker,
   },
   computed: {
     ...mapState("current", [
       "selectedTransportId",
       "orderIsEmergency",
+      "removeOrderReason",
       "currentUser",
     ]),
     // ...mapGetters("transport", ["getByOnlyFreeFilter", "getTransportById"]),
@@ -232,7 +241,7 @@ export default {
       },
       set(newVal) {
         this.setOrderIsEmergency(newVal);
-        this.description = null
+        this.description = null;
       },
     },
     _approvementMenuActive: {
@@ -283,6 +292,10 @@ export default {
             !this.selected.isRequest)
         );
       },
+      set(newVal) {
+        this.setRemoveOrderReason(newVal);
+        this.removeReason = null;
+      }
     },
     _customerCreationCheck: {
       get() {
@@ -409,6 +422,7 @@ export default {
       await this.updateRoute({
         id: this.selected.id,
         ...this.buildRoute(),
+        comment: this.declineReason,
         isApproved: false,
         isDeclined: true,
       });
@@ -449,8 +463,9 @@ export default {
         ? await this.onAddOrder()
         : await this.onUpdateOrder();
     },
+
     async onRemoveOrder() {
-      await this.removeRoute({ id: this.selected.id });
+      await this.removeRoute({ id: this.selected.id, comment: this.removeReason});
       this.$refs.form.reset();
     },
     resetForm() {
@@ -474,6 +489,8 @@ export default {
       this.departurePointName = null;
       this.orderTime = new Date();
       this.description = null;
+      this.removeReason = null;
+      this.declineReason = null;
       this.points = [];
       this.$emit("done");
       this.$emit("routeCopy", false);
@@ -499,6 +516,8 @@ export default {
         this.setCustomerSubdivision(subdivision);
 
         this.description = order.description;
+        this.removeReason = order.removeReason;
+        this.declineReason = order.declineReason;
 
         if (!this.copyMode) this.setSelectedTransportId(order.transportId);
         else this.setSelectedTransportId(null);
@@ -586,6 +605,8 @@ export default {
       departurePointName: null,
       orderTime: new Date(),
       description: null,
+      removeReason: null,
+      declineReason: null,
       points: [],
       _creationMode: false,
     };
