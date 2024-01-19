@@ -21,6 +21,7 @@ export async function requestOrders(context, ignore = false) {
         context.commit("updateRoute", route)
       );
       socketio.on("route_delete", (id) => context.commit("removeRoute", id));
+      socketio.on("route_complete", (id) => context.commit("completeRoute", id));
     },
     "",
     ignore

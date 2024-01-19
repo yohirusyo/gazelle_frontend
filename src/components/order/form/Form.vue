@@ -144,6 +144,22 @@
             dense
           />
         </div>
+        <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
+          selected &&
+          selected.isRequest &&
+          selected.isApproved &&
+          !isCustomer &&
+          currentUser?.id == 1
+          ">
+          <q-btn 
+            text-color="white" 
+            label="Принудительно завершить" 
+            unelevated 
+            class="border-none bg-orange col"
+            @click="onComplete" 
+            no-caps 
+            dense />
+        </div>
       </div>
     </q-form>
   </div>
@@ -357,16 +373,7 @@ export default {
         scenario: point.cargo.withCargo && point.cargo.weight >= 60 ? 2 : 1,
       };
     },
-    async onComplete() {
-      //
-      if (this.checkAlerts()) return;
-      await this.completeRoute({
-        id: this.selected.id,
-        isApproved: true,
-        isDeclined: false,
-        isDone: true,
-      })
-    },
+
     async onApprove() {
       //
       if (this.checkAlerts()) return;
@@ -426,7 +433,20 @@ export default {
     },
 
     async onRemoveOrder() {
-      await this.removeRoute({ id: this.selected.id, comment: this.removeReason});
+      //
+      await this.removeRoute({ 
+        id: this.selected.id, 
+        comment: this.removeReason
+      });
+      this.$refs.form.reset();
+    },
+    async onComplete() {
+      await this.completeRoute({
+        id: this.selected.id,
+        isApproved: true,
+        isDeclined: false,
+        isDone: true,
+      });
       this.$refs.form.reset();
     },
     resetForm() {
