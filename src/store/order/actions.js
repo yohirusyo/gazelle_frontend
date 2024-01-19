@@ -62,6 +62,17 @@ export async function updateRoute({ commit }, { id, ...form }) {
     });
 }
 
+export async function completeRoute({commit}, {id, ...form}) {
+  return api
+    .patch(`order/complete/${id}`, form)
+    .then(({data}) => {
+      showNotifyResult(true, "Маршрут успешно завершен");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка завершения маршрута")
+    })
+}
+
 export async function addOrderRequest({ commit }, form) {
   return api
     .post("/order/request", form)

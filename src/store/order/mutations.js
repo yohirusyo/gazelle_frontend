@@ -59,6 +59,10 @@ export function updateRoute(state, route) {
   }
 }
 
+export function completeRoute(state, route) {
+
+}
+
 export function removeRoute(state, id) {
   const index = state.orders.findIndex((r) => r.id == id);
   if (index != -1) {
