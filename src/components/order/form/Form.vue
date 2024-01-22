@@ -55,7 +55,7 @@
             @click="onApprove" no-caps dense />
 
           <q-btn
-            v-if="declineReason"
+            :disable="!declineReason"
             text-color="white"
             label="Отклонить"
             unelevated
@@ -63,7 +63,7 @@
             @click="onDecline"
             no-caps
             dense
-          />
+          > <q-tooltip v-if="!declineReason" anchor="top middle">Укажите причину отклонения</q-tooltip> </q-btn>
         </div>
 
         <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
@@ -125,7 +125,8 @@
           />
 
           <q-btn
-            v-if="removeReason && !currentUser?.role.includes('WATCHER')"
+            v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')"
+            :disable="!removeReason"
             text-color="white"
             label="Удалить"
             unelevated
@@ -133,7 +134,7 @@
             @click="onRemoveOrder"
             no-caps
             dense
-          />
+            > <q-tooltip v-if="!removeReason" anchor="top middle">Укажите причину удаления</q-tooltip> </q-btn>
           <q-btn
             text-color="white"
             label="Отмена"
