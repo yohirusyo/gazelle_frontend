@@ -97,7 +97,8 @@ export default {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
       if (this.orderIsEmergency) return true;
-      if (this._isFreeMoreThan15Minutes && this._connection != 'mmkmetiz') return true;
+      if (this._isFreeMoreThan15Minutes || this._connection == 'mmkmetiz') return true;
+      console.log(this._connection);
       return false;
       
     },
