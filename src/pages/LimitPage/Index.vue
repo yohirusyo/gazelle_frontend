@@ -115,8 +115,12 @@
       Счет-реестр автоуслуг по управлению снабжения
     </div>
     <div class="row" v-if="_selectedMonth">
-
-      <LimitReport class="col-6"  :year="year" :month="month" :cost="oneKilometrCost" />
+      <LimitReport
+        class="col-6"
+        :year="year"
+        :month="month"
+        :cost="oneKilometrCost"
+      />
       <div class="col-6">
         <q-input
           label='Итоговая скидка для ОАО "ММК МЕТИЗ"'
@@ -130,7 +134,7 @@
         />
         <q-input
           readonly
-          label='Абонентская плата без УС'
+          label="Абонентская плата без УС"
           class="col text-black border-none q-pa-sm"
           square
           outlined
@@ -191,7 +195,7 @@ export default {
       "postEditControl",
       "getMonthLimitSubdivisions",
       "getStatsContorlLimits",
-      "getHoursStatsContorlLimits"
+      "getHoursStatsContorlLimits",
     ]),
     updateData(item) {
       this.getMonthLimitSubdivisions({ year: item.year, month: item.month });
@@ -232,7 +236,11 @@ export default {
     this.getAllControlLimits();
   },
   computed: {
-    ...mapState("limit", ["controlLimits", "monthLimitSubdivisions", "statsHoursControl"]),
+    ...mapState("limit", [
+      "controlLimits",
+      "monthLimitSubdivisions",
+      "statsHoursControl",
+    ]),
     limitMonths: {
       get() {
         return this.controlLimits;
@@ -261,15 +269,19 @@ export default {
     },
     _hoursCost: {
       get() {
-        return this._factSubPay - (this.statsHoursControl * this.oneKilometrCost).toFixed(2)
-      }
+        return (
+          this._factSubPay -
+          this.statsHoursControl * this.oneKilometrCost
+        ).toFixed(2);
+      },
     },
     oneKilometrCost: {
       get() {
         return (
           this._planSubPay /
-          (this.monthLimitSubdivisions.find((item) => item.management.name == "УС")
-            ?.fact)
+          this.monthLimitSubdivisions.find(
+            (item) => item.management.name == "УС"
+          )?.fact
         );
       },
     },
