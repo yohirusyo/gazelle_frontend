@@ -37,6 +37,7 @@
         </div>
         <div class="row">
           <q-input
+            readonly
             label="Плановая абонентская плата"
             class="col text-black border-none q-pa-sm"
             square
@@ -47,6 +48,7 @@
             v-model="_planSubPay"
           />
           <q-input
+            readonly
             label="Итоговая абонентская плата"
             class="col text-black border-none q-pa-sm"
             square
@@ -109,11 +111,53 @@
         dense
       />
     </div>
+    <div class="text-center text-h6" v-if="_selectedMonth">
+      Счет-реестр автоуслуг по управлению снабжения
+    </div>
+    <div class="row" v-if="_selectedMonth">
+
+      <LimitReport class="col-6"  :year="year" :month="month" :cost="oneKilometrCost" />
+      <div class="col-6">
+        <q-input
+          label='Итоговая скидка для ОАО "ММК МЕТИЗ"'
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_discount"
+        />
+        <q-input
+          readonly
+          label='Абонентская плата без УС'
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_hoursCost"
+        />
+        <q-input
+          readonly
+          label='Итоговая прибыль ООО "Автотранспортное управление"'
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_finalPropfit"
+        />
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
 import LimitTable from "./LimitTable.vue";
+import LimitReport from "./LimitReport.vue";
 import { mapActions, mapState } from "vuex";
 import dayjs from "dayjs";
 import objectSupport from "dayjs/plugin/objectSupport";
@@ -127,6 +171,7 @@ export default {
   name: "limit-page",
   components: {
     LimitTable,
+    LimitReport,
   },
   data() {
     return {
@@ -144,10 +189,13 @@ export default {
       "getAllControlLimits",
       "postMonthLimit",
       "postEditControl",
-      "getMonthLimitSubdivisions"
+      "getMonthLimitSubdivisions",
+      "getStatsContorlLimits",
+      "getHoursStatsContorlLimits"
     ]),
     updateData(item) {
       this.getMonthLimitSubdivisions({ year: item.year, month: item.month });
+      this.getHoursStatsContorlLimits({ year: item.year, month: item.month });
       this._productionPlanVolume = item.productionPlanVolume;
       this._productionFactVolume = item.productionFactVolume;
       this._realizationByHours = item.realizationByHours;
@@ -184,7 +232,7 @@ export default {
     this.getAllControlLimits();
   },
   computed: {
-    ...mapState("limit", ["controlLimits", "monthLimitSubdivisions"]),
+    ...mapState("limit", ["controlLimits", "monthLimitSubdivisions", "statsHoursControl"]),
     limitMonths: {
       get() {
         return this.controlLimits;
@@ -209,6 +257,20 @@ export default {
     _finalPropfit: {
       get() {
         return this._factSubPay - this._realizationByHours;
+      },
+    },
+    _hoursCost: {
+      get() {
+        return this._factSubPay - (this.statsHoursControl * this.oneKilometrCost).toFixed(2)
+      }
+    },
+    oneKilometrCost: {
+      get() {
+        return (
+          this._planSubPay /
+          (this.monthLimitSubdivisions.find((item) => item.management.name == "УС")
+            ?.fact)
+        );
       },
     },
   },

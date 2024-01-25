@@ -82,6 +82,14 @@ const routes = [
         },
       },
       {
+        path: "reports",
+        component: () => import("src/pages/Admin/Index.vue"),
+        meta: {
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: "transport",
         component: () => import("src/pages/Operator/Transport.vue"),
         meta: {
