@@ -1,6 +1,9 @@
 import dayjs from "dayjs";
 
 export function setAllControlLimits(state, controlLimits) {
+  controlLimits.sort(function (a, b) {
+    return a.year - b.year || a.month - b.month;
+});
   state.controlLimits = controlLimits;
 }
 

@@ -1,43 +1,22 @@
 <template>
-  <q-tr
-    :props="props"
-    :class="_class"
-    @click="order.isDone ? null : onSelected(order)"
-    :id="'order-list-item-' + order.id"
-  >
+  <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
+
+
     <q-td key="expand" :props="props">
-      <SwitcherRouteShow
-        v-model="_modelValue"
-        :routeId="props.row.id"
-        v-if="order.id == order.parentOrder && props.row.orders.length != 1"
-      />
-      <div
-        v-else-if="props.row.orders.length == 1 || order.parentOrder == null"
-      >
+      <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
+        v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
+      <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
         Одиночная
       </div>
       <div v-else class="column items-center">
-        <q-icon
-          class="q-ml-md"
-          name="las la-level-up-alt"
-          size="md"
-          color="grey"
-          style="transform: rotate(90deg)"
-        />
+        <q-icon class="q-ml-md" name="las la-level-up-alt" size="md" color="grey" style="transform: rotate(90deg)" />
         № {{ order.parentOrder }}
       </div>
     </q-td>
     <q-td key="time" :props="props">
-      <Time
-        :id="order.id"
-        :isEmergency="order.isEmergency"
-        :orderTime="order.orderTime"
-        :name="order.name"
-        :description="order.description"
-        :class="_isYesterdayTime ? 'bg-blue' : ''"
-        :maxWeight="_maxWeight"
-        :createdAt="order.createdAt"
-      />
+      <Time :id="order.id" :isEmergency="order.isEmergency" :orderTime="order.orderTime" :name="order.name"
+        :description="order.description" :class="_isYesterdayTime ? 'bg-blue' : ''" :maxWeight="_maxWeight"
+        :createdAt="order.createdAt" />
     </q-td>
     <q-td key="customer" :props="props">
       <Customer :customerId="order.customerId" />
@@ -54,11 +33,7 @@
       <Transport :transportId="order.transportId" />
     </q-td>
     <q-td key="status" :props="props">
-      <Status
-        :statusId="order.statusId"
-        :statusChangedAt="order.statusChangedAt"
-        :isDone="order.isDone"
-      />
+      <Status :statusId="order.statusId" :statusChangedAt="order.statusChangedAt" :isDone="order.isDone" />
     </q-td>
   </q-tr>
 </template>
@@ -84,6 +59,17 @@ export default {
       this.$emit("onSelected", sel);
     },
     dayjs,
+    handleClick() {
+      const canHandle = this.canHandleClick();
+      // console.warn({ canHandle })
+      if (canHandle) this.onSelected(this.order)
+    },
+    canHandleClick() {
+      // console.warn(this.currentUser)
+      if (this.currentUser?.id === 1) return true;
+      if (!this.order.isDone) return true;
+      return false;
+    }
   },
   components: {
     Time,
@@ -95,6 +81,11 @@ export default {
   },
   computed: {
     ...mapState("order", ["hovered"]),
+    ...mapState("current", [
+      "selectedTransportId",
+      "orderIsEmergency",
+      "currentUser",
+    ]),
     _isYesterdayTime: {
       get() {
         return (

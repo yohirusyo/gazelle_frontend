@@ -10,6 +10,7 @@ export default function () {
     onlyFree: false,
     onlyWithDrivers: true,
     orderIsEmergency: false,
+    removeOrderReason: false,
     hoveredTransportId: null,
     customer: null,
     user: null,

@@ -80,6 +80,10 @@ export function setOrderIsEmergency(state, orderIsEmergency) {
   state.orderIsEmergency = orderIsEmergency;
 }
 
+export function setRemoveOrderReason(state, removeOrderReason) {
+  state.removeOrderReason = removeOrderReason;
+}
+
 export function setHoveredTransportId(state, hoveredTransportId) {
   state.hoveredTransportId = hoveredTransportId;
 }

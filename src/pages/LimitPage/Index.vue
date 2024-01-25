@@ -76,6 +76,26 @@
           hide-hint
           v-model="_realizationByHours"
         />
+        <q-input
+          label='Итоговая прибыль ООО "Автотранспортное управление"'
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_finalPropfit"
+        />
+        <q-input
+          label='Итоговая скидка для ОАО "ММК МЕТИЗ"'
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_discount"
+        />
       </div>
     </div>
     <div class="row q-ma-sm absolute-bottom">
