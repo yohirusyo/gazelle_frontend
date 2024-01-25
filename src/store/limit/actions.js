@@ -15,12 +15,27 @@ export async function getMonthLimitSubdivisions(context, item) {
 }
 
 export async function postMonthLimit(context, item) {
-  return api
-    .post(`control/monthlimits/${item.year}/${item.month}`, item.data)
-
+  return api.post(`control/monthlimits/${item.year}/${item.month}`, item.data);
 }
 
 export async function postEditControl(context, item) {
+  return api.post(`control/edit/${item.year}/${item.month}`, item.data);
+}
+
+export async function getStatsContorlLimits(context, item) {
   return api
-    .post(`control/edit/${item.year}/${item.month}`, item.data)
+    .get(
+      `order/stats-control?period=${item.period}&month=${item.month}&year=${item.year}`
+    )
+    .then(({ data }) => {
+      context.commit("setStatsControl", data);
+    });
+}
+
+export async function getHoursStatsContorlLimits(context, item) {
+  return api
+    .get(`order/stats-control/hours?month=${item.month}&year=${item.year}`)
+    .then(({ data }) => {
+      context.commit("setHoursStatsControl", data);
+    });
 }

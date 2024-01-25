@@ -205,7 +205,7 @@
             dense
             v-if="
               (currentUser?.role == 'ADMIN' ||
-              currentUser?.role == 'WATCHER_WITH_REPORTS')
+              currentUser?.role == 'WATCHER_WITH_REPORTS') && connection == 'mmkmetiz'
             "
           >
             <q-tooltip> Управление лимитами </q-tooltip>

@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function setAllControlLimits(state, controlLimits) {
   state.controlLimits = controlLimits;
 }
@@ -14,3 +16,16 @@ export function setLimit(state, val) {
     }
   });
 }
+
+export function setStatsControl (state, val) {
+  val.forEach(function(x) {
+    x.orderTime = dayjs(x.orderTime).format('DD.MM.YYYY HH:mm');
+    x.routeLength = x.routeLength / 1000
+  });
+  state.statsControl = val
+}
+
+export function setHoursStatsControl (state, val) {
+  state.statsHoursControl = val
+}
+
