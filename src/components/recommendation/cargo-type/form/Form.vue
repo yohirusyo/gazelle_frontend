@@ -29,9 +29,9 @@
             label="Удалить"
             unelevated
             class="border-none col bg-red"
-            type="submit"
             no-caps
             dense
+            @click="onDelete"
           />
         </div>
       </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch, onMounted } from "vue";
+import { ref, defineProps, watch, onMounted, defineEmits } from "vue";
 import Description from "./fields/Description.vue";
 import Priority from "./fields/Priority.vue";
 import { api } from "src/boot/axios";
@@ -48,6 +48,8 @@ import { api } from "src/boot/axios";
 const props = defineProps({
   selected: Object,
 });
+const emit = defineEmits(["done"]);
+
 const creationMode = ref(false);
 
 const description = ref("");
@@ -63,6 +65,7 @@ const form = ref(null);
 const resetForm = () => {
   loadNew();
   form.value.resetValidation();
+  emit("done");
 };
 
 const createCargoType = async () => {
@@ -77,10 +80,17 @@ const onSubmit = async () => {
   resetForm();
 };
 
-watch(props.selected, (newSelected, oldSelected) => {
-  creationMode.value = !newSelected;
-  if (newSelected != oldSelected) loadData();
-});
+const onDelete = async () => {
+  resetForm();
+};
+
+watch(
+  () => props.selected,
+  (newSelected, oldSelected) => {
+    creationMode.value = !newSelected;
+    if (newSelected != oldSelected) loadData();
+  }
+);
 
 const loadData = () => {
   if (props.selected) {

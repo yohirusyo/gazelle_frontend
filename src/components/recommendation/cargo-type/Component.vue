@@ -1,10 +1,10 @@
 <template>
-  <MenuItemV2 :col="props.col" label="Заказы" v-model="order">
+  <MenuItemV2 :col="props.col" label="Типы грузов" v-model="model">
     <template #main="{ height, onSelected }">
       <CargoTypesList @onSelected="onSelected"
     /></template>
     <template #create="{ onDone, selected }">
-      <CargoTypesForm :selected="selected"
+      <CargoTypesForm :selected="selected" @done="onDone"
     /></template>
     <template #menu="{}"> </template>
   </MenuItemV2>
@@ -16,7 +16,7 @@ import { ref, defineProps } from "vue";
 import CargoTypesList from "./list/List.vue";
 import CargoTypesForm from "./form/Form.vue";
 
-const order = ref(null);
+const model = ref(null);
 const props = defineProps({
   col: Number,
 });
