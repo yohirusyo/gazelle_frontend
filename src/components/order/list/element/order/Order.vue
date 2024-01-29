@@ -1,7 +1,8 @@
 <template>
-  <q-tr :props="props" :class="_class" @click="order.isDone ? null : onSelected(order)"
-    :id="'order-list-item-' + order.id">
-    <q-td :class="_latedClass" key="expand" :props="props">
+  <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
+
+
+    <q-td key="expand" :props="props">
       <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
         v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
       <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
@@ -58,6 +59,17 @@ export default {
       this.$emit("onSelected", sel);
     },
     dayjs,
+    handleClick() {
+      const canHandle = this.canHandleClick();
+      // console.warn({ canHandle })
+      if (canHandle) this.onSelected(this.order)
+    },
+    canHandleClick() {
+      // console.warn(this.currentUser)
+      if (this.currentUser?.id === 1) return true;
+      if (!this.order.isDone) return true;
+      return false;
+    }
   },
   components: {
     Time,
@@ -69,6 +81,11 @@ export default {
   },
   computed: {
     ...mapState("order", ["hovered"]),
+    ...mapState("current", [
+      "selectedTransportId",
+      "orderIsEmergency",
+      "currentUser",
+    ]),
     _isYesterdayTime: {
       get() {
         return (

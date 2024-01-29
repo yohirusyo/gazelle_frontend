@@ -5,7 +5,7 @@
         <q-item
           style="user-select: none"
           clickable
-          v-for="(number, index) of getNumbers"
+          v-for="(number) of getNumbers"
           :key="number"
           :class="isSelected(number) ? 'bg-blue-2' : ''"
           @click="isSelected(number) ? remove(number) : add(number)"

@@ -1,47 +1,29 @@
 <template>
   <div class="col column">
-    <q-form
-      @submit="onSubmit"
-      @reset="resetForm"
-      class="col column justify-between"
-      :class="$q.screen.xs ? 'q-pl-xs q-py-xs' : 'q-pa-md'"
-      ref="form"
-    >
+    <q-form @submit="onSubmit" @reset="resetForm" class="col column justify-between"
+      :class="$q.screen.xs ? 'q-pl-xs q-py-xs' : 'q-pa-md'" ref="form">
       <div v-if="selected" class="text-center">
         Номер маршрута {{ selected.id }}
       </div>
       <div class="col row">
-        <q-scroll-area
-          class="col"
-          :visible="$q.screen.xs"
-          :class="$q.screen.xs ? 'q-pr-lg' : ''"
-        >
+        <q-scroll-area class="col" :visible="$q.screen.xs" :class="$q.screen.xs ? 'q-pr-lg' : ''">
           <div class="column col q-gutter-y-md">
-            <CustomerSelect
-              v-if="!isCustomer"
-              :phoneNumber="customer.phoneNumber"
-              :fullname="customer.fullname"
-              :subdivision="customer.subdivision"
-              :mvz="customer.mvz"
+            <CustomerSelect v-if="!isCustomer" :phoneNumber="customer.phoneNumber" :fullname="customer.fullname"
+              :subdivision="customer.subdivision" :mvz="customer.mvz"
               @update:phoneNumber="(val) => (customer.phoneNumber = val)"
               @update:fullname="(val) => (customer.fullname = val)"
-              @update:subdivision="(val) => (customer.subdivision = val)"
-              @update:mvz="(val) => (customer.mvz = val)"
-            />
+              @update:subdivision="(val) => (customer.subdivision = val)" @update:mvz="(val) => (customer.mvz = val)" />
 
-            <PlaceSelect
-              v-model="departurePointName"
-              label="Место отправления"
-            />
+            <PlaceSelect v-model="departurePointName" label="Место отправления" />
 
-            <PointsConstructor
-              v-model="points"
-              :copyMode="copyMode"
-              :isEditMode="!!selected && !copyMode"
-            />
+            <PointsConstructor v-model="points" :copyMode="copyMode" :isEditMode="!!selected && !copyMode" />
 
-            <DescriptionField v-model="description" :emergensy="_orderIsEmergency"/>
+            <DescriptionField v-model="description" :emergensy="_orderIsEmergency" />
 
+            <RemoveReasonField v-if="_removeMenuActive && !_creationMode" v-model="removeReason" :removeReason="_removeMenuActive"/>
+
+            <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason" :removeReason="_approvementMenuActive"/>
+            
             <OrderTimePicker v-model="orderTime" />
 
             <!-- <q-select
@@ -62,32 +44,18 @@
               autocomplete="off"
               class="col-2"
             /> -->
-            <q-checkbox
-              v-model="_orderIsEmergency"
-              label="Аварийная (укажите причину аварийности в комментарии)"
-              dense
-              class="q-mb-md"
-            />
+            <q-checkbox v-model="_orderIsEmergency" label="Аварийная (укажите причину аварийности в комментарии)" dense
+              class="q-mb-md" />
           </div>
         </q-scroll-area>
       </div>
       <div class="col col-shrink q-gutter-y-sm column">
-        <div
-          class="col row q-gutter-x-sm items-center"
-          v-if="_approvementMenuActive"
-        >
-          <q-btn
-            text-color="white"
-            label="Принять"
-            unelevated
-            class="border-none bg-blue-4 col"
-            color="primary"
-            @click="onApprove"
-            no-caps
-            dense
-          />
+        <div class="col row q-gutter-x-sm items-center" v-if="_approvementMenuActive">
+          <q-btn text-color="white" label="Принять" unelevated class="border-none bg-blue-4 col" color="primary"
+            @click="onApprove" no-caps dense />
 
           <q-btn
+            :disable="!declineReason"
             text-color="white"
             label="Отклонить"
             unelevated
@@ -95,30 +63,18 @@
             @click="onDecline"
             no-caps
             dense
-          />
+          > <q-tooltip v-if="!declineReason" anchor="top middle">Укажите причину отклонения</q-tooltip> </q-btn>
         </div>
 
-        <div
-          class="col row q-gutter-x-sm items-center"
-          v-if="
-            !_creationMode &&
-            selected &&
-            selected.isRequest &&
-            selected.isApproved &&
-            !isCustomer &&
-            !currentUser?.role.includes('WATCHER')
-          "
-        >
-          <q-btn
-            text-color="white"
-            label="Вернуть в запрос"
-            unelevated
-            class="border-none bg-grey col"
-            color="primary"
-            @click="onBackToRequest"
-            no-caps
-            dense
-          />
+        <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
+          selected &&
+          selected.isRequest &&
+          selected.isApproved &&
+          !isCustomer &&
+          !currentUser?.role.includes('WATCHER')
+          ">
+          <q-btn text-color="white" label="Вернуть в запрос" unelevated class="border-none bg-grey col" color="primary"
+            @click="onBackToRequest" no-caps dense />
         </div>
 
         <div class="col row q-gutter-x-sm items-center">
@@ -170,6 +126,7 @@
 
           <q-btn
             v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')"
+            :disable="!removeReason"
             text-color="white"
             label="Удалить"
             unelevated
@@ -177,7 +134,7 @@
             @click="onRemoveOrder"
             no-caps
             dense
-          />
+            > <q-tooltip v-if="!removeReason" anchor="top middle">Укажите причину удаления</q-tooltip> </q-btn>
           <q-btn
             text-color="white"
             label="Отмена"
@@ -187,6 +144,22 @@
             no-caps
             dense
           />
+        </div>
+        <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
+          selected &&
+          selected.isRequest &&
+          selected.isApproved &&
+          !isCustomer &&
+          currentUser?.id == 1
+          ">
+          <q-btn 
+            text-color="white" 
+            label="Принудительно завершить" 
+            unelevated 
+            class="border-none bg-orange col"
+            @click="onComplete" 
+            no-caps 
+            dense />
         </div>
       </div>
     </q-form>
@@ -202,21 +175,25 @@ import CustomerSelect from "src/components/customer/form/fields/Customer.vue";
 import PlaceSelect from "src/components/order/form/fields/Place.vue";
 import PointsConstructor from "src/components/order/form/fields/Points.vue";
 import DescriptionField from "src/components/order/form/fields/Description.vue";
+import RemoveReasonField from "./fields/RemoveReason.vue";
 import OrderTimePicker from "src/components/order/form/fields/Time.vue";
+import { ref } from 'vue';
 export default {
-  name: "OrderCreation",
+    name: "OrderCreation",
   props: ["selected", "isCustomer", "copyMode"],
   components: {
     CustomerSelect,
     PlaceSelect,
     PointsConstructor,
     DescriptionField,
+    RemoveReasonField,
     OrderTimePicker,
   },
   computed: {
     ...mapState("current", [
       "selectedTransportId",
       "orderIsEmergency",
+      "removeOrderReason",
       "currentUser",
     ]),
     // ...mapGetters("transport", ["getByOnlyFreeFilter", "getTransportById"]),
@@ -232,7 +209,7 @@ export default {
       },
       set(newVal) {
         this.setOrderIsEmergency(newVal);
-        this.description = null
+        this.description = null;
       },
     },
     _approvementMenuActive: {
@@ -283,6 +260,10 @@ export default {
             !this.selected.isRequest)
         );
       },
+      set(newVal) {
+        this.setRemoveOrderReason(newVal);
+        this.removeReason = null;
+      }
     },
     _customerCreationCheck: {
       get() {
@@ -300,7 +281,7 @@ export default {
     // },
   },
   methods: {
-    ...mapActions("order", ["updateRoute", "removeRoute", "addRoute"]),
+    ...mapActions("order", ["updateRoute", "completeRoute", "removeRoute", "addRoute"]),
     ...mapMutations("current", [
       "setSelectedTransportId",
       "setOrderIsEmergency",
@@ -336,8 +317,8 @@ export default {
         orderTime: ignoreDateTime
           ? this.orderTime
           : !this._creationMode && new Date() > this.orderTime
-          ? new Date()
-          : this.orderTime,
+            ? new Date()
+            : this.orderTime,
         departurePointName: this.departurePointName,
         isEmergency: this._orderIsEmergency,
         transportId: this.selectedTransportId,
@@ -362,16 +343,16 @@ export default {
         height: point.cargo.height ?? 0,
         contactPhoneNumber:
           !!point.passenger.contact.phoneNumber &&
-          point.passenger.contact.phoneNumber.trim() != "" &&
-          !!point.passenger.contact.fullname &&
-          point.passenger.contact.fullname.trim() != ""
+            point.passenger.contact.phoneNumber.trim() != "" &&
+            !!point.passenger.contact.fullname &&
+            point.passenger.contact.fullname.trim() != ""
             ? point.passenger.contact.phoneNumber
             : null,
         contactFullname:
           !!point.passenger.contact.phoneNumber &&
-          point.passenger.contact.phoneNumber.trim() != "" &&
-          !!point.passenger.contact.fullname &&
-          point.passenger.contact.fullname.trim() != ""
+            point.passenger.contact.phoneNumber.trim() != "" &&
+            !!point.passenger.contact.fullname &&
+            point.passenger.contact.fullname.trim() != ""
             ? point.passenger.contact.fullname
             : null,
         name: point.cargo.withCargo ? point.cargo.name : "Пассажиры", // TODO Пассажиры
@@ -393,6 +374,7 @@ export default {
         scenario: point.cargo.withCargo && point.cargo.weight >= 60 ? 2 : 1,
       };
     },
+
     async onApprove() {
       //
       if (this.checkAlerts()) return;
@@ -409,6 +391,7 @@ export default {
       await this.updateRoute({
         id: this.selected.id,
         ...this.buildRoute(),
+        comment: this.declineReason,
         isApproved: false,
         isDeclined: true,
       });
@@ -449,8 +432,22 @@ export default {
         ? await this.onAddOrder()
         : await this.onUpdateOrder();
     },
+
     async onRemoveOrder() {
-      await this.removeRoute({ id: this.selected.id });
+      //
+      await this.removeRoute({ 
+        id: this.selected.id, 
+        comment: this.removeReason
+      });
+      this.$refs.form.reset();
+    },
+    async onComplete() {
+      await this.completeRoute({
+        id: this.selected.id,
+        isApproved: true,
+        isDeclined: false,
+        isDone: true,
+      });
       this.$refs.form.reset();
     },
     resetForm() {
@@ -474,6 +471,8 @@ export default {
       this.departurePointName = null;
       this.orderTime = new Date();
       this.description = null;
+      this.removeReason = null;
+      this.declineReason = null;
       this.points = [];
       this.$emit("done");
       this.$emit("routeCopy", false);
@@ -499,6 +498,8 @@ export default {
         this.setCustomerSubdivision(subdivision);
 
         this.description = order.description;
+        this.removeReason = order.removeReason;
+        this.declineReason = order.declineReason;
 
         if (!this.copyMode) this.setSelectedTransportId(order.transportId);
         else this.setSelectedTransportId(null);
@@ -586,6 +587,8 @@ export default {
       departurePointName: null,
       orderTime: new Date(),
       description: null,
+      removeReason: null,
+      declineReason: null,
       points: [],
       _creationMode: false,
     };

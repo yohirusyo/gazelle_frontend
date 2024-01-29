@@ -21,6 +21,7 @@ export async function requestOrders(context, ignore = false) {
         context.commit("updateRoute", route)
       );
       socketio.on("route_delete", (id) => context.commit("removeRoute", id));
+      socketio.on("route_complete", (id) => context.commit("completeRoute", id));
     },
     "",
     ignore
@@ -52,7 +53,7 @@ export async function addRoute({ commit }, form) {
 }
 
 export async function updateRoute({ commit }, { id, ...form }) {
-  return api
+    return api
     .patch(`order/batch/${id}`, form)
     .then(({ data }) => {
       showNotifyResult(true, "Маршрут успешно изменен!");
@@ -60,6 +61,17 @@ export async function updateRoute({ commit }, { id, ...form }) {
     .catch((err) => {
       showNotifyResult(false, "Ошибка изменения маршрута!");
     });
+}
+
+export async function completeRoute({commit}, {id, ...form}) {
+  return api
+    .patch(`order/complete/${id}`, form)
+    .then(({data}) => {
+      showNotifyResult(true, "Маршрут успешно завершен");
+    })
+    .catch((err) => {
+      showNotifyResult(false, "Ошибка завершения маршрута")
+    })
 }
 
 export async function addOrderRequest({ commit }, form) {
@@ -124,9 +136,9 @@ export async function removeOrder({ commit }, { id }) {
     });
 }
 
-export async function removeRoute({ commit }, { id }) {
+export async function removeRoute({ commit }, { id, ...form }) {
   return api
-    .delete(`order/batch/${id}`)
+    .post(`order/batch/${id}`, form)
     .then((_) => {
       showNotifyResult(true, "Маршрут успешно удален!");
     })
