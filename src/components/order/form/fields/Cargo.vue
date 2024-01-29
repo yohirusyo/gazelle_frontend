@@ -17,8 +17,10 @@
         v-else
         :otherName="_name"
         :selectedCargoTypeId="_selectedCargoTypeId"
+        :withCargoTypeRequest="_withCargoTypeRequest"
         @update:otherName="(val) => (_name = val)"
         @update:selectedCargoTypeId="(val) => (_selectedCargoTypeId = val)"
+        @update:withCargoTypeRequest="(val) => (_withCargoTypeRequest = val)"
       />
       <q-input
         v-model="_weight"
@@ -212,10 +214,20 @@ export default {
         return this.modelValue.cargoTypeId;
       },
       set(val) {
-        console.warn(val);
         this.$emit("update:modelValue", {
           ...this.modelValue,
           cargoTypeId: val,
+        });
+      },
+    },
+    _withCargoTypeRequest: {
+      get() {
+        return this.modelValue.withCargoTypeRequest;
+      },
+      set(val) {
+        this.$emit("update:modelValue", {
+          ...this.modelValue,
+          withCargoTypeRequest: val,
         });
       },
     },

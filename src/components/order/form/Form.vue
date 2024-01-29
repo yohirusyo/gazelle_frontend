@@ -82,6 +82,7 @@
               label="Аварийная (укажите причину аварийности в комментарии)"
               dense
               class="q-mb-md"
+              v-if="!_isMetiz || _orderCanBeEmergency"
             />
           </div>
         </q-scroll-area>
@@ -250,7 +251,7 @@ import PointsConstructor from "src/components/order/form/fields/Points.vue";
 import DescriptionField from "src/components/order/form/fields/Description.vue";
 import RemoveReasonField from "./fields/RemoveReason.vue";
 import OrderTimePicker from "src/components/order/form/fields/Time.vue";
-import { ref } from "vue";
+import { api, getConnection } from "src/boot/axios";
 export default {
   name: "OrderCreation",
   props: ["selected", "isCustomer", "copyMode"],
@@ -283,6 +284,21 @@ export default {
       set(newVal) {
         this.setOrderIsEmergency(newVal);
         this.description = null;
+      },
+    },
+    _orderCanBeEmergency: {
+      get() {
+        console.warn(this.points);
+        return (
+          this._cargoTypes.find(
+            (ct) => ct.id === this.points[0].cargo.cargoTypeId
+          )?.withEmergency ?? false
+        );
+      },
+    },
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
       },
     },
     _approvementMenuActive: {
@@ -398,7 +414,10 @@ export default {
           ? new Date()
           : this.orderTime,
         departurePointName: this.departurePointName,
-        isEmergency: this._orderIsEmergency,
+        isEmergency:
+          !this._isMetiz || this._orderCanBeEmergency
+            ? this._orderIsEmergency
+            : false,
         transportId: this.selectedTransportId,
         customerPhoneNumber: this.customer.phoneNumber,
         customerFullname: this.customer.fullname,
@@ -412,7 +431,6 @@ export default {
       };
     },
     buildPoint(point) {
-      console.warn(point);
       return {
         destinationName: point.destinationName,
         passengerCount: point.passenger.passengerCount ?? 0,
@@ -435,7 +453,7 @@ export default {
             ? point.passenger.contact.fullname
             : null,
         cargoTypeId: point.cargo.cargoTypeId,
-        withCargoTypeRequest: point.cargo.cargoTypeId === -1,
+        withCargoTypeRequest: point.cargo.withCargoTypeRequest,
         name: point.cargo.withCargo ? point.cargo.name : "Пассажиры", // TODO Пассажиры
         isNew: this.copyMode ? true : point.isNew,
         existingId: this.copyMode ? null : point.existingId,
@@ -609,6 +627,8 @@ export default {
               withCargo:
                 o.width != 0 || o.length != 0 || o.weight != 0 || o.height != 0,
               name: o.name,
+              cargoTypeId: o.cargoTypeId,
+              withCargoTypeRequest: false,
               width: o.width,
               length: o.length,
               height: o.height,
@@ -647,7 +667,7 @@ export default {
     },
     dayjs,
   },
-  mounted() {
+  async mounted() {
     if (this.$route.params.id) {
       const route = this.getRequestById(this.$route.params.id);
       this.$emit("routeSelected", route);
@@ -656,6 +676,12 @@ export default {
       this.$emit("routeCopy", true);
     }
     this.loadData();
+    try {
+      const { data } = await api.get("/recommendation/cargo-types");
+      this._cargoTypes = data;
+    } catch (error) {
+      console.error("Ошибка получения типов ТС");
+    }
   },
   data() {
     return {
@@ -672,6 +698,7 @@ export default {
       declineReason: null,
       points: [],
       _creationMode: false,
+      _cargoTypes: [],
     };
   },
   watch: {

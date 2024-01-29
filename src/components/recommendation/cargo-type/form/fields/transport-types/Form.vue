@@ -17,25 +17,15 @@
       :option-label="(item) => item.description"
       :option-value="(item) => item.id"
       v-model="selected"
+      label="Тип ТС"
     ></q-select>
-    <q-input
-      v-model.number="priority"
-      type="text"
-      square
-      outlined
-      dense
-      hide-bottom-space
-      hide-hint
-      label-color="grey"
-      label="Приоритет"
-      autocomplete="off"
-      class="q-mx-sm"
-    />
+
+    <Priority v-model="priority" class="q-mx-sm col col" />
     <q-btn
       text-color="white"
       label="Привязать тип ТС"
       unelevated
-      class="border-none bg-blue-4"
+      class="border-none bg-blue-4 col col-shrink"
       type="submit"
       no-caps
       dense
@@ -46,8 +36,9 @@
 <script setup>
 import { ref, computed, inject } from "vue";
 import { api } from "src/boot/axios";
+import Priority from "../Priority.vue";
 
-const transportTypes = inject('transportTypes')
+const transportTypes = inject("transportTypes");
 
 const props = defineProps({
   relatedTransportTypes: Array(Object),

@@ -1,20 +1,22 @@
 <template>
-  <q-input
-    v-model.number="model"
-    type="text"
+  <q-select
     square
     outlined
-    dense
     hide-bottom-space
     hide-hint
-    label-color="grey"
+    dense
+    flat
+    :options="priorityList"
+    :option-label="(item) => item.description"
+    :option-value="(item) => item.id"
+    v-model="model"
     label="Приоритет"
-    autocomplete="off"
-  />
+  ></q-select>
 </template>
 
 <script setup>
 import { computed } from "vue";
+import { priorityList } from "src/components/recommendation/helpers";
 
 const props = defineProps({
   modelValue: {
@@ -27,10 +29,10 @@ const emit = defineEmits(["update:modelValue"]);
 
 const model = computed({
   get() {
-    return props.modelValue;
+    return priorityList.find((p) => p.id === props.modelValue);
   },
   set(value) {
-    return emit("update:modelValue", value);
+    return emit("update:modelValue", value?.id);
   },
 });
 </script>

@@ -28,6 +28,15 @@
     class="q-mb-md fit"
     v-if="selectedCargoType?.id === -1"
   />
+
+  <q-checkbox
+    v-model="withCargoTypeRequest"
+    class="q-mb-md fit"
+    dense
+    v-if="selectedCargoType?.id === -1"
+  >
+    Создать запрос за создание типа груза
+  </q-checkbox>
 </template>
 
 <script setup>
@@ -39,19 +48,30 @@ const cargoTypes = ref([]);
 const props = defineProps({
   otherName: String,
   selectedCargoTypeId: Number,
+  withCargoTypeRequest: Boolean,
 });
 
 const emit = defineEmits(["update:otherName", "update:selectedCargoTypeId"]);
 
 const selectedCargoType = computed({
   get() {
-    return cargoTypesWithOthers.value.find(
-      (ct) => ct.id === props.selectedCargoTypeId
-    );
+    return props.selectedCargoTypeId
+      ? cargoTypesWithOthers.value.find(
+          (ct) => ct.id === props.selectedCargoTypeId
+        ) ?? cargoTypesWithOthers.value.find((ct) => ct.id === -1)
+      : null;
   },
   set(val) {
-    console.log("emits", "selectedCargoTypeId", val.id);
     emit("update:selectedCargoTypeId", val.id);
+  },
+});
+
+const withCargoTypeRequest = computed({
+  get() {
+    return props.withCargoTypeRequest;
+  },
+  set(val) {
+    emit("update:withCargoTypeRequest", val);
   },
 });
 

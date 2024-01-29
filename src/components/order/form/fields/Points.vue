@@ -137,6 +137,7 @@ export default {
             cargo: {
               withCargo: point.cargo.withCargo,
               cargoTypeId: point.cargo.cargoTypeId,
+              withCargoTypeRequest: point.cargo.withCargoTypeRequest,
               name: point.cargo.name,
               width: point.cargo.width,
               length: point.cargo.length,
@@ -173,6 +174,7 @@ export default {
         cargo: {
           withCargo: false,
           cargoTypeId: null,
+          withCargoTypeRequest: false,
           name: null,
           width: null,
           length: null,
@@ -200,6 +202,7 @@ export default {
           cargo: {
             withCargo: firstPoint.cargo.withCargo,
             cargoTypeId: firstPoint.cargo.cargoTypeId,
+            withCargoTypeRequest: false,
             name: firstPoint.cargo.name,
             width: firstPoint.cargo.width,
             length: firstPoint.cargo.length,

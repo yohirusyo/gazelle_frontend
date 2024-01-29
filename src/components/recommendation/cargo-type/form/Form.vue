@@ -10,6 +10,9 @@
       <div class="column col q-gutter-y-md">
         <Description v-model="description" />
         <Priority v-model="priority" />
+        <q-checkbox v-model="withEmergency">
+          Возможность создания аварийной заявки
+        </q-checkbox>
         <TransportTypesList v-if="!creationMode" :id="selected.id" />
       </div>
 
@@ -76,10 +79,12 @@ const creationMode = computed(() => !props.selected);
 
 const description = ref("");
 const priority = ref(1);
+const withEmergency = ref(false);
 
 const loadNew = () => {
   description.value = "";
   priority.value = 1;
+  withEmergency.value = false;
 };
 
 const form = ref(null);
@@ -97,6 +102,7 @@ const createCargoType = async () => {
   await api.post("/recommendation/cargo-types", {
     description: description.value,
     priority: priority.value,
+    withEmergency: withEmergency.value,
   });
 };
 
@@ -121,6 +127,7 @@ const loadData = () => {
   if (props.selected) {
     description.value = props.selected.description;
     priority.value = props.selected.priority;
+    withEmergency.value = props.selected.withEmergency;
   } else {
     loadNew();
   }

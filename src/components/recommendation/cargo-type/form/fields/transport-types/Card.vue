@@ -5,7 +5,11 @@
   >
     <div class="col-5">{{ props.transportType.description }}</div>
     <div class="col-5">
-      {{ props.transportType.CargoTypeTransportTypeAssociation.transportPrior }}
+      {{
+        getPriorityDescriptionByNumber(
+          props.transportType.CargoTypeTransportTypeAssociation.transportPrior
+        )
+      }}
     </div>
     <div class="col-2 row justify-end">
       <q-btn
@@ -24,7 +28,7 @@
 <script setup>
 import { api } from "src/boot/axios";
 import { inject } from "vue";
-
+import { getPriorityDescriptionByNumber } from "src/components/recommendation/helpers";
 const props = defineProps({
   transportType: Object,
 });
