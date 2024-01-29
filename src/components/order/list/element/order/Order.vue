@@ -2,7 +2,7 @@
   <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
 
 
-    <q-td key="expand" :props="props">
+    <q-td key="expand" :props="props" :class="_latedClass">
       <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
         v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
       <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
