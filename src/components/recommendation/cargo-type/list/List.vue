@@ -19,11 +19,10 @@
 </template>
 
 <script setup>
-import { api } from "src/boot/axios";
 import VScrolltable from "src/components/base/VScrolltable.vue";
-import { onMounted, ref, defineEmits } from "vue";
+import { defineEmits, inject } from "vue";
 
-const cargoTypes = ref([]);
+const cargoTypes = inject("cargoTypes");
 
 const cargoTypesColumns = [
   {
@@ -43,15 +42,6 @@ const cargoTypesColumns = [
     field: (row) => row.priority,
   },
 ];
-
-const fetchCargoTypes = async () => {
-  const { data } = await api.get("/recommendation/cargo-types");
-  cargoTypes.value = data;
-};
-
-onMounted(async () => {
-  await fetchCargoTypes();
-});
 
 const emit = defineEmits(["onSelected"]);
 

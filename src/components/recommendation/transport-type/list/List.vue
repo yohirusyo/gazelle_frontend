@@ -1,7 +1,7 @@
 <template>
   <VScrolltable
-    :rows="cargoTypes"
-    :columns="cargoTypesColumns"
+    :rows="transportTypes"
+    :columns="transportTypesColumns"
     row-key="id"
     :report="false"
   >
@@ -31,13 +31,12 @@
 </template>
 
 <script setup>
-import { api } from "src/boot/axios";
 import VScrolltable from "src/components/base/VScrolltable.vue";
-import { onMounted, ref, defineEmits } from "vue";
+import { defineEmits, inject } from "vue";
 
-const cargoTypes = ref([]);
+const transportTypes = inject('transportTypes')
 
-const cargoTypesColumns = [
+const transportTypesColumns = [
   {
     name: "description",
     required: true,
@@ -87,15 +86,6 @@ const cargoTypesColumns = [
     field: (row) => row.passengerSeats,
   },
 ];
-
-const fetchCargoTypes = async () => {
-  const { data } = await api.get("/recommendation/transport-types");
-  cargoTypes.value = data;
-};
-
-onMounted(async () => {
-  await fetchCargoTypes();
-});
 
 const emit = defineEmits(["onSelected"]);
 

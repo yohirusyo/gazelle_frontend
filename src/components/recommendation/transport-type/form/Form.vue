@@ -26,6 +26,7 @@
             type="submit"
             no-caps
             dense
+            v-if="creationMode"
           />
 
           <q-btn
@@ -36,6 +37,17 @@
             no-caps
             dense
             @click="onDelete"
+            v-if="!creationMode"
+          />
+
+          <q-btn
+            text-color="white"
+            label="Отмена"
+            unelevated
+            class="border-none col bg-red"
+            no-caps
+            dense
+            @click="resetForm"
           />
         </div>
       </div>
@@ -44,8 +56,16 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch, onMounted, defineEmits } from "vue";
-import Description from "./fields/description.vue";
+import {
+  ref,
+  defineProps,
+  onMounted,
+  defineEmits,
+  inject,
+  computed,
+  watch,
+} from "vue";
+import Description from "./fields/Description.vue";
 import Weight from "./fields/Weight.vue";
 import Length from "./fields/Length.vue";
 import Width from "./fields/Width.vue";
@@ -58,7 +78,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["done"]);
 
-const creationMode = ref(false);
+const creationMode = computed(() => !props.selected);
 
 const description = ref("");
 const weight = ref(0);
@@ -78,9 +98,12 @@ const loadNew = () => {
 
 const form = ref(null);
 
-const resetForm = () => {
+const fetchTransportTypes = inject("fetchTransportTypes");
+
+const resetForm = async () => {
   loadNew();
   form.value.resetValidation();
+  await fetchTransportTypes();
   emit("done");
 };
 
@@ -101,13 +124,13 @@ const onSubmit = async () => {
 };
 
 const onDelete = async () => {
+  await api.delete(`/recommendation/transport-types/${props.selected.id}`);
   resetForm();
 };
 
 watch(
   () => props.selected,
   (newSelected, oldSelected) => {
-    creationMode.value = !newSelected;
     if (newSelected != oldSelected) loadData();
   }
 );

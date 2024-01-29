@@ -10,6 +10,7 @@
       <div class="column col q-gutter-y-md">
         <Description v-model="description" />
         <Priority v-model="priority" />
+        <TransportTypesList v-if="!creationMode" :id="selected.id" />
       </div>
 
       <div class="col col-shrink q-gutter-y-sm column">
@@ -22,6 +23,7 @@
             type="submit"
             no-caps
             dense
+            v-if="creationMode"
           />
 
           <q-btn
@@ -32,6 +34,17 @@
             no-caps
             dense
             @click="onDelete"
+            v-if="!creationMode"
+          />
+
+          <q-btn
+            text-color="white"
+            label="Отмена"
+            unelevated
+            class="border-none col bg-red"
+            no-caps
+            dense
+            @click="resetForm"
           />
         </div>
       </div>
@@ -40,9 +53,18 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch, onMounted, defineEmits } from "vue";
+import {
+  ref,
+  defineProps,
+  computed,
+  onMounted,
+  defineEmits,
+  inject,
+  watch,
+} from "vue";
 import Description from "./fields/Description.vue";
 import Priority from "./fields/Priority.vue";
+import TransportTypesList from "./fields/transport-types/List.vue";
 import { api } from "src/boot/axios";
 
 const props = defineProps({
@@ -50,7 +72,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["done"]);
 
-const creationMode = ref(false);
+const creationMode = computed(() => !props.selected);
 
 const description = ref("");
 const priority = ref(1);
@@ -62,9 +84,12 @@ const loadNew = () => {
 
 const form = ref(null);
 
-const resetForm = () => {
+const fetchCargoTypes = inject("fetchCargoTypes");
+
+const resetForm = async () => {
   loadNew();
   form.value.resetValidation();
+  await fetchCargoTypes();
   emit("done");
 };
 
@@ -81,13 +106,13 @@ const onSubmit = async () => {
 };
 
 const onDelete = async () => {
+  await api.delete(`/recommendation/cargo-types/${props.selected.id}`);
   resetForm();
 };
 
 watch(
   () => props.selected,
   (newSelected, oldSelected) => {
-    creationMode.value = !newSelected;
     if (newSelected != oldSelected) loadData();
   }
 );
