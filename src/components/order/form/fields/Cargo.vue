@@ -11,6 +11,14 @@
         @selected="(val) => (_name = val?.name)"
         :required="true"
         class="q-mb-md"
+        v-if="!_isMetiz"
+      />
+      <CargoWithCargoTypes
+        v-else
+        :otherName="_name"
+        :selectedCargoTypeId="_selectedCargoTypeId"
+        @update:otherName="(val) => (_name = val)"
+        @update:selectedCargoTypeId="(val) => (_selectedCargoTypeId = val)"
       />
       <q-input
         v-model="_weight"
@@ -86,6 +94,7 @@
 import ISelect from "components/base/ISelect.vue";
 import { mapState } from "vuex";
 import { getConnection } from "src/boot/axios";
+import CargoWithCargoTypes from "./CargoWithCargoTypes.vue";
 export default {
   props: ["modelValue", "withoutPassengers"],
   data() {
@@ -138,9 +147,14 @@ export default {
         return this.modelValue;
       },
     },
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
+      },
+    },
     _names: {
       get() {
-        if (getConnection() == "mmkmetiz")
+        if (this._isMetiz)
           return [...this.additionalNames.map(this.buildName), ...this.names];
         return this.names;
       },
@@ -193,9 +207,22 @@ export default {
         this.$emit("update:modelValue", { ...this.modelValue, height: val });
       },
     },
+    _selectedCargoTypeId: {
+      get() {
+        return this.modelValue.cargoTypeId;
+      },
+      set(val) {
+        console.warn(val);
+        this.$emit("update:modelValue", {
+          ...this.modelValue,
+          cargoTypeId: val,
+        });
+      },
+    },
   },
   components: {
     ISelect,
+    CargoWithCargoTypes,
   },
 };
 </script>

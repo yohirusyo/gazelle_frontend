@@ -6,8 +6,8 @@
     :report="false"
   >
     <template v-slot:body="props">
-      <q-tr :props="props" @click="onSelected(props.row)">
-        <q-td key="description" :props="props">
+      <q-tr :props="props" @click="onSelected(props.row)" :class="{'bg-green': props.row.isRequest}">
+        <q-td key="description" :props="props" >
           {{ props.row.description }}
         </q-td>
         <q-td key="priority" :props="props">
