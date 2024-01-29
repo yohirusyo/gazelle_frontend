@@ -545,7 +545,8 @@ export default {
               ? `Удален / ${val.deletedByFullname}`
               : val.order.isRequest && val.order.isDeclined
               ? `Отклонен / ${val.deletedByFullname}`
-              : "Завершен" /* (!val ? "Завершен" : "Удален") */,
+              : `Завершен ${Math.abs(dayjs(val.order.orderTime).diff(dayjs(val.entryToCustomerFact), 'hour', true)) > 3 ?
+              ` с опозданием` : ``}`,
           sortable: true,
         },
         {

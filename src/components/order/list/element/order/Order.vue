@@ -1,43 +1,21 @@
 <template>
-  <q-tr
-    :props="props"
-    :class="_class"
-    @click="order.isDone ? null : onSelected(order)"
-    :id="'order-list-item-' + order.id"
-  >
-    <q-td key="expand" :props="props">
-      <SwitcherRouteShow
-        v-model="_modelValue"
-        :routeId="props.row.id"
-        v-if="order.id == order.parentOrder && props.row.orders.length != 1"
-      />
-      <div
-        v-else-if="props.row.orders.length == 1 || order.parentOrder == null"
-      >
+  <q-tr :props="props" :class="_class" @click="order.isDone ? null : onSelected(order)"
+    :id="'order-list-item-' + order.id">
+    <q-td :class="_latedClass" key="expand" :props="props">
+      <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
+        v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
+      <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
         Одиночная
       </div>
       <div v-else class="column items-center">
-        <q-icon
-          class="q-ml-md"
-          name="las la-level-up-alt"
-          size="md"
-          color="grey"
-          style="transform: rotate(90deg)"
-        />
+        <q-icon class="q-ml-md" name="las la-level-up-alt" size="md" color="grey" style="transform: rotate(90deg)" />
         № {{ order.parentOrder }}
       </div>
     </q-td>
     <q-td key="time" :props="props">
-      <Time
-        :id="order.id"
-        :isEmergency="order.isEmergency"
-        :orderTime="order.orderTime"
-        :name="order.name"
-        :description="order.description"
-        :class="_isYesterdayTime ? 'bg-blue' : ''"
-        :maxWeight="_maxWeight"
-        :createdAt="order.createdAt"
-      />
+      <Time :id="order.id" :isEmergency="order.isEmergency" :orderTime="order.orderTime" :name="order.name"
+        :description="order.description" :class="_isYesterdayTime ? 'bg-blue' : ''" :maxWeight="_maxWeight"
+        :createdAt="order.createdAt" />
     </q-td>
     <q-td key="customer" :props="props">
       <Customer :customerId="order.customerId" />
@@ -54,11 +32,7 @@
       <Transport :transportId="order.transportId" />
     </q-td>
     <q-td key="status" :props="props">
-      <Status
-        :statusId="order.statusId"
-        :statusChangedAt="order.statusChangedAt"
-        :isDone="order.isDone"
-      />
+      <Status :statusId="order.statusId" :statusChangedAt="order.statusChangedAt" :isDone="order.isDone" />
     </q-td>
   </q-tr>
 </template>
@@ -115,6 +89,15 @@ export default {
     _endedClass() {
       if (this.order.isDone) return "ended-order";
       return "";
+    },
+    _latedClass() {
+      const date1 = dayjs(this.order.orderTime)
+      const date2 = dayjs(this.order.stats.entryToCustomerFact)
+      if (this.order.stats.entryToCustomerFact) {
+        const diffTime = Math.abs(date1.diff(date2, 'hour', true))
+        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2"
+        if (diffTime > 3) return "bg-red-2"
+      }
     },
     _class() {
       return [this._orderClass, this._endedClass].join(" ");
