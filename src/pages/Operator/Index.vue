@@ -8,7 +8,7 @@
       <Order />
     </div>
     <div class="col column" v-if="!$q.screen.xs">
-      <div class="col row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
+      <div class="col row" style="-bottom: 1px solid rgba(0, 0, 0, 0.12)">
         <div class="col q-pa-md">
           <Transport :col="6" :isLocal="false" />
         </div>
