@@ -20,13 +20,18 @@
         <div class="col row q-gutter-x-sm items-center">
           <q-btn
             text-color="white"
-            label="Создать"
+            :label="
+              creationMode
+                ? 'Создать'
+                : props.selected.isRequest
+                ? 'Принять'
+                : 'Обновить'
+            "
             unelevated
             class="border-none col bg-blue-4"
             type="submit"
             no-caps
             dense
-            v-if="creationMode"
           />
 
           <q-btn
@@ -106,8 +111,31 @@ const createCargoType = async () => {
   });
 };
 
+const updateCargoType = async () => {
+  await api.patch(`/recommendation/cargo-types/${props.selected.id}`, {
+    description: description.value,
+    priority: priority.value,
+    withEmergency: withEmergency.value,
+  });
+};
+
+const approveCargoType = async () => {
+  await api.patch(`/recommendation/cargo-types/${props.selected.id}`, {
+    description: description.value,
+    priority: priority.value,
+    withEmergency: withEmergency.value,
+    isRequest: false,
+  });
+};
+
 const onSubmit = async () => {
-  createCargoType();
+  if (creationMode.value) {
+    await createCargoType();
+  } else if (props.selected.isRequest) {
+    await approveCargoType();
+  } else {
+    await updateCargoType();
+  }
   resetForm();
 };
 

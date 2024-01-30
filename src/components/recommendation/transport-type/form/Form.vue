@@ -20,13 +20,12 @@
         <div class="col row q-gutter-x-sm items-center">
           <q-btn
             text-color="white"
-            label="Создать"
+            :label="creationMode ? 'Создать' : 'Обновить'"
             unelevated
             class="border-none col bg-blue-4"
             type="submit"
             no-caps
             dense
-            v-if="creationMode"
           />
 
           <q-btn
@@ -118,8 +117,23 @@ const createTransportType = async () => {
   });
 };
 
+const updateTransportType = async () => {
+  await api.patch(`/recommendation/transport-types/${props.selected.id}`, {
+    description: description.value,
+    weight: weight.value,
+    length: length.value,
+    width: width.value,
+    height: height.value,
+    passengerSeats: passengerSeats.value,
+  });
+};
+
 const onSubmit = async () => {
-  createTransportType();
+  if (creationMode.value) {
+    await createTransportType();
+  } else {
+    await updateTransportType();
+  }
   resetForm();
 };
 
