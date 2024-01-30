@@ -138,6 +138,14 @@ const routes = [
         },
       },
       {
+        path: "recommendation",
+        component: () => import("src/pages/Admin/Recommendation.vue"),
+        meta: {
+          roles: ["ADMIN"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: ":id/:copy?",
         component: () => import("pages/Index.vue"),
         meta: {

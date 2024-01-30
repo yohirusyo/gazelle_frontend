@@ -8,7 +8,7 @@
       :index="index"
       :isFirst="index === 0"
       :isSolo="points.length === 0"
-      :isLast="index === points.length-1"
+      :isLast="index === points.length - 1"
       :initPointsLength="initPointsLength"
       :points="points"
       @remove="remove"
@@ -59,7 +59,7 @@ export default {
       id: 0,
       toggle: true,
       sortable: null,
-      initPointsLength: 0
+      initPointsLength: 0,
     };
   },
   methods: {
@@ -71,7 +71,7 @@ export default {
       }
     },
     elDown(index) {
-      if (index != this.points.length-1) {
+      if (index != this.points.length - 1) {
         let next = this.points[index + 1];
         this.points[index + 1] = this.points[index];
         this.points[index] = next;
@@ -136,6 +136,8 @@ export default {
             },
             cargo: {
               withCargo: point.cargo.withCargo,
+              cargoTypeId: point.cargo.cargoTypeId,
+              withCargoTypeRequest: point.cargo.withCargoTypeRequest,
               name: point.cargo.name,
               width: point.cargo.width,
               length: point.cargo.length,
@@ -171,6 +173,8 @@ export default {
         },
         cargo: {
           withCargo: false,
+          cargoTypeId: null,
+          withCargoTypeRequest: false,
           name: null,
           width: null,
           length: null,
@@ -197,6 +201,8 @@ export default {
           },
           cargo: {
             withCargo: firstPoint.cargo.withCargo,
+            cargoTypeId: firstPoint.cargo.cargoTypeId,
+            withCargoTypeRequest: false,
             name: firstPoint.cargo.name,
             width: firstPoint.cargo.width,
             length: firstPoint.cargo.length,

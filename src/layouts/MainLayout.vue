@@ -135,7 +135,17 @@
             <q-tooltip> Карта </q-tooltip>
           </q-btn>
 
-          <!-- <q-btn
+          <q-btn
+            icon="las la-question-circle"
+            to="/recommendation"
+            flat
+            dense
+            v-if="currentUser?.role.includes('ADMIN')"
+          >
+            <q-tooltip> Рекоммендации </q-tooltip>
+          </q-btn>
+
+          <q-btn
             icon="las la-book"
             to="/report"
             flat
@@ -180,7 +190,7 @@
             dense
             v-if="
               (currentUser?.role == 'ADMIN' ||
-              currentUser?.role == 'WATCHER_WITH_REPORTS') &&
+                currentUser?.role == 'WATCHER_WITH_REPORTS') &&
               connection == `mmkmetiz`
             "
           >
@@ -192,8 +202,8 @@
             flat
             dense
             v-if="
-              (currentUser?.role == 'ADMIN' ||
-              currentUser?.role == 'WATCHER_WITH_REPORTS')
+              currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS'
             "
           >
             <q-tooltip> Отчёт по подразделеням </q-tooltip>
