@@ -8,7 +8,7 @@
       <q-checkbox v-model="_selected" :disable="!_isNotDisabled" dense />
     </q-td>
 
-    <q-td key="type">{{ transport?.type }}</q-td>
+    <q-td key="type">{{ transportType }}</q-td>
     <q-td
       key="number"
       @mouseover="_hovered = transport?.id"
@@ -58,6 +58,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
+import { getConnection } from "src/boot/axios";
 dayjs.extend(utc);
 export default {
   name: "TransportListElement",
@@ -65,7 +66,8 @@ export default {
     AutoNumber,
     TransportStatus,
   },
-  props: ["id", "freeStatuses", "selected"],
+  props: ["id", "freeStatuses", "selected", "transportTypes"],
+  inject: ["isMetiz"],
   computed: {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
@@ -77,6 +79,17 @@ export default {
       "orderIsEmergency",
       "hoveredTransportId",
     ]),
+    transportType: {
+      get() {
+        if (this.isMetiz)
+          return (
+            this.transportTypes.find(
+              (t) => t.id === this.transport.transportTypeId
+            )?.description ?? "-"
+          );
+        else return this.transport.type;
+      },
+    },
     ...mapState("order", [
       "customerPhoneNumber",
       "customerFullname",
@@ -96,7 +109,9 @@ export default {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
       if (this.orderIsEmergency) return true;
-      if (this._isFreeMoreThan15Minutes) return true;
+      if (this._isFreeMoreThan15Minutes || this._connection == "mmkmetiz")
+        return true;
+      console.log(this._connection);
       return false;
     },
 
@@ -174,6 +189,7 @@ export default {
       _isFreeMoreThan15Minutes: false,
       _isBusyMoreThan1Hour: false,
       oldStatus: null,
+      _connection: getConnection(),
     };
   },
   mounted() {

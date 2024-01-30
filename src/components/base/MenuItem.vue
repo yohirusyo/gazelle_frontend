@@ -33,7 +33,7 @@
           no-caps
           :ripple="false"
           style="border-radius: 8px"
-          v-if="!currentUser?.role.includes('WATCHER')"
+          v-if="!currentUser?.role.includes('WATCHER') && !currentUser?.role.includes('OPERATOR')"
         >
           <q-tooltip>
             {{ modelValue ? "Редактирование" : "Создание" }}

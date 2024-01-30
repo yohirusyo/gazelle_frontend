@@ -10,7 +10,7 @@
         <q-scroll-area class="col">
           <div class="column col q-gutter-y-md">
             <CustomerSelect
-              :phoneNumber="phoneNumber"
+                            :phoneNumber="phoneNumber"
               :fullname="fullname"
               :subdivision="subdivision"
               :mvz="mvz"
@@ -25,7 +25,7 @@
       <div class="col col-shrink q-gutter-y-sm column">
         <div class="col row q-gutter-x-sm items-center">
           <q-btn
-            v-if="_creationMode"
+            v-if="_creationMode && !currentUser?.role.includes('OPERATOR')"
             text-color="white"
             label="Создать"
             unelevated
@@ -36,7 +36,7 @@
           />
 
           <q-btn
-            v-if="!_creationMode"
+            v-if="!_creationMode && !currentUser?.role.includes('OPERATOR')"
             text-color="white"
             label="Изменить"
             unelevated
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import CustomerSelect from "./fields/Customer.vue";
 export default {
   name: "CustomerForm",
@@ -87,6 +87,14 @@ export default {
       mvz: null,
       _creationMode: false,
     };
+  },
+  computed: {
+    ...mapState("current", [
+      "selectedTransportId",
+      "orderIsEmergency",
+      "removeOrderReason",
+      "currentUser",
+    ]),
   },
   methods: {
     ...mapActions("customer", ["addCustomer", "updateCustomer"]),
@@ -125,7 +133,7 @@ export default {
     },
     onCancel() {
       this.resetForm();
-    },
+          },
     loadData() {
       if (this.selected) {
         this.fullname = this.selected.fullname;

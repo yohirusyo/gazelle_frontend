@@ -8,7 +8,7 @@
     <div class="col">
       <VScrolltable :rows="managements" :columns="columns" row-key="name">
         <template v-slot:body="props">
-          <q-tr :props="props" @click="!currentUser?.role.includes('WATCHER') ? setManagement(props.row) : ''"
+          <q-tr :props="props" @click="!currentUser?.role.includes('WATCHER') && !currentUser?.role.includes('OPERATOR') ? setManagement(props.row) : ''"
             class="text-center">
             <q-td auto-width>
               <q-checkbox v-model="props.expand" dense></q-checkbox>
