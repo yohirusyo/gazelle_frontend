@@ -53,10 +53,7 @@
             to="/admin"
             flat
             dense
-            v-if="
-              currentUser?.role == 'ADMIN' ||
-              currentUser?.role.includes('WATCHER')
-            "
+            v-if="currentUser?.role == 'ADMIN' || currentUser?.role == 'OPERATOR' || currentUser?.role.includes('WATCHER')"
           >
             <q-tooltip> Панель администратора </q-tooltip>
           </q-btn>
@@ -210,6 +207,18 @@
             "
           >
             <q-tooltip> Отчёт по подразделеням </q-tooltip>
+          </q-btn> -->
+          <q-btn
+            icon="las la-book"
+            to="/reports"
+            flat
+            dense
+            v-if="
+              (currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS')
+            "
+          >
+            <q-tooltip> Отчеты </q-tooltip>
           </q-btn>
           <q-btn
             icon="settings"
@@ -217,8 +226,8 @@
             flat
             dense
             v-if="
-              currentUser?.role == 'ADMIN' ||
-              currentUser?.role == 'WATCHER_WITH_REPORTS'
+              (currentUser?.role == 'ADMIN' ||
+              currentUser?.role == 'WATCHER_WITH_REPORTS') && connection == 'mmkmetiz'
             "
           >
             <q-tooltip> Управление лимитами </q-tooltip>

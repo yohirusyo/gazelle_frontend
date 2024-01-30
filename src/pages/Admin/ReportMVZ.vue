@@ -227,7 +227,7 @@ export default {
       const cells3 = Array.from({ length: cellCountMvz }, (_, index) => {
         const nextRow = parseInt(startRow) + index * 2;
         return `${startColumn}${nextRow}`;
-      });
+      }); 
 
       // Определение стилей ячеек МВЗ
       cells3.forEach((cell) => {

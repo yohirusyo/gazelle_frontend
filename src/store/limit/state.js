@@ -1,6 +1,8 @@
 export default function () {
   return {
    controlLimits: [],
-   monthLimitSubdivisions: []
+   monthLimitSubdivisions: [],
+   statsControl: [],
+   statsHoursControl: null
   };
 }

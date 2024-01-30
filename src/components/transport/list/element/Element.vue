@@ -58,6 +58,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
+import { getConnection } from "src/boot/axios";
 dayjs.extend(utc);
 export default {
   name: "TransportListElement",
@@ -66,7 +67,7 @@ export default {
     TransportStatus,
   },
   props: ["id", "freeStatuses", "selected"],
-  computed: {
+    computed: {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
@@ -96,8 +97,10 @@ export default {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
       if (this.orderIsEmergency) return true;
-      if (this._isFreeMoreThan15Minutes) return true;
+      if (this._isFreeMoreThan15Minutes || this._connection == 'mmkmetiz') return true;
+      console.log(this._connection);
       return false;
+      
     },
 
     _selected: {
@@ -174,6 +177,7 @@ export default {
       _isFreeMoreThan15Minutes: false,
       _isBusyMoreThan1Hour: false,
       oldStatus: null,
+      _connection: getConnection(),
     };
   },
   mounted() {

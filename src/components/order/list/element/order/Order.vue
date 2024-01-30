@@ -2,7 +2,7 @@
   <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
 
 
-    <q-td key="expand" :props="props">
+    <q-td key="expand" :props="props" :class="_latedClass">
       <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
         v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
       <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
@@ -106,6 +106,15 @@ export default {
     _endedClass() {
       if (this.order.isDone) return "ended-order";
       return "";
+    },
+    _latedClass() {
+      const date1 = dayjs(this.order.orderTime)
+      const date2 = dayjs(this.order.stats.entryToCustomerFact)
+      if (this.order.stats.entryToCustomerFact) {
+        const diffTime = Math.abs(date1.diff(date2, 'hour', true))
+        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2"
+        if (diffTime > 3) return "bg-red-2"
+      }
     },
     _class() {
       return [this._orderClass, this._endedClass].join(" ");
