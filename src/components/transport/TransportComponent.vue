@@ -1,9 +1,5 @@
 <template>
-  <MenuItemV2
-    :col="col"
-    label="Транспорт"
-    v-model="transport"
-  >
+  <MenuItemV2 :col="col" label="Транспорт" v-model="transport">
     <template #main="{ height, onSelected }">
       <TransportList
         :col="col"
@@ -11,34 +7,24 @@
         :height="height"
         @onSelected="onSelected"
         :isLocal="isLocal"
+        :transportTypes="_transportTypes"
       />
-      <TransportListMobile
-        :col="col"
-        v-else
-        :height="height"
-      />
+      <TransportListMobile :col="col" v-else :height="height" />
     </template>
     <template #create="{ height, onDone, selected }">
       <TransportCreation
         :height="height"
         @done="onDone"
         :selected="selected"
+        :transportTypes="_transportTypes"
       />
     </template>
     <template #menu="{}">
       <div class="column items-center justify-center q-x-auto">
-        <q-checkbox
-          class="col q-my-sm"
-          v-model="_onlyWithDrivers"
-          size="xs"
-        >
+        <q-checkbox class="col q-my-sm" v-model="_onlyWithDrivers" size="xs">
           <q-tooltip> Только с водителем </q-tooltip>
         </q-checkbox>
-        <q-checkbox
-          class="col"
-          v-model="_onlyFree"
-          size="xs"
-        >
+        <q-checkbox class="col" v-model="_onlyFree" size="xs">
           <q-tooltip> Только свободные </q-tooltip>
         </q-checkbox>
       </div>
@@ -52,6 +38,7 @@ import TransportListMobile from "./list/mobile/List.vue";
 import TransportCreation from "./TransportCreation.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import { mapMutations, mapState } from "vuex";
+import { api, getConnection } from "src/boot/axios";
 export default {
   name: "Transport",
   components: {
@@ -62,7 +49,7 @@ export default {
   },
   props: ["col", "isLocal"],
   computed: {
-    ...mapState("current", [/* "transport",  */"onlyFree", "onlyWithDrivers"]),
+    ...mapState("current", [/* "transport",  */ "onlyFree", "onlyWithDrivers"]),
     _onlyFree: {
       get() {
         return this.onlyFree;
@@ -82,12 +69,21 @@ export default {
   },
   methods: {
     ...mapMutations("current", ["setOnlyFree", "setOnlyWithDrivers"]),
-
   },
   data() {
     return {
-      transport: null
-    }
+      transport: null,
+      _transportTypes: [],
+    };
+  },
+  provide() {
+    return {
+      isMetiz: getConnection() == "mmkmetiz",
+    };
+  },
+  async mounted() {
+    const { data } = await api.get("/recommendation/transport-types");
+    this._transportTypes = data;
   },
 };
 </script>
