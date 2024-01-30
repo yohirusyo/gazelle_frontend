@@ -38,7 +38,7 @@ import TransportListMobile from "./list/mobile/List.vue";
 import TransportCreation from "./TransportCreation.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import { mapMutations, mapState } from "vuex";
-import { api } from "src/boot/axios";
+import { api, getConnection } from "src/boot/axios";
 export default {
   name: "Transport",
   components: {
@@ -74,6 +74,11 @@ export default {
     return {
       transport: null,
       _transportTypes: [],
+    };
+  },
+  provide() {
+    return {
+      isMetiz: getConnection() == "mmkmetiz",
     };
   },
   async mounted() {

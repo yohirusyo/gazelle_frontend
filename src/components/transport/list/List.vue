@@ -53,6 +53,7 @@ export default {
     VScrolltable,
   },
   props: ["col", "height", "selected", "isLocal", "transportTypes"],
+  inject: ["isMetiz"],
   methods: {
     onSelected(sel) {
       this.$emit("onSelected", sel);
@@ -67,8 +68,12 @@ export default {
           const x = descending ? b : a;
           const y = descending ? a : b;
           if (sortBy === "type") {
-            const xTT = this.getTransportTypeById(x.transportTypeId);
-            const yTT = this.getTransportTypeById(y.transportTypeId);
+            const xTT = this.isMetiz
+              ? this.getTransportTypeById(x.transportTypeId)
+              : x.type;
+            const yTT = this.isMetiz
+              ? this.getTransportTypeById(y.transportTypeId)
+              : y.type;
             return yTT > xTT ? 1 : xTT > yTT ? -1 : 0;
           } else if (sortBy == "number") {
             const numberX = parseInt(

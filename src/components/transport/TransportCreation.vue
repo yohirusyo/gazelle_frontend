@@ -22,7 +22,22 @@
               :option-value="(item) => item.id"
               v-model="_transportType"
               label="Тип ТС"
+              v-if="isMetiz"
             ></q-select>
+            <q-input
+              v-model="_type"
+              type="text"
+              square
+              outlined
+              hide-bottom-space
+              hide-hint
+              dense
+              label-color="grey"
+              label="Введите тип ТС"
+              autocomplete="off"
+              v-else
+            />
+
             <q-input
               v-model="_transportNumber"
               type="text"
@@ -226,6 +241,7 @@ import { shortConnectionName } from "src/helpers/formatters";
 export default {
   name: "TransportCreation",
   props: ["height", "selected", "transportTypes"],
+  inject: ["isMetiz"],
   computed: {
     ...mapState("current", ["place", "currentUser"]),
     ...mapState("place", ["places"]),
@@ -251,7 +267,7 @@ export default {
     ...mapMutations("current", ["clearTransport", "setPlace"]),
     async onAddTransport() {
       await this.addTransport({
-        // type: this._type,
+        type: this._type,
         transportTypeId: this._transportTypeId,
         transportNumber: this._transportNumber,
         placeId: this._place?.id,
@@ -269,7 +285,7 @@ export default {
     async onUpdateTransport() {
       await this.updateTransport({
         id: this.selected.id,
-        // type: this._type,
+        type: this._type,
         transportTypeId: this._transportTypeId,
         transportNumber: this._transportNumber,
         placeId: this._place?.id || null,
@@ -293,7 +309,7 @@ export default {
       this.$refs.form.reset();
     },
     resetForm() {
-      // this._type = null;
+      this._type = null;
       this._transportTypeId = null;
       this._transportNumber = null;
       this._place = null;
@@ -309,7 +325,7 @@ export default {
     },
     loadData() {
       if (this.selected) {
-        // this._type = this.selected.type;
+        this._type = this.selected.type;
         this._transportTypeId = this.selected.transportTypeId;
         this._transportNumber = this.selected.transportNumber;
         this._place = this.getPlaceById(this.selected.placeId);
@@ -332,7 +348,7 @@ export default {
   },
   data() {
     return {
-      // _type: null,
+      _type: null,
       _transportType: null,
       _transportNumber: null,
       _place: null,

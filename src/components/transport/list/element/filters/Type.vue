@@ -1,6 +1,6 @@
 <template>
   <q-btn icon="las la-filter" size="0.7rem" dense flat @click.stop>
-    <q-menu persistent>
+    <q-menu persistent v-if="isMetiz">
       <q-list style="min-width: 100px">
         <q-item
           style="user-select: none"
@@ -14,6 +14,20 @@
         </q-item>
       </q-list>
     </q-menu>
+    <q-menu persistent v-else>
+      <q-list style="min-width: 100px">
+        <q-item
+          style="user-select: none"
+          clickable
+          v-for="(type, index) of getTypes"
+          :key="type.id"
+          :class="isSelected(type) ? 'bg-blue-2' : ''"
+          @click="isSelected(type) ? remove(type) : add(type)"
+        >
+          <q-item-section>{{ type }} </q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
   </q-btn>
 </template>
 
@@ -22,6 +36,7 @@ import { mapGetters } from "vuex";
 
 export default {
   props: ["modelValue", "transportTypes"],
+  inject: ["isMetiz"],
   computed: {
     _modelValue: {
       get() {

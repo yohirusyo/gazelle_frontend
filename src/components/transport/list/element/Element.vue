@@ -67,6 +67,7 @@ export default {
     TransportStatus,
   },
   props: ["id", "freeStatuses", "selected", "transportTypes"],
+  inject: ["isMetiz"],
   computed: {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
@@ -80,11 +81,13 @@ export default {
     ]),
     transportType: {
       get() {
-        return (
-          this.transportTypes.find(
-            (t) => t.id === this.transport.transportTypeId
-          )?.description ?? "-"
-        );
+        if (this.isMetiz)
+          return (
+            this.transportTypes.find(
+              (t) => t.id === this.transport.transportTypeId
+            )?.description ?? "-"
+          );
+        else return this.transport.type;
       },
     },
     ...mapState("order", [
