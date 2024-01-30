@@ -109,8 +109,8 @@ export default {
     },
     _latedClass() {
       const date1 = dayjs(this.order.orderTime)
-      const date2 = dayjs(this.order.stats.entryToCustomerFact)
-      if (this.order.stats.entryToCustomerFact) {
+      const date2 = dayjs()
+      if (this.props.row.orders[0].statusId == 2) {
         const diffTime = Math.abs(date1.diff(date2, 'hour', true))
         if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2"
         if (diffTime > 3) return "bg-red-2"
