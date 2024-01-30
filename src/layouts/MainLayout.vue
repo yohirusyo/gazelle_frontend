@@ -145,7 +145,7 @@
             <q-tooltip> Рекоммендации </q-tooltip>
           </q-btn>
 
-          <q-btn
+          <!-- <q-btn
             icon="las la-book"
             to="/report"
             flat
@@ -208,6 +208,7 @@
           >
             <q-tooltip> Отчёт по подразделеням </q-tooltip>
           </q-btn> -->
+          
           <q-btn
             icon="las la-book"
             to="/reports"

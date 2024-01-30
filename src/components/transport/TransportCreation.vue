@@ -9,18 +9,20 @@
       <div class="col row q-mb-md">
         <q-scroll-area class="col">
           <div class="column q-gutter-y-md">
-            <q-input
-              v-model="_type"
-              type="text"
+            <q-select
               square
               outlined
               hide-bottom-space
               hide-hint
+              class="fit col"
               dense
-              label-color="grey"
-              label="Введите тип ТС"
-              autocomplete="off"
-            />
+              flat
+              :options="transportTypes"
+              :option-label="(item) => item.description"
+              :option-value="(item) => item.id"
+              v-model="_transportType"
+              label="Тип ТС"
+            ></q-select>
             <q-input
               v-model="_transportNumber"
               type="text"
@@ -223,7 +225,7 @@ import { mapActions, mapMutations, mapState, mapGetters } from "vuex";
 import { shortConnectionName } from "src/helpers/formatters";
 export default {
   name: "TransportCreation",
-  props: ["height", "selected"],
+  props: ["height", "selected", "transportTypes"],
   computed: {
     ...mapState("current", ["place", "currentUser"]),
     ...mapState("place", ["places"]),
@@ -231,6 +233,14 @@ export default {
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
     ...mapGetters("status", ["getStatusByCode"]),
+    _transportTypeId: {
+      get() {
+        return this._transportType?.id;
+      },
+      set(val) {
+        this._transportType = this.transportTypes.find((tt) => tt.id === val);
+      },
+    },
   },
   methods: {
     ...mapActions("transport", [
@@ -241,7 +251,8 @@ export default {
     ...mapMutations("current", ["clearTransport", "setPlace"]),
     async onAddTransport() {
       await this.addTransport({
-        type: this._type,
+        // type: this._type,
+        transportTypeId: this._transportTypeId,
         transportNumber: this._transportNumber,
         placeId: this._place?.id,
         statusId: this.getStatusByCode("FREE").id,
@@ -258,7 +269,8 @@ export default {
     async onUpdateTransport() {
       await this.updateTransport({
         id: this.selected.id,
-        type: this._type,
+        // type: this._type,
+        transportTypeId: this._transportTypeId,
         transportNumber: this._transportNumber,
         placeId: this._place?.id || null,
         driverId: this._driver?.id || null,
@@ -281,7 +293,8 @@ export default {
       this.$refs.form.reset();
     },
     resetForm() {
-      this._type = null;
+      // this._type = null;
+      this._transportTypeId = null;
       this._transportNumber = null;
       this._place = null;
       this._driver = null;
@@ -296,7 +309,8 @@ export default {
     },
     loadData() {
       if (this.selected) {
-        this._type = this.selected.type;
+        // this._type = this.selected.type;
+        this._transportTypeId = this.selected.transportTypeId;
         this._transportNumber = this.selected.transportNumber;
         this._place = this.getPlaceById(this.selected.placeId);
         this._driver = this.getDriverById(this.selected.driverId);
@@ -318,7 +332,8 @@ export default {
   },
   data() {
     return {
-      _type: null,
+      // _type: null,
+      _transportType: null,
       _transportNumber: null,
       _place: null,
       _driver: null,

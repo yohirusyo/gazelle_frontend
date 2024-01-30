@@ -5,12 +5,12 @@
         <q-item
           style="user-select: none"
           clickable
-          v-for="(type, index) of getTypes"
-          :key="type"
-          :class="isSelected(type) ? 'bg-blue-2' : ''"
-          @click="isSelected(type) ? remove(type) : add(type)"
+          v-for="(type, index) of transportTypes"
+          :key="type.id"
+          :class="isSelected(type.id) ? 'bg-blue-2' : ''"
+          @click="isSelected(type.id) ? remove(type.id) : add(type.id)"
         >
-          <q-item-section>{{ type }} </q-item-section>
+          <q-item-section>{{ type.description }} </q-item-section>
         </q-item>
       </q-list>
     </q-menu>
@@ -21,7 +21,7 @@
 import { mapGetters } from "vuex";
 
 export default {
-  props: ["modelValue"],
+  props: ["modelValue", "transportTypes"],
   computed: {
     _modelValue: {
       get() {

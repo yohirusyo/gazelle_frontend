@@ -8,7 +8,7 @@
     <template v-slot:header-cell-type="props">
       <q-th :props="props">
         {{ props.col.label }}
-        <TypeFilter v-model="typeFilter" />
+        <TypeFilter v-model="typeFilter" :transportTypes="transportTypes" />
       </q-th>
     </template>
     <template v-slot:header-cell-number="props">
@@ -30,6 +30,7 @@
         :id="props.row.id"
         :freeStatuses="freeStatuses"
         @onSelected="onSelected"
+        :transportTypes="transportTypes"
       />
     </template>
   </VScrolltable>
@@ -51,10 +52,13 @@ export default {
     DriverFilter,
     VScrolltable,
   },
-  props: ["col", "height", "selected", "isLocal"],
+  props: ["col", "height", "selected", "isLocal", "transportTypes"],
   methods: {
     onSelected(sel) {
       this.$emit("onSelected", sel);
+    },
+    getTransportTypeById(id) {
+      return this.transportTypes.find((t) => t.id === id)?.description ?? null;
     },
     customSort(rows, sortBy, descending) {
       const data = [...rows];
@@ -63,7 +67,9 @@ export default {
           const x = descending ? b : a;
           const y = descending ? a : b;
           if (sortBy === "type") {
-            return y.type > x.type ? 1 : x.type > y.type ? -1 : 0;
+            const xTT = this.getTransportTypeById(x.transportTypeId);
+            const yTT = this.getTransportTypeById(y.transportTypeId);
+            return yTT > xTT ? 1 : xTT > yTT ? -1 : 0;
           } else if (sortBy == "number") {
             const numberX = parseInt(
               x.transportNumber.replace(/\s+/g, "").substring(1, 4)
@@ -226,7 +232,7 @@ export default {
         );
         if (this.typeFilter.length != 0)
           transport__ = transport__.filter((t) =>
-            this.typeFilter.includes(t.type)
+            this.typeFilter.includes(t.transportTypeId)
           );
         if (this.numberFilter.length != 0)
           transport__ = transport__.filter((t) => {

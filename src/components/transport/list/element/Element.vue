@@ -8,7 +8,7 @@
       <q-checkbox v-model="_selected" :disable="!_isNotDisabled" dense />
     </q-td>
 
-    <q-td key="type">{{ transport?.type }}</q-td>
+    <q-td key="type">{{ transportType }}</q-td>
     <q-td
       key="number"
       @mouseover="_hovered = transport?.id"
@@ -66,8 +66,8 @@ export default {
     AutoNumber,
     TransportStatus,
   },
-  props: ["id", "freeStatuses", "selected"],
-    computed: {
+  props: ["id", "freeStatuses", "selected", "transportTypes"],
+  computed: {
     ...mapGetters("status", ["getStatusById"]),
     ...mapGetters("user", ["getDriverById"]),
     ...mapGetters("place", ["getPlaceById"]),
@@ -78,6 +78,15 @@ export default {
       "orderIsEmergency",
       "hoveredTransportId",
     ]),
+    transportType: {
+      get() {
+        return (
+          this.transportTypes.find(
+            (t) => t.id === this.transport.transportTypeId
+          )?.description ?? "-"
+        );
+      },
+    },
     ...mapState("order", [
       "customerPhoneNumber",
       "customerFullname",
@@ -97,10 +106,10 @@ export default {
       if (this.customerSubdivision == this.transport?.lastCustomerSubdivision)
         return true;
       if (this.orderIsEmergency) return true;
-      if (this._isFreeMoreThan15Minutes || this._connection == 'mmkmetiz') return true;
+      if (this._isFreeMoreThan15Minutes || this._connection == "mmkmetiz")
+        return true;
       console.log(this._connection);
       return false;
-      
     },
 
     _selected: {
