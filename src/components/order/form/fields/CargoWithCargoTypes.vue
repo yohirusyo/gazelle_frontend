@@ -55,7 +55,7 @@ const emit = defineEmits(["update:otherName", "update:selectedCargoTypeId"]);
 
 const selectedCargoType = computed({
   get() {
-    return props.selectedCargoTypeId
+    return props.selectedCargoTypeId || props.otherName
       ? cargoTypesWithOthers.value.find(
           (ct) => ct.id === props.selectedCargoTypeId
         ) ?? cargoTypesWithOthers.value.find((ct) => ct.id === -1)
