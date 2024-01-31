@@ -113,7 +113,7 @@
       </div>
       <div class="row q-gutter-x-md">
         <q-btn
-          v-if="_creationMode"
+          v-if="_creationMode && !currentUser?.role.includes('OPERATOR')"
           text-color="white"
           label="Создать"
           unelevated
@@ -161,6 +161,7 @@ export default {
   },
   computed: {
     ...mapState("current", ["management"]),
+    ...mapState("current", ["currentUser"]),
     ...mapState("customer", ["customers"]),
     ...mapGetters("customer", ["getCustomerById", "subdivisions"]),
     ...mapGetters("hierarchy", ["getManagementRequests"]),
