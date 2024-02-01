@@ -110,10 +110,10 @@ export default {
     },
 
     getCargoTypeColor(priority) {
-      if(priority === 'C')return 'bg-yellow';
-      else if (priority === 'Н') return 'bg-green';
-      else if (priority === 'В') return 'bg-red';
-      return 'bg-grey';
+      if(priority === 'C')return 'bg-yellow-11';
+      else if (priority === 'Н') return 'bg-green-11';
+      else if (priority === 'В') return 'bg-red-11';
+      return 'bg-grey-5';
     }
   },
   components: {
