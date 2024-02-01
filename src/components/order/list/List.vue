@@ -7,11 +7,7 @@
       </q-th>
     </template>
     <template v-slot:body="props">
-      <RouteElement
-        :props="props"
-        @onSelected="onSelected"
-        :yesterdayTime="_yesterdayTime"
-      />
+      <RouteElement :props="props" @onSelected="onSelected" :yesterdayTime="_yesterdayTime" />
     </template>
   </VScrolltable>
 </template>
@@ -28,7 +24,7 @@ dayjs.extend(utc);
 import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   name: "OrderList",
-  props: ["col", "height", "twoHoursToStart"],
+  props: ["col", "height", "twoHoursToStart", 'cargoTypes', 'prioritySort'],
   components: {
     RouteElement,
     CustomerFilter,
@@ -46,11 +42,8 @@ export default {
     ...mapGetters("status", ["getStatusById", "getBusyStatusesCodes"]),
     _orderList: {
       get() {
-        // const filtered = this.filteredOrders({
-        //   subdivisions: this._selectedSubdivisions,
-        // })
         const filtered = this.orders;
-        return filtered.filter((o) => {
+        const data = filtered.filter((o) => {
           return (
             ((this.twoHoursToStart &&
               new Date(o.orderTime) < this._timerActives) ||
@@ -59,7 +52,14 @@ export default {
               this.selectedCustomers.includes(o.orders[0].customerId))
           );
         });
-        // return filtered;
+        if (this.prioritySort) {
+          return data.sort((a, b) => {
+            const result = this.getRoutePriority(b) - this.getRoutePriority(a);
+            if (result == 0) return this.getCargoTypeById(b.orders[0].cargoTypeId)?.priority - this.getCargoTypeById(a.orders[0].cargoTypeId)?.priority;
+            return result;
+          });
+        }
+        return data;
       },
     },
     _hoveredOrder: {
@@ -193,6 +193,14 @@ export default {
     },
     onSelected(sel) {
       this.$emit("onSelected", sel);
+    },
+    getCargoTypeById(id) {
+      return this.cargoTypes.find(ct => ct.id == id)
+    },
+    getRoutePriority(route) {
+      if (route.orders[0].isEmergency) return 3;
+      if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime)) return 2;
+      return 1;
     },
   },
 };
