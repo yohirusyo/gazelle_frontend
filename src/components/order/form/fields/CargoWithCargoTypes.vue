@@ -12,6 +12,9 @@
     :option-value="(item) => item.id"
     v-model="selectedCargoType"
     label="Наименование груза"
+    use-input
+    input-debounce="0"
+    @filter="filterFn"
   ></q-select>
 
   <q-input
@@ -44,6 +47,7 @@ import { api } from "src/boot/axios";
 import { ref, onMounted, computed } from "vue";
 
 const cargoTypes = ref([]);
+const filter = ref("");
 
 const props = defineProps({
   otherName: String,
@@ -84,17 +88,25 @@ const otherName = computed({
   },
 });
 
-const cargoTypesWithOthers = computed(() => [
-  ...cargoTypes.value.filter((ct) => ct.isRequest === false),
-  {
-    description: "Другое",
-    id: -1,
-  },
-]);
+const cargoTypesWithOthers = computed(() =>
+  [
+    ...cargoTypes.value.filter((ct) => ct.isRequest === false),
+    {
+      description: "Другое",
+      id: -1,
+    },
+  ].filter((ct) => ct.description.toLowerCase().includes(filter.value.toLowerCase()))
+);
 
 const fetchCargoTypes = async () => {
   const { data } = await api.get("/recommendation/cargo-types");
   cargoTypes.value = data;
+};
+
+const filterFn = (val, update) => {
+  update(() => {
+    filter.value = val;
+  });
 };
 
 onMounted(async () => {

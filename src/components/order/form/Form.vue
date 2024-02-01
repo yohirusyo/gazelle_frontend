@@ -160,7 +160,6 @@ export default {
     },
     _orderCanBeEmergency: {
       get() {
-        console.warn(this.points);
         return (
           this.cargoTypes.find(
             (ct) => ct.id === this.points[0]?.cargo?.cargoTypeId

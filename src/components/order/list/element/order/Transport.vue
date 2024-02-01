@@ -30,7 +30,7 @@ export default {
     },
     _withoutDriver: {
       get() {
-        return !this._transport.driver;
+        return !this._transport?.driver;
       },
     },
   },
