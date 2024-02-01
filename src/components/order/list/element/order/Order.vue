@@ -60,7 +60,9 @@
         :isDone="order.isDone"
       />
     </q-td>
-    <q-td key="cargoPriority" :props="props">
+    <q-td key="cargoPriority" :props="props" 
+    :class="getCargoTypeColor(getCargoTypeDescrtiptionById(order.cargoTypeId))"
+    >
       {{ getCargoTypeDescrtiptionById(order.cargoTypeId) }}
     </q-td>
   </q-tr>
@@ -106,6 +108,13 @@ export default {
       else if (ct?.priority === 1) return "Н";
       return "-";
     },
+
+    getCargoTypeColor(priority) {
+      if(priority === 'C')return 'bg-yellow';
+      else if (priority === 'Н') return 'bg-green';
+      else if (priority === 'В') return 'bg-red';
+      return 'bg-grey';
+    }
   },
   components: {
     Time,
