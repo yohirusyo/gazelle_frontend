@@ -14,6 +14,7 @@
             @routeSelected="setRoute"
             @routeCopy="setCopy"
             :copyMode="_copy"
+            :cargoTypes="cargoTypes"
           />
         </template>
       </MenuItemV2>
@@ -34,6 +35,7 @@ import OrderHistory from "src/components/history/OrderHistory.vue";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import OrderForm from "src/components/order/form/Form.vue";
 import { mapActions } from "vuex";
+import { api } from "src/boot/axios";
 export default {
   components: {
     OrderHistory,
@@ -42,6 +44,12 @@ export default {
   },
   async mounted() {
     await this.requestMyManagement();
+    try {
+      const { data } = await api.get("/recommendation/cargo-types");
+      this.cargoTypes = data;
+    } catch (error) {
+      console.error("Ошибка получения типов ТС");
+    }
   },
   computed: {
     _route: {
@@ -65,6 +73,7 @@ export default {
     return {
       route: null,
       copy: false,
+      cargoTypes: [],
     };
   },
   methods: {

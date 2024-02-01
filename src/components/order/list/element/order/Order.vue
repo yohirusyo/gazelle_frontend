@@ -1,22 +1,43 @@
 <template>
-  <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
-
-
+  <q-tr
+    :props="props"
+    :class="_class"
+    @click="handleClick"
+    :id="'order-list-item-' + order.id"
+  >
     <q-td key="expand" :props="props" :class="_latedClass">
-      <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id"
-        v-if="order.id == order.parentOrder && props.row.orders.length != 1" />
-      <div v-else-if="props.row.orders.length == 1 || order.parentOrder == null">
+      <SwitcherRouteShow
+        v-model="_modelValue"
+        :routeId="props.row.id"
+        v-if="order.id == order.parentOrder && props.row.orders.length != 1"
+      />
+      <div
+        v-else-if="props.row.orders.length == 1 || order.parentOrder == null"
+      >
         Одиночная
       </div>
       <div v-else class="column items-center">
-        <q-icon class="q-ml-md" name="las la-level-up-alt" size="md" color="grey" style="transform: rotate(90deg)" />
+        <q-icon
+          class="q-ml-md"
+          name="las la-level-up-alt"
+          size="md"
+          color="grey"
+          style="transform: rotate(90deg)"
+        />
         № {{ order.parentOrder }}
       </div>
     </q-td>
     <q-td key="time" :props="props">
-      <Time :id="order.id" :isEmergency="order.isEmergency" :orderTime="order.orderTime" :name="order.name"
-        :description="order.description" :class="_isYesterdayTime ? 'bg-blue' : ''" :maxWeight="_maxWeight"
-        :createdAt="order.createdAt" />
+      <Time
+        :id="order.id"
+        :isEmergency="order.isEmergency"
+        :orderTime="order.orderTime"
+        :name="order.name"
+        :description="order.description"
+        :class="_isYesterdayTime ? 'bg-blue' : ''"
+        :maxWeight="_maxWeight"
+        :createdAt="order.createdAt"
+      />
     </q-td>
     <q-td key="customer" :props="props">
       <Customer :customerId="order.customerId" />
@@ -33,7 +54,14 @@
       <Transport :transportId="order.transportId" />
     </q-td>
     <q-td key="status" :props="props">
-      <Status :statusId="order.statusId" :statusChangedAt="order.statusChangedAt" :isDone="order.isDone" />
+      <Status
+        :statusId="order.statusId"
+        :statusChangedAt="order.statusChangedAt"
+        :isDone="order.isDone"
+      />
+    </q-td>
+    <q-td key="cargoPriority" :props="props">
+      {{ getCargoTypeDescrtiptionById(order.cargoTypeId) }}
     </q-td>
   </q-tr>
 </template>
@@ -51,8 +79,9 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+import { getConnection } from "src/boot/axios";
 export default {
-  props: ["props", "modelValue", "order", "yesterdayTime"],
+  props: ["props", "modelValue", "order", "yesterdayTime", "cargoTypes"],
   methods: {
     ...mapMutations("current", ["setOrder"]),
     onSelected(sel) {
@@ -62,14 +91,21 @@ export default {
     handleClick() {
       const canHandle = this.canHandleClick();
       // console.warn({ canHandle })
-      if (canHandle) this.onSelected(this.order)
+      if (canHandle) this.onSelected(this.order);
     },
     canHandleClick() {
       // console.warn(this.currentUser)
       if (this.currentUser?.id === 1) return true;
       if (!this.order.isDone) return true;
       return false;
-    }
+    },
+    getCargoTypeDescrtiptionById(id) {
+      const ct = this.cargoTypes.find((ct) => ct.id === id);
+      if (ct?.priority === 3) return "В";
+      else if (ct?.priority === 2) return "C";
+      else if (ct?.priority === 1) return "Н";
+      return "-";
+    },
   },
   components: {
     Time,
@@ -86,6 +122,11 @@ export default {
       "orderIsEmergency",
       "currentUser",
     ]),
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
+      },
+    },
     _isYesterdayTime: {
       get() {
         return (
@@ -108,12 +149,12 @@ export default {
       return "";
     },
     _latedClass() {
-      const date1 = dayjs(this.order.orderTime)
-      const date2 = dayjs()
+      const date1 = dayjs(this.order.orderTime);
+      const date2 = dayjs();
       if (this.props.row.orders[0].statusId == 2) {
-        const diffTime = Math.abs(date1.diff(date2, 'hour', true))
-        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2"
-        if (diffTime > 3) return "bg-red-2"
+        const diffTime = Math.abs(date1.diff(date2, "hour", true));
+        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2";
+        if (diffTime > 3) return "bg-red-2";
       }
     },
     _class() {

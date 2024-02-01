@@ -1,5 +1,5 @@
 <template>
-  <VScrolltable :rows="_orderList" :columns="columns" row-key="id" ref="scroll">
+  <VScrolltable :rows="_orderList" :columns="_columns" row-key="id" ref="scroll">
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
@@ -7,7 +7,12 @@
       </q-th>
     </template>
     <template v-slot:body="props">
-      <RouteElement :props="props" @onSelected="onSelected" :yesterdayTime="_yesterdayTime" />
+      <RouteElement
+        :props="props"
+        @onSelected="onSelected"
+        :yesterdayTime="_yesterdayTime"
+        :cargoTypes="cargoTypes"
+      />
     </template>
   </VScrolltable>
 </template>
@@ -22,9 +27,10 @@ dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import VScrolltable from "src/components/base/VScrolltable.vue";
+import { getConnection } from "src/boot/axios";
 export default {
   name: "OrderList",
-  props: ["col", "height", "twoHoursToStart", 'cargoTypes', 'prioritySort'],
+  props: ["col", "height", "twoHoursToStart", "cargoTypes", "prioritySort"],
   components: {
     RouteElement,
     CustomerFilter,
@@ -54,8 +60,14 @@ export default {
         });
         if (this.prioritySort) {
           return data.sort((a, b) => {
+            const withTs = this.isWithTs(a) - this.isWithTs(b);
+            if (withTs !== 0) return withTs;
             const result = this.getRoutePriority(b) - this.getRoutePriority(a);
-            if (result == 0) return this.getCargoTypeById(b.orders[0].cargoTypeId)?.priority - this.getCargoTypeById(a.orders[0].cargoTypeId)?.priority;
+            if (result == 0)
+              return (
+                this.getCargoTypeById(b.orders[0].cargoTypeId)?.priority -
+                this.getCargoTypeById(a.orders[0].cargoTypeId)?.priority
+              );
             return result;
           });
         }
@@ -68,6 +80,26 @@ export default {
       },
       set(val) {
         this.setHovered(val);
+      },
+    },
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
+      },
+    },
+    _columns: {
+      get() {
+        if (!this._isMetiz) return this.columns;
+        return [
+          ...this.columns,
+          {
+            name: "cargoPriority",
+            required: true,
+            label: "ПГ",
+            align: "center",
+            sortable: false,
+          },
+        ];
       },
     },
   },
@@ -195,12 +227,18 @@ export default {
       this.$emit("onSelected", sel);
     },
     getCargoTypeById(id) {
-      return this.cargoTypes.find(ct => ct.id == id)
+      return this.cargoTypes.find((ct) => ct.id == id);
     },
     getRoutePriority(route) {
       if (route.orders[0].isEmergency) return 3;
-      if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime)) return 2;
+      if (
+        dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime)
+      )
+        return 2;
       return 1;
+    },
+    isWithTs(route) {
+      return route.orders[0].transportId ? 1 : 0;
     },
   },
 };
