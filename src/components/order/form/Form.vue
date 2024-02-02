@@ -26,7 +26,7 @@
             <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason"
               :removeReason="_approvementMenuActive" />
 
-            <OrderTimePicker v-model="orderTime" />
+            <OrderTimePicker v-model="orderTime" class="q-mb-md" />
 
             <!-- <q-select
               v-if="$q.screen.xs"
