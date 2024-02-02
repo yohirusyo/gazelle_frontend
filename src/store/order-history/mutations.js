@@ -15,7 +15,6 @@ export function set(state, history) {
 
 
 export function update(state, order) {
-  console.log(order);
   const index = state.history.findIndex((o) => o.id == order.id);
   if (index == -1)
     state.history.push(order);
