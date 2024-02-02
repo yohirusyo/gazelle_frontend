@@ -1,5 +1,10 @@
 <template>
-  <VScrolltable :rows="_orderList" :columns="_columns" row-key="id" ref="scroll">
+  <VScrolltable
+    :rows="_orderList"
+    :columns="_columns"
+    row-key="id"
+    ref="scroll"
+  >
     <template v-slot:header-cell-customer="props">
       <q-th :props="props">
         {{ props.col.label }}
@@ -49,29 +54,41 @@ export default {
     _orderList: {
       get() {
         const filtered = this.orders;
-        const data = filtered.filter((o) => {
-          return (
-            ((this.twoHoursToStart &&
-              new Date(o.orderTime) < this._timerActives) ||
-              !this.twoHoursToStart) &&
-            (this.selectedCustomers.length == 0 ||
-              this.selectedCustomers.includes(o.orders[0].customerId))
-          );
-        });
-        if (this.prioritySort) {
-          return data.sort((a, b) => {
-            const withTs = this.isWithTs(a) - this.isWithTs(b);
-            if (withTs !== 0) return withTs;
-            const result = this.getRoutePriority(b) - this.getRoutePriority(a);
-            if (result == 0)
-              return (
-                this.getCargoTypeById(b.orders[0].cargoTypeId)?.priority -
-                this.getCargoTypeById(a.orders[0].cargoTypeId)?.priority
-              );
-            return result;
+        return filtered
+          .filter((o) => {
+            return (
+              ((this.twoHoursToStart &&
+                new Date(o.orderTime) < this._timerActives) ||
+                !this.twoHoursToStart) &&
+              (this.selectedCustomers.length == 0 ||
+                this.selectedCustomers.includes(o.orders[0].customerId))
+            );
+          })
+          .sort((a, b) => {
+            const aTsResult = this.isWithTs(a);
+            const bTsResult = this.isWithTs(b);
+
+            if (aTsResult > bTsResult) return 1;
+            if (bTsResult > aTsResult) return -1;
+
+            const orderTimeResult =
+              b.orders[0].orderTime - a.orders[0].orderTime;
+            if (!this.prioritySort) return orderTimeResult;
+
+            const aRoutePriorityResult = this.getRoutePriority(a);
+            const bRoutePriorityResult = this.getRoutePriority(b);
+
+            if (aRoutePriorityResult > bRoutePriorityResult) return -1;
+            if (bRoutePriorityResult > aRoutePriorityResult) return 1;
+
+            const aCargoTypeResult = this.getCargoTypePriority(a);
+            const bCargoTypeResult = this.getCargoTypePriority(b);
+
+            if (aCargoTypeResult > bCargoTypeResult) return -1;
+            if (bCargoTypeResult > aCargoTypeResult) return 1;
+
+            return orderTimeResult;
           });
-        }
-        return data;
       },
     },
     _hoveredOrder: {
@@ -228,6 +245,13 @@ export default {
     },
     getCargoTypeById(id) {
       return this.cargoTypes.find((ct) => ct.id == id);
+    },
+    getCargoTypePriority(route) {
+      return route.orders.reduce((prev, curr) => {
+        const currPriority =
+          this.getCargoTypeById(curr.cargoTypeId)?.priority ?? 1;
+        return currPriority > prev ? currPriority : prev;
+      }, 0);
     },
     getRoutePriority(route) {
       if (route.orders[0].isEmergency) return 3;

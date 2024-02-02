@@ -1,19 +1,19 @@
 function sort(state) {
   state.orders
-    .sort((a, b) => {
-      if (a.isRequest && !a.isApproved && b.isRequest && !b.isApproved) {
-        return a.createdAt - b.createdAt;
-      } else if (a.isRequest && a.isApproved && b.isRequest && !b.isApproved) {
-        return 1;
-      } else if (b.isRequest && b.isApproved && a.isRequest && !a.isApproved) {
-        return -1;
-      } else if (a.isRequest && !a.isApproved && !b.isRequest) {
-        return -1;
-      } else if (b.isRequest && !b.isApproved && !a.isRequest) {
-        return 1;
-      }
-      return a.createdAt - b.createdAt;
-    })
+    // .sort((a, b) => {
+    //   if (a.isRequest && !a.isApproved && b.isRequest && !b.isApproved) {
+    //     return a.createdAt - b.createdAt;
+    //   } else if (a.isRequest && a.isApproved && b.isRequest && !b.isApproved) {
+    //     return 1;
+    //   } else if (b.isRequest && b.isApproved && a.isRequest && !a.isApproved) {
+    //     return -1;
+    //   } else if (a.isRequest && !a.isApproved && !b.isRequest) {
+    //     return -1;
+    //   } else if (b.isRequest && !b.isApproved && !a.isRequest) {
+    //     return 1;
+    //   }
+    //   return a.createdAt - b.createdAt;
+    // })
     .filter((order) => !order.isDeleted && !order.isDone && !order.isDeclined);
 }
 

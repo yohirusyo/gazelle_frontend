@@ -235,7 +235,6 @@ export default {
     },
     async loadData() {
       if (this.management) {
-        console.log(this.management);
         this._name = this.management.name;
         this._defaultLimit = this.management.defaultLimit;
         this._isMinutes = this.management.isMinutes;

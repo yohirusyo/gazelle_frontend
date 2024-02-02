@@ -111,7 +111,6 @@ export default {
       if (this.orderIsEmergency) return true;
       if (this._isFreeMoreThan15Minutes || this._connection == "mmkmetiz")
         return true;
-      console.log(this._connection);
       return false;
     },
 
