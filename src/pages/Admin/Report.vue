@@ -3,51 +3,18 @@
     <div class="column fit">
       <div class="col col-shrink">
         <div class="row">
-          <q-btn
-            text-color="white"
-            label="Экспорт в excel"
-            icon="las la-file-excel"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-            @click="createExcel"
-          />
-          <ISelect
-            :options="statsSubidivisions"
-            v-model="_selectedSubdivision"
-            :labelFn="(item) => item"
-            label="Подразделение"
-            @selected="(val) => (_selectedSubdivision = val)"
-            class="col text-black border-none"
-          />
-          <ISelect
-            :options="driversFullnames"
-            v-model="_selectedDriverFullname"
-            :labelFn="(item) => item"
-            label="Ф.И.О. водителя"
-            @selected="(val) => (_selectedDriverFullname = val)"
-            class="col text-black border-none"
-            flat
-          />
-          <q-btn
-            text-color="white"
-            :label="`с ${LabelDDMMYYYY(_selectedDate?.from)} по ${LabelDDMMYYYY(
-              _selectedDate?.to
-            )}`"
-            unelevated
-            class="col bg-white text-black border-none"
-            flat
-            no-caps
-          >
+          <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
+            class="col bg-white text-black border-none" flat no-caps @click="createExcel" />
+          <ISelect :options="statsSubidivisions" v-model="_selectedSubdivision" :labelFn="(item) => item"
+            label="Подразделение" @selected="(val) => (_selectedSubdivision = val)" class="col text-black border-none" />
+          <ISelect :options="driversFullnames" v-model="_selectedDriverFullname" :labelFn="(item) => item"
+            label="Ф.И.О. водителя" @selected="(val) => (_selectedDriverFullname = val)"
+            class="col text-black border-none" flat />
+          <q-btn text-color="white" :label="`с ${LabelDDMMYYYY(_selectedDate?.from)} по ${LabelDDMMYYYY(
+            _selectedDate?.to
+          )}`" unelevated class="col bg-white text-black border-none" flat no-caps>
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date
-                v-model="_selectedDate"
-                mask="DD.MM.YYYY HH:mm"
-                minimal
-                :options="optionsFn"
-                range
-              >
+              <q-date v-model="_selectedDate" mask="DD.MM.YYYY HH:mm" minimal :options="optionsFn" range>
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
@@ -55,14 +22,8 @@
             </q-popup-proxy>
           </q-btn>
           <q-separator vertical />
-          <q-btn
-            text-color="white"
-            :label="`с ${LabelHHmm(_selectedDate?.from)}`"
-            unelevated
-            class="col-shrink bg-white text-black border-none"
-            flat
-            no-caps
-          >
+          <q-btn text-color="white" :label="`с ${LabelHHmm(_selectedDate?.from)}`" unelevated
+            class="col-shrink bg-white text-black border-none" flat no-caps>
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-time v-model="_selectedDate.from" mask="DD.MM.YYYY HH:mm">
                 <div class="row items-center justify-end">
@@ -72,14 +33,8 @@
             </q-popup-proxy>
           </q-btn>
           <q-separator vertical />
-          <q-btn
-            text-color="white"
-            :label="`по ${LabelHHmm(_selectedDate?.to)}`"
-            unelevated
-            class="col-shrink bg-white text-black border-none"
-            flat
-            no-caps
-          >
+          <q-btn text-color="white" :label="`по ${LabelHHmm(_selectedDate?.to)}`" unelevated
+            class="col-shrink bg-white text-black border-none" flat no-caps>
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-time v-model="_selectedDate.to" mask="DD.MM.YYYY HH:mm">
                 <div class="row items-center justify-end">
@@ -88,25 +43,13 @@
               </q-time>
             </q-popup-proxy>
           </q-btn>
-          <q-btn
-            icon="search"
-            label="сформировать"
-            flat
-            @click="requestOrderStats(_selectedDate)"
-          ></q-btn>
+          <q-btn icon="search" label="сформировать" flat @click="requestOrderStats(_selectedDate)"></q-btn>
         </div>
       </div>
       <q-separator></q-separator>
       <div class="col">
-        <VScrolltable
-          :rows="
-            getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
-          "
-          :columns="columns"
-          rowKey="orderId"
-          :report="true"
-          id="report-table"
-        />
+        <VScrolltable :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
+          " :columns="columns" rowKey="orderId" :report="true" id="report-table" />
       </div>
     </div>
   </q-page>
@@ -116,7 +59,7 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import customParseFormat  from "dayjs/plugin/customParseFormat"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 dayjs.extend(duration);
 dayjs.extend(customParseFormat)
 import utc from "dayjs/plugin/utc";
@@ -126,6 +69,7 @@ import ISelect from "components/base/ISelect.vue";
 import MapOrder from "components/report/Map.vue";
 import { getexcel } from "src/helpers/excel";
 import VScrolltable from "src/components/base/VScrolltable.vue";
+import { api } from "src/boot/axios";
 export default {
   name: "Report",
   components: {
@@ -199,14 +143,13 @@ export default {
           align: "right",
           field: (row) =>
             row.order.routeLength != null
-              ? `${
-                  (
-                    (row.order.routeLength < 100 && row.order.routeLength != 0
-                      ? 100
-                      : row.order.routeLength) / 1000
-                  ).toFixed(1)
-                  /* .replace(".", ",") */
-                }`
+              ? `${(
+                (row.order.routeLength < 100 && row.order.routeLength != 0
+                  ? 100
+                  : row.order.routeLength) / 1000
+              ).toFixed(1)
+              /* .replace(".", ",") */
+              }`
               : null,
           sortable: true,
         },
@@ -544,9 +487,10 @@ export default {
             val.isDeleted || val.order.isDeleted
               ? `Удален / ${val.deletedByFullname}`
               : val.order.isRequest && val.order.isDeclined
-              ? `Отклонен / ${val.deletedByFullname}`
-              : `Завершен ${Math.abs(dayjs(val.order.orderTime).diff(dayjs(val.entryToCustomerFact), 'hour', true)) > 3 ?
-              ` с опозданием` : ``}`,
+                ? `Отклонен / ${val.deletedByFullname}`
+                : `Завершен ${Math.abs(dayjs(val.order.orderTime).diff(dayjs(val.entryToCustomerFact), 'hour', true)) > 2 &&
+                  this.getCargoTypePriority(val.order) == 3 ?
+                  ` с опозданием` : ``}`,
           sortable: true,
         },
         {
@@ -609,6 +553,7 @@ export default {
 
         ////////////////////////////
       ],
+      cargoTypes: [],
     };
   },
   computed: {
@@ -648,7 +593,7 @@ export default {
       if (this.checkNull(val)) return null;
       return dayjs(val, "DD.MM.YYYY HH:mm").format("DD.MM.YYYY");
     },
-    LabelHHmm(val){
+    LabelHHmm(val) {
       if (this.checkNull(val)) return null;
       return dayjs(val, "DD.MM.YYYY HH:mm").format("HH:mm");
     },
@@ -681,10 +626,17 @@ export default {
         `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}`
       );
     },
+    getCargoTypeById(id) {
+      return this.cargoTypes.find((ct) => ct.id == id);
+    },
+    getCargoTypePriority(order) {
+      const currPriority =
+        this.getCargoTypeById(order.cargoTypeId)?.priority;
+      return currPriority;
+    },
   },
   async mounted() {
     Loading.show();
-
     // this.height =
     //   // parseInt(this.$refs.page.$el.style.minHeight) -
     //   this.$refs.page.$el.clientHeight - this.$refs.header.clientHeight - 17;
@@ -695,6 +647,12 @@ export default {
       to: dayjs().endOf("day").format("DD.MM.YYYY HH:mm"),
     };
     await this.requestOrderStats(this._selectedDate);
+    try {
+      const { data } = await api.get("/recommendation/cargo-types");
+      this.cargoTypes = data;
+    } catch (error) {
+      console.error("Ошибка получения типов ТС");
+    }
     Loading.hide();
   },
   watch: {
@@ -733,6 +691,7 @@ export default {
   border-right: 1px solid rgba(0, 0, 0, 0.12);
   /* border */
 }
+
 .map-td {
   padding: 0 !important;
 }
