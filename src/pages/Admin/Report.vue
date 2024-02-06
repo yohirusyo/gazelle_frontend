@@ -98,7 +98,7 @@
       </div>
       <q-separator></q-separator>
       <div class="col">
-        <VScrolltable
+                <VScrolltable
           :rows="
             getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
           "
@@ -548,6 +548,15 @@ export default {
               : `Завершен ${Math.abs(dayjs(val.order.orderTime).diff(dayjs(val.entryToCustomerFact), 'hour', true)) > 3 ?
               ` с опозданием` : ``}`,
           sortable: true,
+        },
+        {
+          name: "removeRouteReason",
+          required: "true",
+          label: "Причина удаления/отклонения",
+          align: "left",
+          field: (row) => row.order.route,
+          format: (val) =>
+            val.comment? `${val.comment}`: ``,
         },
         {
           name: "cargoRecieverSubdivision",
