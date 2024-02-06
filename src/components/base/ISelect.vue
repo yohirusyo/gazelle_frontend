@@ -94,11 +94,9 @@ export default {
       });
     },
     updateValue(event) {
-      console.log("updateValue");
       this.$emit("update:modelValue", event.target.value);
     },
     setModel(value) {
-      console.log("setModel", this.noWrite);
       if (this.noWrite) return;
       this.$emit("update:modelValue", value);
     },

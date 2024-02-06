@@ -6,6 +6,7 @@
     @onSelected="onSelected"
     :yesterdayTime="yesterdayTime"
     :cargoTypes="cargoTypes"
+    :priority="getCargoTypePriority(props.row)"
   />
   <Order
     v-for="o of route"
@@ -52,6 +53,16 @@ export default {
   methods: {
     onSelected() {
       this.$emit("onSelected", this.props.row);
+    },
+    getCargoTypeById(id) {
+      return this.cargoTypes.find((ct) => ct.id == id);
+    },
+    getCargoTypePriority(route) {
+      return route.orders.reduce((prev, curr) => {
+        const currPriority =
+          this.getCargoTypeById(curr.cargoTypeId)?.priority ?? 1;
+        return currPriority > prev ? currPriority : prev;
+      }, 1);
     },
   },
 };

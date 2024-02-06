@@ -9,13 +9,9 @@
       <SwitcherRouteShow
         v-model="_modelValue"
         :routeId="props.row.id"
-        v-if="order.id == order.parentOrder && props.row.orders.length != 1"
+        v-if="_isParent"
       />
-      <div
-        v-else-if="props.row.orders.length == 1 || order.parentOrder == null"
-      >
-        Одиночная
-      </div>
+      <div v-else-if="_isSolo">Одиночная</div>
       <div v-else class="column items-center">
         <q-icon
           class="q-ml-md"
@@ -60,10 +56,24 @@
         :isDone="order.isDone"
       />
     </q-td>
-    <q-td key="cargoPriority" :props="props" 
-    :class="getCargoTypeColor(getCargoTypeDescrtiptionById(order.cargoTypeId))"
+
+    <q-td
+      key="cargoPriority"
+      :props="props"
+      :class="
+        getPriorityColor(
+          _isParent && !_modelValue
+            ? priority
+            : getCargoTypePriority(order.cargoTypeId)
+        )
+      "
     >
-      {{ getCargoTypeDescrtiptionById(order.cargoTypeId) }}
+      <span v-if="_isParent && !_modelValue">
+        {{ getDescriptionByPriority(priority) }}
+      </span>
+      <span v-else>
+        {{ getDescriptionByPriority(getCargoTypePriority(order.cargoTypeId)) }}
+      </span>
     </q-td>
   </q-tr>
 </template>
@@ -82,8 +92,30 @@ dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { getConnection } from "src/boot/axios";
+
+const priorityNames = {
+  3: "В",
+  2: "С",
+  1: "Н",
+  0: "-",
+};
+
+const priorityColors = {
+  3: "bg-red-11",
+  2: "bg-yellow-11",
+  1: "bg-green-11",
+  0: "bg-grey-5",
+};
+
 export default {
-  props: ["props", "modelValue", "order", "yesterdayTime", "cargoTypes"],
+  props: [
+    "props",
+    "modelValue",
+    "order",
+    "yesterdayTime",
+    "cargoTypes",
+    "priority",
+  ],
   methods: {
     ...mapMutations("current", ["setOrder"]),
     onSelected(sel) {
@@ -92,29 +124,22 @@ export default {
     dayjs,
     handleClick() {
       const canHandle = this.canHandleClick();
-      // console.warn({ canHandle })
       if (canHandle) this.onSelected(this.order);
     },
     canHandleClick() {
-      // console.warn(this.currentUser)
       if (this.currentUser?.id === 1) return true;
       if (!this.order.isDone) return true;
       return false;
     },
-    getCargoTypeDescrtiptionById(id) {
-      const ct = this.cargoTypes.find((ct) => ct.id === id);
-      if (ct?.priority === 3) return "В";
-      else if (ct?.priority === 2) return "C";
-      else if (ct?.priority === 1) return "Н";
-      return "-";
+    getCargoTypePriority(ctId) {
+      return this.cargoTypes.find((ct) => ct.id === ctId)?.priority ?? 0;
     },
-
-    getCargoTypeColor(priority) {
-      if(priority === 'C')return 'bg-yellow-11';
-      else if (priority === 'Н') return 'bg-green-11';
-      else if (priority === 'В') return 'bg-red-11';
-      return 'bg-grey-5';
-    }
+    getDescriptionByPriority(priority) {
+      return priorityNames[priority];
+    },
+    getPriorityColor(priority) {
+      return priorityColors[priority];
+    },
   },
   components: {
     Time,
@@ -134,6 +159,21 @@ export default {
     _isMetiz: {
       get() {
         return getConnection() == "mmkmetiz";
+      },
+    },
+    _isParent: {
+      get() {
+        return (
+          this.order.id == this.order.parentOrder &&
+          this.props.row.orders.length != 1
+        );
+      },
+    },
+    _isSolo: {
+      get() {
+        return (
+          this.props.row.orders.length == 1 || this.order.parentOrder == null
+        );
       },
     },
     _isYesterdayTime: {
@@ -160,10 +200,10 @@ export default {
     _latedClass() {
       const date1 = dayjs(this.order.orderTime);
       const date2 = dayjs();
-      if (this.props.row.orders[0].statusId == 2) {
+      if (this.props.row.orders[0].statusId == 2 && this.priority === 3) {
         const diffTime = Math.abs(date1.diff(date2, "hour", true));
-        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2";
-        if (diffTime > 3) return "bg-red-2";
+        if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
+        if (diffTime > 2) return "bg-red-2";
       }
     },
     _class() {
