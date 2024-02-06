@@ -8,6 +8,7 @@
         @onSelected="onSelected"
         :isLocal="isLocal"
         :transportTypes="_transportTypes"
+        :withRecomendations="_withRecomendations"
       />
       <TransportListMobile :col="col" v-else :height="height" />
     </template>
@@ -26,6 +27,14 @@
         </q-checkbox>
         <q-checkbox class="col" v-model="_onlyFree" size="xs">
           <q-tooltip> Только свободные </q-tooltip>
+        </q-checkbox>
+        <q-checkbox
+          class="col"
+          v-model="_withRecomendations"
+          size="xs"
+          v-if="_isMetiz"
+        >
+          <q-tooltip> Отображать рекомендации </q-tooltip>
         </q-checkbox>
       </div>
     </template>
@@ -66,6 +75,11 @@ export default {
         this.setOnlyWithDrivers(newVal);
       },
     },
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
+      },
+    },
   },
   methods: {
     ...mapMutations("current", ["setOnlyFree", "setOnlyWithDrivers"]),
@@ -74,11 +88,12 @@ export default {
     return {
       transport: null,
       _transportTypes: [],
+      _withRecomendations: false,
     };
   },
   provide() {
     return {
-      isMetiz: getConnection() == "mmkmetiz",
+      isMetiz: this._isMetiz,
     };
   },
   async mounted() {
