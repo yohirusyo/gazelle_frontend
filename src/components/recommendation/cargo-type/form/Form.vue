@@ -13,6 +13,9 @@
         <q-checkbox v-model="withEmergency">
           Возможность создания аварийной заявки
         </q-checkbox>
+        <q-checkbox v-model="ignoreInRecommendation">
+          Игнорирование при рекомендации ТС
+        </q-checkbox>
         <TransportTypesList v-if="!creationMode" :id="selected.id" />
       </div>
 
@@ -85,6 +88,7 @@ const creationMode = computed(() => !props.selected);
 const description = ref("");
 const priority = ref(1);
 const withEmergency = ref(false);
+const ignoreInRecommendation = ref(false);
 
 const loadNew = () => {
   description.value = "";
@@ -108,6 +112,7 @@ const createCargoType = async () => {
     description: description.value,
     priority: priority.value,
     withEmergency: withEmergency.value,
+    ignoreInRecommendation: ignoreInRecommendation.value,
   });
 };
 
@@ -116,6 +121,7 @@ const updateCargoType = async () => {
     description: description.value,
     priority: priority.value,
     withEmergency: withEmergency.value,
+    ignoreInRecommendation: ignoreInRecommendation.value,
   });
 };
 
@@ -124,6 +130,7 @@ const approveCargoType = async () => {
     description: description.value,
     priority: priority.value,
     withEmergency: withEmergency.value,
+    ignoreInRecommendation: ignoreInRecommendation.value,
     isRequest: false,
   });
 };
@@ -156,6 +163,7 @@ const loadData = () => {
     description.value = props.selected.description;
     priority.value = props.selected.priority;
     withEmergency.value = props.selected.withEmergency;
+    ignoreInRecommendation.value = props.selected.ignoreInRecommendation;
   } else {
     loadNew();
   }
