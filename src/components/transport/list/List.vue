@@ -52,7 +52,14 @@ export default {
     DriverFilter,
     VScrolltable,
   },
-  props: ["col", "height", "selected", "isLocal", "transportTypes"],
+  props: [
+    "col",
+    "height",
+    "selected",
+    "isLocal",
+    "transportTypes",
+    "withRecomendations",
+  ],
   inject: ["isMetiz"],
   methods: {
     onSelected(sel) {
@@ -213,7 +220,7 @@ export default {
   computed: {
     ...mapState("current", ["onlyFree", "onlyWithDrivers"]),
     ...mapState("status", ["statuses"]),
-    ...mapState("transport", ["transports"]),
+    ...mapState("transport", ["transports", "transportRecommendationList"]),
     ...mapGetters("transport", ["getByOnlyFreeFilter"]),
     ...mapGetters("status", ["getStatusById"]),
     ...mapState("current", ["currentUser"]),
@@ -248,6 +255,20 @@ export default {
           transport__ = transport__.filter((t) =>
             this.driverFilter.includes(t.driverId)
           );
+        }
+        if (
+          this.transportRecommendationList.length > 0 &&
+          this.withRecomendations
+        ) {
+          return this.transportRecommendationList
+            .map((tt) =>
+              transport__.filter(
+                (tr) =>
+                  tr.transportTypeId === tt &&
+                  this.getStatusById(tr.statusId)?.code === "FREE"
+              )
+            )
+            .flat();
         }
         return transport__;
       },

@@ -2,30 +2,30 @@ function sort(state) {
   state.transports.sort((a, b) => {
     if (a.driverId == null && b.driverId == null) return a.id - b.id;
     if (a.driverId == null) return 1;
-    if (b.driverId == null) return - 1;
-    return `${a.driver?.surname} ${a.driver?.name} ${a.driver?.middlename}`.localeCompare(`${b.driver?.surname} ${b.driver?.name} ${b.driver?.middlename}`);
-  })
+    if (b.driverId == null) return -1;
+    return `${a.driver?.surname} ${a.driver?.name} ${a.driver?.middlename}`.localeCompare(
+      `${b.driver?.surname} ${b.driver?.name} ${b.driver?.middlename}`
+    );
+  });
 }
-
 
 export function add(state, transport) {
   const index = state.transports.findIndex((t) => t.id == transport.id);
   if (index == -1) {
     state.transports.push(transport);
-    sort(state)
+    sort(state);
   }
 }
 
 export function set(state, transports) {
   state.transports = transports;
-  sort(state)
+  sort(state);
 }
 
 export function update(state, transport) {
   const index = state.transports.findIndex((t) => t.id == transport.id);
   state.transports[index] = transport;
-  sort(state)
-
+  sort(state);
 }
 
 export function remove(state, id) {
@@ -38,4 +38,11 @@ export function setLoading(state, loading) {
 
 export function setLoaded(state, loaded) {
   state.isLoaded = loaded;
+}
+
+export function setTransportRecommendationList(
+  state,
+  transportRecommendationList
+) {
+  state.transportRecommendationList = transportRecommendationList;
 }
