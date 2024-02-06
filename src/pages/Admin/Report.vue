@@ -48,8 +48,15 @@
       </div>
       <q-separator></q-separator>
       <div class="col">
-        <VScrolltable :rows="getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
-          " :columns="columns" rowKey="orderId" :report="true" id="report-table" />
+                <VScrolltable
+          :rows="
+            getFilteredStats(_selectedDriverFullname, _selectedSubdivision)
+          "
+          :columns="columns"
+          rowKey="orderId"
+          :report="true"
+          id="report-table"
+        />
       </div>
     </div>
   </q-page>
@@ -492,6 +499,15 @@ export default {
                   this.getCargoTypePriority(val.order) == 3 ?
                   ` с опозданием` : ``}`,
           sortable: true,
+        },
+        {
+          name: "removeRouteReason",
+          required: "true",
+          label: "Причина удаления/отклонения",
+          align: "left",
+          field: (row) => row.order.route,
+          format: (val) =>
+            val.comment? `${val.comment}`: ``,
         },
         {
           name: "cargoRecieverSubdivision",
