@@ -200,10 +200,10 @@ export default {
     _latedClass() {
       const date1 = dayjs(this.order.orderTime);
       const date2 = dayjs();
-      if (this.props.row.orders[0].statusId == 2) {
+      if (this.props.row.orders[0].statusId == 2 && this.priority === 3) {
         const diffTime = Math.abs(date1.diff(date2, "hour", true));
-        if (diffTime > 2 && diffTime <= 3) return "bg-yellow-2";
-        if (diffTime > 3) return "bg-red-2";
+        if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
+        if (diffTime > 2) return "bg-red-2";
       }
     },
     _class() {
