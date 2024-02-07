@@ -79,22 +79,29 @@ export default {
   methods: {
     ...mapMutations("transport", ["setTransportRecommendationList"]),
     async onSelectedRoute(route) {
-      const ct = route.orders.reduce((prev, curr) => {
-        const cargoType = this.cargoTypes.find(
-          (ct) => ct.id === curr.cargoTypeId
-        );
-        if (!cargoType || cargoType.ignoreInRecommendation) return prev;
-        if (cargoType.priority > (prev?.priority ?? 0)) return cargoType;
-        return prev;
-      }, null);
-      if (!ct) {
+      const orderWithCT = route.orders.find((order) => {
+        const ct = this.cargoTypes.find((ct) => ct.id === order.cargoTypeId);
+        if (!ct || ct.ignoreInRecommendation) return false;
+        return true;
+      });
+      // const ct = route.orders.reduce((prev, curr) => {
+      //   const cargoType = this.cargoTypes.find(
+      //     (ct) => ct.id === curr.cargoTypeId
+      //   );
+      //   if (!cargoType || cargoType.ignoreInRecommendation) return prev;
+      //   if (cargoType.priority > (prev?.priority ?? 0)) return cargoType;
+      //   return prev;
+      // }, null);
+      if (!orderWithCT) {
         this.setTransportRecommendationList([]);
+        return;
       }
       const { data } = await api.get(
-        `/recommendation/related-transport-types/${ct.id}`
+        `/recommendation/related-transport-types/${orderWithCT.cargoTypeId}`
       );
       if (!data?.transportTypes) {
         this.setTransportRecommendationList([]);
+        return;
       }
       this.setTransportRecommendationList(
         data.transportTypes.map((tt) => tt.id)
