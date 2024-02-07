@@ -6,9 +6,10 @@
         class="text-black border-none q-pa-sm" />
     </div>
     <div class="col">
-      <VScrolltable :rows="managements" :columns="columns" row-key="name">
+      <VScrolltable :rows="managements" :columns="columns" row-key="name" :key="_key">
         <template v-slot:body="props">
-          <q-tr :props="props" @click="!currentUser?.role.includes('WATCHER') && !currentUser?.role.includes('OPERATOR') ? setManagement(props.row) : ''"
+          <q-tr :props="props"
+            @click="!currentUser?.role.includes('WATCHER') && !currentUser?.role.includes('OPERATOR') ? setManagement(props.row) : ''"
             class="text-center">
             <q-td auto-width>
               <q-checkbox v-model="props.expand" dense></q-checkbox>
@@ -32,7 +33,7 @@
           <q-tr v-if="props.expand">
             <q-td colspan="6">
               <OrderHistory :item="props.row.id" :operatingSpeedVariable="props.row.operatingSpeedVariable"
-                :isMinutes="props.row.isMinutes" />
+                :isMinutes="props.row.isMinutes" :selectedMonth="_selectedMonth" />
             </q-td>
           </q-tr>
         </template>
@@ -69,7 +70,7 @@ export default {
         .format("MMMM YYYY"))
     },
     updateData(item) {
-      this.$emit("reqManagements", {year: item.year, month: item.month});
+      this.$emit("reqManagements", { year: item.year, month: item.month });
     },
   },
   data() {
@@ -119,7 +120,8 @@ export default {
           sortable: false,
         },
       ],
-      _selectedMonth: {year: dayjs().year(), month: dayjs().month()},
+      _selectedMonth: { year: dayjs().year(), month: dayjs().month() },
+      _key: new Date().getTime()
     };
   },
   computed: {
@@ -131,6 +133,11 @@ export default {
   async mounted() {
     await this.getAllControlLimits();
   },
+  watch: {
+    _selectedMonth() {
+      this._key = new Date().getTime()
+    }
+  }
 };
 </script>
 
