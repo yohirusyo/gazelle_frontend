@@ -289,7 +289,7 @@ export default {
           !this._isMetiz || this._orderCanBeEmergency
             ? this._orderIsEmergency
             : false,
-        transportId: this.selectedTransportId,
+        transportId: this.isCustomer && this._creationMode  ? null : this.selectedTransportId,
         customerPhoneNumber: this.customer.phoneNumber,
         customerFullname: this.customer.fullname,
         customerSubdivision: this.customer.subdivision,
