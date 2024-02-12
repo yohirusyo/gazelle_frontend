@@ -220,10 +220,7 @@
             to="/reports"
             flat
             dense
-            v-if="
-              currentUser?.role == 'ADMIN' ||
-              currentUser?.role == 'WATCHER_WITH_REPORTS'
-            "
+
           >
             <q-tooltip> Отчеты </q-tooltip>
           </q-btn>

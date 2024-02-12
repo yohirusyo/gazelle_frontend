@@ -507,7 +507,7 @@ export default {
           align: "left",
           field: (row) => row.order.route,
           format: (val) =>
-            val.comment? `${val.comment}`: ``,
+            val.comment? `${val.comment}`: `-`,
         },
         {
           name: "cargoRecieverSubdivision",
