@@ -13,6 +13,10 @@
       outline
       unelevated
       to="/report-shifts"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
     />
     <q-btn
       label="Отчёт по диспетчерам"
@@ -20,6 +24,10 @@
       outline
       unelevated
       to="/report-operator-shifts"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
     />
     <q-btn
       label="Отчёт по МВЗ"
@@ -27,6 +35,10 @@
       outline
       unelevated
       to="/report-mvz"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
     />
     <q-btn
       label="Отчёт по подразделеням"
@@ -34,12 +46,21 @@
       outline
       unelevated
       to="/report-subdivision"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
     />
  </q-page>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
+  computed: {
+  ...mapState("current", ["currentUser"]),
+  },
   name: "reports"
 }
 </script>
