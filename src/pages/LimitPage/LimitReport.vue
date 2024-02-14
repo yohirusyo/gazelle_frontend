@@ -11,7 +11,16 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(0)"></q-icon>
+
+        <q-btn
+          :disable="!checkFormatPropsDate15"
+          flat
+          dense
+          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(0)"
+        />
       </template>
     </q-input>
     <q-input
@@ -25,7 +34,15 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(1)"></q-icon>
+        <q-btn
+          :disable="!checkFormatPropsDate15"
+          flat
+          dense
+          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(1)"
+        />
       </template>
     </q-input>
     <q-input
@@ -39,7 +56,15 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(2)"></q-icon>
+        <q-btn
+          :disable="!checkFormatPropsDate15"
+          flat
+          dense
+          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(2)"
+        />
       </template>
     </q-input>
     <table
@@ -124,7 +149,7 @@ export default {
           month: this.month,
         });
         this.first = this.statsControl;
-        if (dayjs().format("YYYYMMDD") >= this.formatPropsDate() + "15") {
+        if (this.checkFormatPropsDate15) {
           await this.getStatsContorlLimits({
             period: 1,
             year: this.year,
@@ -132,14 +157,14 @@ export default {
           });
           this.second = this.statsControl;
         } else this.second = null;
-        if (dayjs().format("YYYYMMDD") >= this.formatPropsDate() + "21") {
+        if (this.checkFormatPropsDate20) {
           await this.getStatsContorlLimits({
             period: 2,
             year: this.year,
             month: this.month,
           });
           this.third = this.statsControl;
-        } else this.third = null
+        } else this.third = null;
       },
       immediate: true,
     },
@@ -203,32 +228,62 @@ export default {
     },
     secondPeriodRouteLength: {
       get() {
-        return this.second == null ? 0 : this.second?.reduce((sum, item) => {
-          if (item.routeLength !== null) {
-            return sum + Number(item.routeLength);
-          } else {
-            return sum;
-          }
-        }, 0);
+        return this.second == null
+          ? 0
+          : this.second?.reduce((sum, item) => {
+              if (item.routeLength !== null) {
+                return sum + Number(item.routeLength);
+              } else {
+                return sum;
+              }
+            }, 0);
       },
     },
     thirdPeriodRouteLength: {
       get() {
-        return this.third == null ? 0 : this.third?.reduce((sum, item) => {
-          if (item.routeLength !== null) {
-            return sum + Number(item.routeLength);
-          } else {
-            return sum;
-          }
-        }, 0);
+        return this.third == null
+          ? 0
+          : this.third?.reduce((sum, item) => {
+              if (item.routeLength !== null) {
+                return sum + Number(item.routeLength);
+              } else {
+                return sum;
+              }
+            }, 0);
+      },
+    },
+    checkFormatPropsDate15: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate15();
+      },
+    },
+    checkFormatPropsDate20: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate20();
       },
     },
   },
 
   methods: {
     ...mapActions("limit", ["getStatsContorlLimits"]),
-    formatPropsDate() {
-      return dayjs({ year: this.year, month: this.month }).format("YYYYMM");
+    formatPropsDate15() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+        date: 15,
+        hours: 19,
+        minutes: 30,
+      }).format("YYYYMMDDHHmm");
+    },
+    formatPropsDate20() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+        date: 20,
+        hours: 19,
+        hours: 19,
+        minutes: 30,
+      }).format("YYYYMM");
     },
     async getReport(period) {
       period == 0
