@@ -120,7 +120,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { api } from "src/boot/axios";
 import { mapGetters, mapState } from "vuex";
 import VScrolltable from "src/components/base/VScrolltable.vue";
-import moment from 'moment';
 export default {
   components: {
     VScrolltable,
@@ -194,8 +193,8 @@ export default {
     };
   },
   async mounted() {
-    this._selectedDate.from = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').startOf('month').format('YYYYMMDD'),
-    this._selectedDate.to = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').endOf('month').format('YYYYMMDD'),
+    this._selectedDate.from = dayjs(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').startOf('month').format('YYYYMMDD'),
+    this._selectedDate.to = dayjs(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').endOf('month').format('YYYYMMDD'),
     this.fetchOrders();
   },
   computed: {
