@@ -225,6 +225,11 @@ export default {
         return this.controlLimits;
       },
     },
+    planVolume: {
+      get() {
+        return this._productionPlanVolume * 1.12607971119134;
+      },
+    },
     _planSubPay: {
       get() {
         return (
@@ -258,9 +263,7 @@ export default {
       get() {
         return (
           this._planSubPay /
-          this.monthLimitSubdivisions.find(
-            (item) => item.management.name == "УС"
-          )?.fact
+          this.planVolume
         );
       },
     },

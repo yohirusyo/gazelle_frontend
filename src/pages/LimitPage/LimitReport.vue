@@ -11,7 +11,6 @@
       readonly
     >
       <template v-slot:after>
-
         <q-btn
           :disable="!checkFormatPropsDate15"
           flat
@@ -35,10 +34,10 @@
     >
       <template v-slot:after>
         <q-btn
-          :disable="!checkFormatPropsDate15"
+          :disable="!checkFormatPropsDate20"
           flat
           dense
-          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          :text-color="checkFormatPropsDate20 ? 'primary' : 'black'"
           size="lg"
           icon="download"
           @click="getReport(1)"
@@ -57,10 +56,10 @@
     >
       <template v-slot:after>
         <q-btn
-          :disable="!checkFormatPropsDate15"
+          :disable="!checkFormatPropsDate30"
           flat
           dense
-          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
           size="lg"
           icon="download"
           @click="getReport(2)"
@@ -262,6 +261,11 @@ export default {
         return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate20();
       },
     },
+    checkFormatPropsDate30: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate30();
+      },
+    },
   },
 
   methods: {
@@ -270,7 +274,7 @@ export default {
       return dayjs({
         year: this.year,
         month: this.month,
-        date: 15,
+        date: 14,
         hours: 19,
         minutes: 30,
       }).format("YYYYMMDDHHmm");
@@ -283,7 +287,13 @@ export default {
         hours: 19,
         hours: 19,
         minutes: 30,
-      }).format("YYYYMM");
+      }).format("YYYYMMDDHHmm");
+    },
+    formatPropsDate30() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+      }).endOf('month').format("YYYYMMDDHHmm");
     },
     async getReport(period) {
       period == 0
