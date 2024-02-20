@@ -10,6 +10,8 @@ import Dialog from "./Dialog.vue";
 import { useStore } from "vuex";
 import { api } from "src/boot/axios";
 
+const props = defineProps(["onSelfDisable"]);
+
 const $q = useQuasar();
 
 const store = useStore();
@@ -24,13 +26,6 @@ const subscribe = async () => {
     console.error("Ошибка получения типов ТС");
   }
 
-  const { data: relatedCargoTypes } = await api.get(
-    `/recommendation/related-cargo-types/5`
-    //${transport.transportTypeId}`
-  );
-
-  console.log(relatedCargoTypes);
-
   socketio.on("free_transport_type", async (transport) => {
     const { data: relatedCargoTypes } = await api.get(
       `/recommendation/related-cargo-types/${transport.transportTypeId}`
@@ -41,21 +36,72 @@ const subscribe = async () => {
       relatedCargoTypes.cargoTypes
     );
 
+    if (!route) return;
+
     $q.dialog({
       component: Dialog,
       componentProps: {
         transport,
         route,
+        cargoTypes: cargoTypes.value,
       },
     })
-      .onOk(() => {
-        console.log("OK");
+      .onOk(async () => {
+        const { fullname, phoneNumber, subdivision, mvz } = store.getters[
+          "customer/getCustomerById"
+        ](route.orders[0].customerId);
+
+        await store.dispatch("order/updateRoute", {
+          id: route.id,
+          isApproved: true,
+          isDeclined: false,
+          isRequest: route.isRequest,
+          orderTime: route.orderTime,
+          departurePointName: store.getters["place/getPlaceById"](
+            route.orders[0].departurePointId
+          ).name,
+          isEmergency: route.isEmergency,
+          transportId: transport.id,
+          customerPhoneNumber: phoneNumber,
+          customerFullname: fullname,
+          customerSubdivision: subdivision,
+          customermvz: mvz,
+          description: route.orders[0].description,
+          elements: route.orders.map((order) => {
+            const contact = store.getters["contact/getContactById"](
+              order.contactId
+            );
+            const cargoReciever = store.getters["customer/getCustomerById"](
+              order.cargoRecieverId
+            );
+            return {
+              destinationName: store.getters["place/getPlaceById"](
+                order.destinationId
+              ).name,
+              passengerCount: order.passengerCount,
+              weight: order.weight,
+              width: order.width,
+              height: order.height,
+              length: order.length,
+              contactPhoneNumber: contact?.phoneNumber,
+              contactFullname: contact?.fullname,
+              cargoTypeId: order.cargoTypeId,
+              withCargoTypeRequest: false,
+              name: order.name,
+              isNew: false,
+              existingId: order.id,
+              forDelete: false,
+              cargoRecievedPhoneNumber: cargoReciever?.phoneNumber,
+              cargoRecieverFullname: cargoReciever?.fullname,
+              cargoRecieverSubdivision: cargoReciever?.subdivision,
+              cargoRecieverMvz: cargoReciever?.mvz,
+              scenario: order.scenario,
+            };
+          }),
+        });
       })
       .onCancel(() => {
-        console.log("Cancel");
-      })
-      .onDismiss(() => {
-        console.log("Called on OK or Cancel");
+        props.onSelfDisable?.();
       });
   });
 };
@@ -63,7 +109,6 @@ const subscribe = async () => {
 onMounted(subscribe);
 
 const unsubscribe = () => {
-  console.log("auto-dialog unmounted");
   socketio.off("free_transport_type");
 };
 
