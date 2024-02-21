@@ -132,7 +132,7 @@ export default {
       return false;
     },
     getCargoTypePriority(ctId) {
-      return this.cargoTypes.find((ct) => ct.id === ctId)?.priority ?? 0;
+      return this.cargoTypes?.find((ct) => ct.id === ctId)?.priority ?? 0;
     },
     getDescriptionByPriority(priority) {
       return priorityNames[priority];

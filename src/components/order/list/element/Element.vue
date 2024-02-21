@@ -55,7 +55,7 @@ export default {
       this.$emit("onSelected", this.props.row);
     },
     getCargoTypeById(id) {
-      return this.cargoTypes.find((ct) => ct.id == id);
+      return this.cargoTypes?.find((ct) => ct.id == id);
     },
     getCargoTypePriority(route) {
       return route.orders.reduce((prev, curr) => {
