@@ -20,6 +20,7 @@
         <div class="col text-h5 row items-center">
           <div class="q-pl-md" v-if="!$q.screen.xs">{{ сonnectionName() }}</div>
           <LimitWarning />
+
         </div>
         <div
           class="q-pr-sm text-center col col-shrink column justify-center items-end"
@@ -215,13 +216,7 @@
             <q-tooltip> Отчёт по подразделеням </q-tooltip>
           </q-btn> -->
 
-          <q-btn
-            icon="las la-book"
-            to="/reports"
-            flat
-            dense
-
-          >
+          <q-btn icon="las la-book" to="/reports" flat dense>
             <q-tooltip> Отчеты </q-tooltip>
           </q-btn>
           <q-btn
@@ -259,6 +254,7 @@ import { formatRole } from "src/helpers/formatters.js";
 import { getConnection, api } from "src/boot/axios";
 import { сonnectionName } from "src/helpers/formatters";
 import LimitWarning from "src/components/limits/LimitWarning.vue";
+
 export default {
   name: "MainLayout",
   components: {
@@ -270,6 +266,7 @@ export default {
       connection: getConnection(),
       isMobile: localStorage.getItem("mobile") === "true",
       api,
+
     };
   },
   methods: {

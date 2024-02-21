@@ -1,3 +1,9 @@
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 export const getFilteredNames = (state) => (name) => {
   const data =
     !!name && name != ""
@@ -81,3 +87,85 @@ export const ordersCustomers = (state) => {
     ),
   ];
 };
+
+const isWithTs = (route) => (route.orders[0].transportId ? 1 : 0);
+
+const getRoutePriority = (route) => {
+  if (route.orders[0].isEmergency) return 3;
+  if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime))
+    return 2;
+  return 1;
+};
+
+const getCargoTypeById = (id, cargoTypes) => {
+  return cargoTypes.find((ct) => ct.id == id);
+};
+
+const getCargoTypePriority = (route) => {
+  return route.orders.reduce((prev, curr) => {
+    const currPriority =
+      getCargoTypeById(curr.cargoTypeId, cargoTypes)?.priority ?? 1;
+    return currPriority > prev ? currPriority : prev;
+  }, 0);
+};
+
+const getCargoTypePriorityWithCargoType = (route, cargoTypes) => {
+  return route.orders.reduce(
+    (prev, curr) => {
+      const currPriority =
+        getCargoTypeById(curr.cargoTypeId, cargoTypes)?.priority ?? 1;
+      return currPriority > prev.priority
+        ? { priority: currPriority, cargoTypeId: curr.cargoTypeId }
+        : prev;
+    },
+    { priority: 0, cargoTypeId: null }
+  );
+};
+
+const getCargoTypeTransportTypePriorityResult = (route, relatedCargoTypes) => {
+  const [_, cargoTypeId] = getCargoTypePriorityWithCargoType(route);
+  const relatedCargoType = relatedCargoTypes.find(
+    (rct) => rct.id === cargoTypeId
+  );
+  return (
+    relatedCargoType?.CargoTypeTransportTypeAssociation?.transportPriorityF ?? 0
+  );
+};
+
+export const getMostPrioritizedRoute =
+  (state) => (transportType, cargoTypes, relatedCargoTypes) => {
+    const routes = state.orders
+      .filter((route) => !isWithTs(route))
+      .filter((route) => {
+        const test = getCargoTypePriorityWithCargoType(route, cargoTypes);
+        console.warn(test);
+        return relatedCargoTypes.map((ct) => ct.id).includes(test.cargoTypeId);
+      })
+      .sort((a, b) => {
+        // const aTsResult = isWithTs(a);
+        // const bTsResult = isWithTs(b);
+
+        // if (aTsResult > bTsResult) return 1;
+        // if (bTsResult > aTsResult) return -1;
+
+        const aRoutePriorityResult = getRoutePriority(a);
+        const bRoutePriorityResult = getRoutePriority(b);
+
+        if (aRoutePriorityResult > bRoutePriorityResult) return -1;
+        if (bRoutePriorityResult > aRoutePriorityResult) return 1;
+
+        const aCargoTypeResult = getCargoTypePriority(a, cargoTypes);
+        const bCargoTypeResult = getCargoTypePriority(b, cargoTypes);
+
+        if (aCargoTypeResult > bCargoTypeResult) return -1;
+        if (bCargoTypeResult > aCargoTypeResult) return 1;
+
+        const aCargoTypeTransportTypePriorityResult =
+          getCargoTypeTransportTypePriorityResult(a, relatedCargoTypes);
+        const bCargoTypeTransportTypePriorityResult =
+          getCargoTypeTransportTypePriorityResult(b, relatedCargoTypes);
+
+        return orderTimeResult;
+      });
+    return routes?.[0] ?? null;
+  };

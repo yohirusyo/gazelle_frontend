@@ -37,6 +37,7 @@
         <q-checkbox class="col" v-model="prioritySort" size="xs">
           <q-tooltip> Сортировка по приоритетам </q-tooltip>
         </q-checkbox>
+        <AutoWrapper />
       </div>
     </template>
   </MenuItemV2>
@@ -49,6 +50,8 @@ import OrderForm from "src/components/order/form/Form.vue";
 import { mapState, mapMutations } from "vuex";
 import MenuItemV2 from "src/components/base/MenuItemV2.vue";
 import { api } from "src/boot/axios";
+import AutoWrapper from "src/components/recommendation/auto-dialog/Wrapper.vue";
+
 export default {
   name: "Order",
   components: {
@@ -56,6 +59,7 @@ export default {
     OrderForm,
     OrderListMobile,
     MenuItemV2,
+    AutoWrapper,
   },
   props: ["col"],
   computed: {
@@ -84,14 +88,6 @@ export default {
         if (!ct || ct.ignoreInRecommendation) return false;
         return true;
       });
-      // const ct = route.orders.reduce((prev, curr) => {
-      //   const cargoType = this.cargoTypes.find(
-      //     (ct) => ct.id === curr.cargoTypeId
-      //   );
-      //   if (!cargoType || cargoType.ignoreInRecommendation) return prev;
-      //   if (cargoType.priority > (prev?.priority ?? 0)) return cargoType;
-      //   return prev;
-      // }, null);
       if (!orderWithCT) {
         this.setTransportRecommendationList([]);
         return;
