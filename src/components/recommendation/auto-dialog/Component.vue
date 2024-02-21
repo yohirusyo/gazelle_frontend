@@ -19,6 +19,7 @@ const store = useStore();
 const cargoTypes = ref([]);
 
 const subscribe = async () => {
+  console.log("free_transport_type subscribed");
   try {
     const { data } = await api.get("/recommendation/cargo-types");
     cargoTypes.value = data;
@@ -109,6 +110,7 @@ const subscribe = async () => {
 onMounted(subscribe);
 
 const unsubscribe = () => {
+  console.log("free_transport_type unsubscribed");
   socketio.off("free_transport_type");
 };
 

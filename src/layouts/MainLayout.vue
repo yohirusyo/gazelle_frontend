@@ -20,8 +20,7 @@
         <div class="col text-h5 row items-center">
           <div class="q-pl-md" v-if="!$q.screen.xs">{{ сonnectionName() }}</div>
           <LimitWarning />
-          <AutoDialog v-if="auto" />
-          <q-checkbox v-model="auto"></q-checkbox>
+
         </div>
         <div
           class="q-pr-sm text-center col col-shrink column justify-center items-end"
@@ -255,12 +254,11 @@ import { formatRole } from "src/helpers/formatters.js";
 import { getConnection, api } from "src/boot/axios";
 import { сonnectionName } from "src/helpers/formatters";
 import LimitWarning from "src/components/limits/LimitWarning.vue";
-import AutoDialog from "src/components/recommendation/auto-dialog/Component.vue";
+
 export default {
   name: "MainLayout",
   components: {
     LimitWarning,
-    AutoDialog,
   },
   data() {
     return {
@@ -268,7 +266,7 @@ export default {
       connection: getConnection(),
       isMobile: localStorage.getItem("mobile") === "true",
       api,
-      auto: true,
+
     };
   },
   methods: {
