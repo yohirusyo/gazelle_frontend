@@ -139,25 +139,38 @@ const getCargoTypeTransportTypePriorityResult = (
 export const getMostPrioritizedRoute =
   (state) => (transportType, cargoTypes, relatedCargoTypes) => {
     const routes = state.orders
+      // Отфильтровываем заявки с неназначенным ТС
       .filter((route) => !isWithTs(route))
+      // Отфильтровываем маршруты обрабатываемые этим типом ТС
       .filter((route) => {
-        const test = getCargoTypePriorityWithCargoType(route, cargoTypes);
-        return relatedCargoTypes.map((ct) => ct.id).includes(test.cargoTypeId);
+        // Самый приоритетный груз в маршруте
+        const mvpRoute = getCargoTypePriorityWithCargoType(route, cargoTypes);
+        // Проверка на то, что самый приоритетный груз обслуживается этим типом ТС
+        return relatedCargoTypes
+          .filter((ct) =>
+            [3].includes(
+              // Просьба Андрея обслуживать только высокий приоритет в привязке Тип груза к типу ТС, если нужно обрабатывать любой груз поставить [3,2,1] или убрать этот фильтр
+              ct?.CargoTypeTransportTypeAssociation?.transportPriorityF ?? 0
+            )
+          )
+          .map((ct) => ct.id)
+          .includes(mvpRoute.cargoTypeId);
       })
+      // Сортируем
       .sort((a, b) => {
-        const aRoutePriorityResult = getRoutePriority(a);
+        const aRoutePriorityResult = getRoutePriority(a); // Приоритет маршрута (3 аварийный, 2 плановый, 1 обычный)
         const bRoutePriorityResult = getRoutePriority(b);
 
         if (aRoutePriorityResult > bRoutePriorityResult) return -1;
         if (bRoutePriorityResult > aRoutePriorityResult) return 1;
 
-        const aCargoTypeResult = getCargoTypePriority(a, cargoTypes);
+        const aCargoTypeResult = getCargoTypePriority(a, cargoTypes); // Приортитет типа груза
         const bCargoTypeResult = getCargoTypePriority(b, cargoTypes);
 
         if (aCargoTypeResult > bCargoTypeResult) return -1;
         if (bCargoTypeResult > aCargoTypeResult) return 1;
 
-        const aCargoTypeTransportTypePriorityResult =
+        const aCargoTypeTransportTypePriorityResult = // Приоритет связки тип груза тип ТС
           getCargoTypeTransportTypePriorityResult(
             a,
             relatedCargoTypes,
@@ -170,10 +183,18 @@ export const getMostPrioritizedRoute =
             cargoTypes
           );
 
-        return (
-          bCargoTypeTransportTypePriorityResult -
+        if (
+          aCargoTypeTransportTypePriorityResult >
+          bCargoTypeTransportTypePriorityResult
+        )
+          return -1;
+        if (
+          bCargoTypeTransportTypePriorityResult >
           aCargoTypeTransportTypePriorityResult
-        );
+        )
+          return 1;
+
+        return 0;
       });
     return routes?.[0] ?? null;
   };
