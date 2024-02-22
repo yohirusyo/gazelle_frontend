@@ -92,8 +92,8 @@ const isWithTs = (route) => (route.orders[0].transportId ? 1 : 0);
 
 const getRoutePriority = (route) => {
   if (route.orders[0].isEmergency) return 3;
-  if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime))
-    return 2;
+  // if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime))
+  //   return 2;
   return 1;
 };
 
@@ -101,7 +101,7 @@ const getCargoTypeById = (id, cargoTypes) => {
   return cargoTypes.find((ct) => ct.id == id);
 };
 
-const getCargoTypePriority = (route) => {
+const getCargoTypePriority = (route, cargoTypes) => {
   return route.orders.reduce((prev, curr) => {
     const currPriority =
       getCargoTypeById(curr.cargoTypeId, cargoTypes)?.priority ?? 1;
@@ -122,10 +122,14 @@ const getCargoTypePriorityWithCargoType = (route, cargoTypes) => {
   );
 };
 
-const getCargoTypeTransportTypePriorityResult = (route, relatedCargoTypes) => {
-  const [_, cargoTypeId] = getCargoTypePriorityWithCargoType(route);
+const getCargoTypeTransportTypePriorityResult = (
+  route,
+  relatedCargoTypes,
+  cargoTypes
+) => {
+  const test = getCargoTypePriorityWithCargoType(route, cargoTypes);
   const relatedCargoType = relatedCargoTypes.find(
-    (rct) => rct.id === cargoTypeId
+    (rct) => rct.id === test?.cargoTypeId
   );
   return (
     relatedCargoType?.CargoTypeTransportTypeAssociation?.transportPriorityF ?? 0
@@ -138,16 +142,9 @@ export const getMostPrioritizedRoute =
       .filter((route) => !isWithTs(route))
       .filter((route) => {
         const test = getCargoTypePriorityWithCargoType(route, cargoTypes);
-        console.warn(test);
         return relatedCargoTypes.map((ct) => ct.id).includes(test.cargoTypeId);
       })
       .sort((a, b) => {
-        // const aTsResult = isWithTs(a);
-        // const bTsResult = isWithTs(b);
-
-        // if (aTsResult > bTsResult) return 1;
-        // if (bTsResult > aTsResult) return -1;
-
         const aRoutePriorityResult = getRoutePriority(a);
         const bRoutePriorityResult = getRoutePriority(b);
 
@@ -161,11 +158,22 @@ export const getMostPrioritizedRoute =
         if (bCargoTypeResult > aCargoTypeResult) return 1;
 
         const aCargoTypeTransportTypePriorityResult =
-          getCargoTypeTransportTypePriorityResult(a, relatedCargoTypes);
+          getCargoTypeTransportTypePriorityResult(
+            a,
+            relatedCargoTypes,
+            cargoTypes
+          );
         const bCargoTypeTransportTypePriorityResult =
-          getCargoTypeTransportTypePriorityResult(b, relatedCargoTypes);
+          getCargoTypeTransportTypePriorityResult(
+            b,
+            relatedCargoTypes,
+            cargoTypes
+          );
 
-        return orderTimeResult;
+        return (
+          bCargoTypeTransportTypePriorityResult -
+          aCargoTypeTransportTypePriorityResult
+        );
       });
     return routes?.[0] ?? null;
   };
