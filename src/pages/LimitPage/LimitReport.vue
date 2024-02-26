@@ -11,7 +11,15 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(0)"></q-icon>
+        <q-btn
+          :disable="!checkFormatPropsDate15"
+          flat
+          dense
+          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(0)"
+        />
       </template>
     </q-input>
     <q-input
@@ -25,7 +33,15 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(1)"></q-icon>
+        <q-btn
+          :disable="!checkFormatPropsDate20"
+          flat
+          dense
+          :text-color="checkFormatPropsDate20 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(1)"
+        />
       </template>
     </q-input>
     <q-input
@@ -39,7 +55,15 @@
       readonly
     >
       <template v-slot:after>
-        <q-icon name="download" size="md" @click="getReport(2)"></q-icon>
+        <q-btn
+          :disable="!checkFormatPropsDate30"
+          flat
+          dense
+          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="getReport(2)"
+        />
       </template>
     </q-input>
     <table
@@ -66,6 +90,12 @@
         <td></td>
         <td>АТУ ООО</td>
         <td></td>
+      </tr>
+      <tr>
+        <td>Дата</td>
+        <td>ТС</td>
+        <td>КМ</td>
+        <td>Руб</td>
       </tr>
       <tr v-for="item of statsControl" :key="item.id">
         <td>{{ item.orderTime }}</td>
@@ -97,7 +127,46 @@ export default {
   data() {
     return {
       _period: null,
+      first: null,
+      second: null,
+      third: null,
     };
+  },
+  mounted() {
+    this.getStatsContorlLimits({
+      period: 0,
+      year: this.year,
+      month: this.month,
+    });
+  },
+  watch: {
+    month: {
+      async handler(newVal, oldVal) {
+        await this.getStatsContorlLimits({
+          period: 0,
+          year: this.year,
+          month: this.month,
+        });
+        this.first = this.statsControl;
+        if (this.checkFormatPropsDate15) {
+          await this.getStatsContorlLimits({
+            period: 1,
+            year: this.year,
+            month: this.month,
+          });
+          this.second = this.statsControl;
+        } else this.second = null;
+        if (this.checkFormatPropsDate20) {
+          await this.getStatsContorlLimits({
+            period: 2,
+            year: this.year,
+            month: this.month,
+          });
+          this.third = this.statsControl;
+        } else this.third = null;
+      },
+      immediate: true,
+    },
   },
   computed: {
     ...mapState("limit", ["statsControl"]),
@@ -108,17 +177,29 @@ export default {
     },
     firstPeriod: {
       get() {
-        return `c 01.${this.monthLabel}.${this.year} по 14.${this.monthLabel}.${this.year}`;
+        return `c 01.${this.monthLabel}.${this.year} по 14.${this.monthLabel}.${
+          this.year
+        } / ${this.firstPeriodRouteLength?.toFixed(2)} км / ${(
+          this.firstPeriodRouteLength * this.cost
+        )?.toFixed(2)} руб.`;
       },
     },
     secondPeriod: {
       get() {
-        return `c 15.${this.monthLabel}.${this.year} по 20.${this.monthLabel}.${this.year}`;
+        return `c 15.${this.monthLabel}.${this.year} по 20.${this.monthLabel}.${
+          this.year
+        } / ${this.secondPeriodRouteLength?.toFixed(2)} км / ${(
+          this.secondPeriodRouteLength * this.cost
+        )?.toFixed(2)} руб.`;
       },
     },
     thirdPeriod: {
       get() {
-        return `c 21.${this.monthLabel}.${this.year} по последнее число месяца`;
+        return `c 21.${this.monthLabel}.${
+          this.year
+        } по последнее число месяца / ${this.thirdPeriodRouteLength?.toFixed(
+          2
+        )} км / ${(this.thirdPeriodRouteLength * this.cost)?.toFixed(2)} руб.`;
       },
     },
 
@@ -133,17 +214,93 @@ export default {
         }, 0);
       },
     },
+    firstPeriodRouteLength: {
+      get() {
+        return this.first?.reduce((sum, item) => {
+          if (item.routeLength !== null) {
+            return sum + Number(item.routeLength);
+          } else {
+            return sum;
+          }
+        }, 0);
+      },
+    },
+    secondPeriodRouteLength: {
+      get() {
+        return this.second == null
+          ? 0
+          : this.second?.reduce((sum, item) => {
+              if (item.routeLength !== null) {
+                return sum + Number(item.routeLength);
+              } else {
+                return sum;
+              }
+            }, 0);
+      },
+    },
+    thirdPeriodRouteLength: {
+      get() {
+        return this.third == null
+          ? 0
+          : this.third?.reduce((sum, item) => {
+              if (item.routeLength !== null) {
+                return sum + Number(item.routeLength);
+              } else {
+                return sum;
+              }
+            }, 0);
+      },
+    },
+    checkFormatPropsDate15: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate15();
+      },
+    },
+    checkFormatPropsDate20: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate20();
+      },
+    },
+    checkFormatPropsDate30: {
+      get() {
+        return dayjs().format("YYYYMMDDHHmm") >= this.formatPropsDate30();
+      },
+    },
   },
 
   methods: {
     ...mapActions("limit", ["getStatsContorlLimits"]),
+    formatPropsDate15() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+        date: 14,
+        hours: 19,
+        minutes: 30,
+      }).format("YYYYMMDDHHmm");
+    },
+    formatPropsDate20() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+        date: 20,
+        hours: 19,
+        hours: 19,
+        minutes: 30,
+      }).format("YYYYMMDDHHmm");
+    },
+    formatPropsDate30() {
+      return dayjs({
+        year: this.year,
+        month: this.month,
+      }).endOf('month').format("YYYYMMDDHHmm");
+    },
     async getReport(period) {
       period == 0
-        ? (this._period = this.firstPeriod)
+        ? (this._period = `c 01.${this.monthLabel}.${this.year} по 14.${this.monthLabel}.${this.year}`)
         : period == 1
-        ? (this._period = this.secondPeriod)
-        : (this._period = this.thirdPeriod);
-
+        ? (this._period = `c 15.${this.monthLabel}.${this.year} по 20.${this.monthLabel}.${this.year}`)
+        : (this._period = `c 21.${this.monthLabel}.${this.year} по последнее число месяца`);
       await this.getStatsContorlLimits({
         period: period,
         year: this.year,
@@ -191,6 +348,10 @@ export default {
         "B3",
         "C3",
         "D3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
       ];
       cells1.forEach((cell) => {
         (ws[cell].s = {
@@ -202,7 +363,7 @@ export default {
           (ws[cell].t = "s");
       });
       // Формирование основной таблицы
-      const startingCells = ["A4", "B4", "C4", "D4"]; // Начальные точки
+      const startingCells = ["A5", "B5", "C5", "D5"]; // Начальные точки
 
       const cellCount = this.statsControl.length; // Количество заявок (без итого)
 
@@ -260,6 +421,6 @@ export default {
 <style>
 .q-field--outlined.q-field--readonly .q-field__control:before {
   border-style: solid;
-  border: 1px solid black
+  border: 1px solid black;
 }
 </style>

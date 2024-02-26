@@ -22,7 +22,7 @@ export function setLimit(state, val) {
 
 export function setStatsControl (state, val) {
   val.forEach(function(x) {
-    x.orderTime = dayjs(x.orderTime).format('DD.MM.YYYY HH:mm');
+    x.orderTime = dayjs(x.orderTime).format('DD.MM.YYYY');
     x.routeLength = x.routeLength / 1000
   });
   state.statsControl = val

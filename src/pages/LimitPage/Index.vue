@@ -37,6 +37,16 @@
         </div>
         <div class="row">
           <q-input
+          label="Реализация по часам"
+          class="col text-black border-none q-pa-sm"
+          square
+          outlined
+          dense
+          hide-bottom-space
+          hide-hint
+          v-model="_realizationByHours"
+        />
+          <q-input
             readonly
             label="Плановая абонентская плата"
             class="col text-black border-none q-pa-sm"
@@ -58,44 +68,13 @@
             hide-hint
             v-model="_factSubPay"
           />
+
         </div>
         <LimitTable
           :plan="_productionPlanVolume"
           :year="year"
           :month="month"
         ></LimitTable>
-      </div>
-      <div class="row" v-if="_selectedMonth">
-        <q-input
-          label="Реализация по часам"
-          class="col text-black border-none q-pa-sm"
-          square
-          outlined
-          dense
-          hide-bottom-space
-          hide-hint
-          v-model="_realizationByHours"
-        />
-        <q-input
-          label='Итоговая прибыль ООО "Автотранспортное управление"'
-          class="col text-black border-none q-pa-sm"
-          square
-          outlined
-          dense
-          hide-bottom-space
-          hide-hint
-          v-model="_finalPropfit"
-        />
-        <q-input
-          label='Итоговая скидка для ОАО "ММК МЕТИЗ"'
-          class="col text-black border-none q-pa-sm"
-          square
-          outlined
-          dense
-          hide-bottom-space
-          hide-hint
-          v-model="_discount"
-        />
       </div>
     </div>
     <div class="row q-ma-sm absolute-bottom">
@@ -246,6 +225,11 @@ export default {
         return this.controlLimits;
       },
     },
+    planVolume: {
+      get() {
+        return this._productionPlanVolume * 1.12607971119134;
+      },
+    },
     _planSubPay: {
       get() {
         return (
@@ -264,7 +248,7 @@ export default {
     },
     _finalPropfit: {
       get() {
-        return this._factSubPay - this._realizationByHours;
+        return (this._factSubPay - this._realizationByHours)?.toFixed(2);
       },
     },
     _hoursCost: {
@@ -279,9 +263,7 @@ export default {
       get() {
         return (
           this._planSubPay /
-          this.monthLimitSubdivisions.find(
-            (item) => item.management.name == "УС"
-          )?.fact
+          this.planVolume
         );
       },
     },

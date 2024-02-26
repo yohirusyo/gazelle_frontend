@@ -1,3 +1,9 @@
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 export const getFilteredNames = (state) => (name) => {
   const data =
     !!name && name != ""
@@ -81,3 +87,114 @@ export const ordersCustomers = (state) => {
     ),
   ];
 };
+
+const isWithTs = (route) => (route.orders[0].transportId ? 1 : 0);
+
+const getRoutePriority = (route) => {
+  if (route.orders[0].isEmergency) return 3;
+  // if (dayjs(route.orders[0].createdAt).utc() < dayjs.unix(this._yesterdayTime))
+  //   return 2;
+  return 1;
+};
+
+const getCargoTypeById = (id, cargoTypes) => {
+  return cargoTypes.find((ct) => ct.id == id);
+};
+
+const getCargoTypePriority = (route, cargoTypes) => {
+  return route.orders.reduce((prev, curr) => {
+    const currPriority =
+      getCargoTypeById(curr.cargoTypeId, cargoTypes)?.priority ?? 1;
+    return currPriority > prev ? currPriority : prev;
+  }, 0);
+};
+
+const getCargoTypePriorityWithCargoType = (route, cargoTypes) => {
+  return route.orders.reduce(
+    (prev, curr) => {
+      const currPriority =
+        getCargoTypeById(curr.cargoTypeId, cargoTypes)?.priority ?? 1;
+      return currPriority > prev.priority
+        ? { priority: currPriority, cargoTypeId: curr.cargoTypeId }
+        : prev;
+    },
+    { priority: 0, cargoTypeId: null }
+  );
+};
+
+const getCargoTypeTransportTypePriorityResult = (
+  route,
+  relatedCargoTypes,
+  cargoTypes
+) => {
+  const test = getCargoTypePriorityWithCargoType(route, cargoTypes);
+  const relatedCargoType = relatedCargoTypes.find(
+    (rct) => rct.id === test?.cargoTypeId
+  );
+  return (
+    relatedCargoType?.CargoTypeTransportTypeAssociation?.transportPriorityF ?? 0
+  );
+};
+
+export const getMostPrioritizedRoute =
+  (state) => (transportType, cargoTypes, relatedCargoTypes) => {
+    const routes = state.orders
+      // Отфильтровываем заявки с неназначенным ТС
+      .filter((route) => !isWithTs(route))
+      // Отфильтровываем маршруты обрабатываемые этим типом ТС
+      .filter((route) => {
+        // Самый приоритетный груз в маршруте
+        const mvpRoute = getCargoTypePriorityWithCargoType(route, cargoTypes);
+        // Проверка на то, что самый приоритетный груз обслуживается этим типом ТС
+        return relatedCargoTypes
+          .filter((ct) =>
+            [3].includes(
+              // Просьба Андрея обслуживать только высокий приоритет в привязке Тип груза к типу ТС, если нужно обрабатывать любой груз поставить [3,2,1] или убрать этот фильтр
+              ct?.CargoTypeTransportTypeAssociation?.transportPriorityF ?? 0
+            )
+          )
+          .map((ct) => ct.id)
+          .includes(mvpRoute.cargoTypeId);
+      })
+      // Сортируем
+      .sort((a, b) => {
+        const aRoutePriorityResult = getRoutePriority(a); // Приоритет маршрута (3 аварийный, 2 плановый, 1 обычный)
+        const bRoutePriorityResult = getRoutePriority(b);
+
+        if (aRoutePriorityResult > bRoutePriorityResult) return -1;
+        if (bRoutePriorityResult > aRoutePriorityResult) return 1;
+
+        const aCargoTypeResult = getCargoTypePriority(a, cargoTypes); // Приортитет типа груза
+        const bCargoTypeResult = getCargoTypePriority(b, cargoTypes);
+
+        if (aCargoTypeResult > bCargoTypeResult) return -1;
+        if (bCargoTypeResult > aCargoTypeResult) return 1;
+
+        const aCargoTypeTransportTypePriorityResult = // Приоритет связки тип груза тип ТС
+          getCargoTypeTransportTypePriorityResult(
+            a,
+            relatedCargoTypes,
+            cargoTypes
+          );
+        const bCargoTypeTransportTypePriorityResult =
+          getCargoTypeTransportTypePriorityResult(
+            b,
+            relatedCargoTypes,
+            cargoTypes
+          );
+
+        if (
+          aCargoTypeTransportTypePriorityResult >
+          bCargoTypeTransportTypePriorityResult
+        )
+          return -1;
+        if (
+          bCargoTypeTransportTypePriorityResult >
+          aCargoTypeTransportTypePriorityResult
+        )
+          return 1;
+
+        return 0;
+      });
+    return routes?.[0] ?? null;
+  };

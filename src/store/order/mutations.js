@@ -38,11 +38,9 @@ export function update(state, order) {
   const route = state.orders.find((r) =>
     r.orders.map((o) => o.id).includes(order.id)
   );
-  const index = route.orders.findIndex((o) => o.id == order.id);
-  if (index != -1) {
-    // const changedPriopity = state.orders[index].priority != order.priority || state.orders[index].statusId != order.statusId;
+  const index = route?.orders.findIndex((o) => o.id == order.id);
+  if (index !== null && index != -1) {
     route.orders[index] = order;
-    // if (changedPriopity) sort(state)
   }
 }
 
