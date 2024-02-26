@@ -1,11 +1,10 @@
 <template>
-
   <q-table wrap-cells hide-bottom :rows-per-page-options="[0]" table-header-class="bg-white" separator="cell"
     class="my-sticky-header-table" dense flat square :rows="_history"
     :columns="_isMinutes ? minutesColumns : kilometersColumns" row-key="owner" v-model:expanded="expanded">
-
     <template v-slot:header="props">
-<q-th class="text-center" colspan="4" auto-width> {{ _selectedDate ? toDate(_selectedDate?.from) + " - " + toDate(_selectedDate?.to) : "" }} </q-th>
+      <q-th class="text-center" colspan="4" auto-width> {{ _selectedDate ? toDate(_selectedDate?.from) + " - " +
+        toDate(_selectedDate?.to) : "" }} </q-th>
 
       <q-tr :props="props">
 
@@ -120,7 +119,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { api } from "src/boot/axios";
 import { mapGetters, mapState } from "vuex";
 import VScrolltable from "src/components/base/VScrolltable.vue";
-import moment from 'moment';
 export default {
   components: {
     VScrolltable,
@@ -128,8 +126,8 @@ export default {
   props: ["item", "operatingSpeedVariable", "isMinutes", "selectedMonth"],
   data() {
     return {
-      _selectedDate:{
-        from:null,
+      _selectedDate: {
+        from: null,
         to: null
       },
       history: [],
@@ -194,8 +192,8 @@ export default {
     };
   },
   async mounted() {
-    this._selectedDate.from = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').startOf('month').format('YYYYMMDD'),
-    this._selectedDate.to = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').endOf('month').format('YYYYMMDD'),
+    this._selectedDate.from = dayjs(new Date(this.selectedMonth.year, this.selectedMonth.month)).startOf('month').format('YYYYMMDD'),
+    this._selectedDate.to = dayjs(new Date(this.selectedMonth.year, this.selectedMonth.month)).endOf('month').format('YYYYMMDD'),
     this.fetchOrders();
   },
   computed: {
@@ -292,15 +290,13 @@ export default {
       }
     },
   },
-  // mounted(){
-  //   this._selectedDate.from = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').startOf('month').format('YYYYMMDD'),
-  //   this._selectedDate.to = moment(`${this.selectedMonth.month+1}-${this.selectedMonth.year}`, 'M-YYYY').endOf('month').format('YYYYMMDD'),
-  //   console.log(this._selectedDate);
-  // },
   methods: {
     toDate(val) {
-      dayjs.extend(customParseFormat)
-      return dayjs(val).format('DD.MM.YYYY')
+      if (val) {
+        dayjs.extend(customParseFormat)
+        return dayjs(val).format('DD.MM.YYYY')
+      }
+
     },
     toMinutes(time) {
       if (!time) return "0.00";
