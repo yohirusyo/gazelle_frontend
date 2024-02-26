@@ -279,11 +279,12 @@ export default {
     },
     buildRoute(ignoreDateTime = false) {
       return {
-        orderTime: ignoreDateTime
-          ? this.orderTime
-          : !this._creationMode && new Date() > this.orderTime
-            ? new Date()
-            : this.orderTime,
+        // orderTime: ignoreDateTime
+        //   ? this.orderTime
+        //   : !this._creationMode && new Date() > this.orderTime
+        //     ? new Date()
+        //     : this.orderTime,
+        orderTime: this.orderTime,
         departurePointName: this.departurePointName,
         isEmergency:
           !this._isMetiz || this._orderCanBeEmergency
