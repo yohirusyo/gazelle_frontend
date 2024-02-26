@@ -17,17 +17,23 @@
             <q-td key="name" :props="props">
               {{ props.row.name }}
             </q-td>
-            <q-td key="usedMonthLimit" :props="props">
-              {{ round(props.row.limits[0].used) }}
-            </q-td>
             <q-td key="factMonthLimit" :props="props">
               {{ round(props.row.limits[0].fact) }}
             </q-td>
-            <q-td key="isMinutes" :props="props">
+            <q-td key="usedMonthLimit" :props="props">
+              {{ round(props.row.limits[0].used) }}
+            </q-td>
+            <!-- <q-td key="isMinutes" :props="props">
               {{ props.row.isMinutes ? "Минуты" : "Километры" }}
             </q-td>
             <q-td key="bossId" :props="props">
               {{ formatCustomer(getCustomerById(props.row.bossId)) }}
+            </q-td> -->
+            <q-td key="whileNotDriving" :props="props">
+              {{ findWhileDriving(props.row.id) }}
+            </q-td>
+            <q-td key="whileDriving" :props="props">
+              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id)) }}
             </q-td>
           </q-tr>
           <q-tr v-if="props.expand">
@@ -36,6 +42,13 @@
                 :isMinutes="props.row.isMinutes" :selectedMonth="_selectedMonth" />
             </q-td>
           </q-tr>
+          <div v-if="managements.length - 1 == props.pageIndex" class="absolute q-ml-sm ">
+            <div class="q-pt-sm">
+              <q-table
+                :title="`Запас: ${_plan.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
+                :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom flat bordered/>
+            </div>
+          </div>
         </template>
       </VScrolltable>
     </div>
@@ -72,10 +85,51 @@ export default {
     updateData(item) {
       this.$emit("reqManagements", { year: item.year, month: item.month });
     },
+    findWhileDriving(id) {
+      return this.managementsWhileDriving[id];
+    },
   },
   data() {
     return {
       options: [],
+      columnsReserve: [  
+        {
+          name: 'subdivision',
+          required: true,
+          label: 'Подразделение',
+          align: 'center',
+          field: row => row.subdivision,
+          format: val => `${val}`,
+          sortable: true
+        },
+        {
+          name: 'fullname',
+          required: true,
+          label: 'Ответственный',
+          align: 'center',
+          field: row => row.fullname,
+          format: val => `${val}`,
+          sortable: true
+        },
+        {
+          name: 'phoneNumber',
+          required: true,
+          label: 'Телефон',
+          align: 'center',
+          field: row => row.phoneNumber,
+          format: val => `${val}`,
+          sortable: true
+        },
+        {
+          name: 'amount',
+          required: true,
+          label: 'Израсходовано',
+          align: 'center',
+          field: row => row.amount,
+          format: val => `${val}`,
+          sortable: true
+        },
+      ],
       columns: [
         {
           name: "orders",
@@ -92,30 +146,44 @@ export default {
           sortable: false,
         },
         {
-          name: "usedMonthLimit",
-          required: true,
-          label: "Израсходованный месячный лимит",
-          align: "center",
-          sortable: false,
-        },
-        {
           name: "factMonthLimit",
           required: true,
-          label: "Фактический месячный лимит",
+          label: "Лимит на месяц",
           align: "center",
           sortable: false,
         },
         {
-          name: "isMinutes",
+          name: "usedMonthLimit",
           required: true,
-          label: "Единица измерения",
+          label: "Израсходованный лимит",
+          align: "center",
+          sortable: false,
+        },
+        // {
+        //   name: "isMinutes",
+        //   required: true,
+        //   label: "Единица измерения",
+        //   align: "center",
+        //   sortable: false,
+        // },
+        // {
+        //   name: "bossId",
+        //   required: false,
+        //   label: "Главный ответственный",
+        //   align: "center",
+        //   sortable: false,
+        // },
+        {
+          name: "whileDriving",
+          required: true,
+          label: "Во время движения",
           align: "center",
           sortable: false,
         },
         {
-          name: "bossId",
-          required: false,
-          label: "Главный ответственный",
+          name: "whileNotDriving",
+          required: true,
+          label: "На погрузке/разгрузке",
           align: "center",
           sortable: false,
         },
@@ -125,10 +193,25 @@ export default {
     };
   },
   computed: {
-    ...mapState("management", ["managements"]),
+    ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve"]),
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapState("current", ["currentUser"]),
     ...mapState("limit", ["controlLimits"]),
+    planVolume: {
+      get() {
+        return this.managementsReserve.factMonthLimit * 1.12607971119134;
+      },
+    },
+    _plan: {
+      get() {
+        return (
+          this.planVolume -
+          _.sumBy(this.managements, function (o) {
+            return Number(o.limits[0].plan);
+          })
+        );
+      },
+    },
   },
   async mounted() {
     await this.getAllControlLimits();

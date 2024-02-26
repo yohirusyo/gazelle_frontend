@@ -10,22 +10,31 @@ export async function requestManagements(context, {year, month}) {
       try {
         ['management_update', 'management_delete'].forEach(socketio.removeAllListeners)
       } catch (error) { }
+      await api.get(`management/driving/${year}/${month}`).then(({ data }) => {
+        context.commit("setDriving", data);
+      });
+      await api.get(`management/reserve/${year}/${month}`).then(({ data }) => {
+        context.commit("setReserve", data);
+      });
       await api.get(`management/${year}/${month}`).then(({ data }) => {
         context.commit("set", data);
-      });
+      })
       socketio.on('management_update', management => context.commit("update", management))
       socketio.on("management_delete", id => context.commit("remove", id))
     }
   )
 }
 export async function requestChangeManagements(context, {year, month}) {
-  return api.get(`management/${year}/${month}`)
+  await api.get(`management/driving/${year}/${month}`).then(({ data }) => {
+    context.commit("setDriving", data);
+  });
+  await api.get(`management/reserve/${year}/${month}`).then(({ data }) => {
+    context.commit("setReserve", data);
+  });
+    return await api.get(`management/${year}/${month}`)
     .then(({ data }) => {
       context.commit("set", data);
     })
-    .catch((err) => {
-      
-    });
 }
 
 export async function requestMyManagement(context) {

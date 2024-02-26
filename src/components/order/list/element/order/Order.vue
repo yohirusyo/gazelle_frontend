@@ -1,39 +1,17 @@
 <template>
-  <q-tr
-    :props="props"
-    :class="_class"
-    @click="handleClick"
-    :id="'order-list-item-' + order.id"
-  >
+  <q-tr :props="props" :class="_class" @click="handleClick" :id="'order-list-item-' + order.id">
     <q-td key="expand" :props="props" :class="_latedClass">
-      <SwitcherRouteShow
-        v-model="_modelValue"
-        :routeId="props.row.id"
-        v-if="_isParent"
-      />
+      <SwitcherRouteShow v-model="_modelValue" :routeId="props.row.id" v-if="_isParent" />
       <div v-else-if="_isSolo">Одиночная</div>
       <div v-else class="column items-center">
-        <q-icon
-          class="q-ml-md"
-          name="las la-level-up-alt"
-          size="md"
-          color="grey"
-          style="transform: rotate(90deg)"
-        />
+        <q-icon class="q-ml-md" name="las la-level-up-alt" size="md" color="grey" style="transform: rotate(90deg)" />
         № {{ order.parentOrder }}
       </div>
     </q-td>
     <q-td key="time" :props="props">
-      <Time
-        :id="order.id"
-        :isEmergency="order.isEmergency"
-        :orderTime="order.orderTime"
-        :name="order.name"
-        :description="order.description"
-        :class="_isYesterdayTime ? 'bg-blue' : ''"
-        :maxWeight="_maxWeight"
-        :createdAt="order.createdAt"
-      />
+      <Time :id="order.id" :isEmergency="order.isEmergency" :orderTime="order.orderTime" :name="order.name"
+        :description="order.description" :class="_isYesterdayTime ? 'bg-blue' : ''" :maxWeight="_maxWeight"
+        :createdAt="order.createdAt" />
     </q-td>
     <q-td key="customer" :props="props">
       <Customer :customerId="order.customerId" />
@@ -50,24 +28,15 @@
       <Transport :transportId="order.transportId" />
     </q-td>
     <q-td key="status" :props="props">
-      <Status
-        :statusId="order.statusId"
-        :statusChangedAt="order.statusChangedAt"
-        :isDone="order.isDone"
-      />
+      <Status :statusId="order.statusId" :statusChangedAt="order.statusChangedAt" :isDone="order.isDone" />
     </q-td>
 
-    <q-td
-      key="cargoPriority"
-      :props="props"
-      :class="
-        getPriorityColor(
-          _isParent && !_modelValue
-            ? priority
-            : getCargoTypePriority(order.cargoTypeId)
-        )
-      "
-    >
+    <q-td key="cargoPriority" :props="props" :class="getPriorityColor(
+      _isParent && !_modelValue
+        ? priority
+        : getCargoTypePriority(order.cargoTypeId)
+    )
+      ">
       <span v-if="_isParent && !_modelValue">
         {{ getDescriptionByPriority(priority) }}
       </span>
@@ -200,10 +169,11 @@ export default {
     _latedClass() {
       const date1 = dayjs(this.order.orderTime);
       const date2 = dayjs();
-      if (this.props.row.orders[0].statusId == 2 && this.priority === 3) {
-        const diffTime = Math.abs(date1.diff(date2, "hour", true));
-        if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
-        if (diffTime > 2) return "bg-red-2";
+      const diffToNow = date1.diff(date2, "hour", true)
+      if (this.props.row.orders[0].statusId == 2 && this.priority === 3 && diffToNow <= 1.5) {
+          const diffTime = Math.abs(date1.diff(date2, "hour", true));
+          if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
+          if (diffTime > 2) return "bg-red-2";
       }
     },
     _class() {

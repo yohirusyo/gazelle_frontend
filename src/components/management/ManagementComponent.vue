@@ -38,6 +38,7 @@ export default {
   },
   mounted() {
     this.requestManagements({year: dayjs().year(), month: dayjs().month()});
+    this.requestChangeManagements({year: dayjs().year(), month: dayjs().month()});
   }
 };
 </script>

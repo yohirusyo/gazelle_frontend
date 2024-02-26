@@ -14,7 +14,14 @@ export function set(state, managements) {
   state.managements = managements;
   // sort(state);
 }
-
+export function setDriving(state, data) {
+  state.managementsWhileDriving = data;
+  // sort(state);
+}
+export function setReserve(state, data) {
+  state.managementsReserve = data;
+  // sort(state);
+}
 export function update(state, management) {
   const index = state.managements.findIndex((p) => p.id == management.id);
   if (index == -1) state.managements.push(management);
