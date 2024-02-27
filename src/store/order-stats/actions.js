@@ -26,3 +26,11 @@ export async function requestSubdivisionStats({commit}, {from, to}) {
     commit("setSubdivision", data);
   });
 }
+
+export async function getStatsIndicatorReport(context, item) {
+  return api
+    .get(`order/indicator-stats?month=${item.month}&year=${item.year}`)
+    .then(({ data }) => {
+      context.commit("setStatsIndicatorReport", data);
+    });
+}
