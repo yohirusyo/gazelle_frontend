@@ -26,6 +26,7 @@ export default defineComponent({
       }
     },
   },
+  
   async mounted() {
     if (
       localStorage.getItem("token") != null &&
