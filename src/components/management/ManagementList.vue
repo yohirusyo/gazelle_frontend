@@ -21,7 +21,7 @@
               {{ round(props.row.limits[0].fact) }}
             </q-td>
             <q-td key="usedMonthLimit" :props="props">
-              {{ round(props.row.limits[0].used) }}
+              {{ round(props.row.limits[0].used + props.row.limits[0].technologicalTransport) }}
             </q-td>
             <!-- <q-td key="isMinutes" :props="props">
               {{ props.row.isMinutes ? "Минуты" : "Километры" }}
@@ -33,7 +33,7 @@
               {{ findWhileDriving(props.row.id) }}
             </q-td>
             <q-td key="whileDriving" :props="props">
-              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id)) }}
+              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id) + props.row.limits[0].technologicalTransport) }}
             </q-td>
           </q-tr>
           <q-tr v-if="props.expand">

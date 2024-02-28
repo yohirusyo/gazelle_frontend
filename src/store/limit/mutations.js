@@ -20,6 +20,14 @@ export function setLimit(state, val) {
   });
 }
 
+export function setTechnologicalTransportLimit(state, val) {
+  state.monthLimitSubdivisions.forEach((item) => {
+    if (item.id === val.id) {
+      item[val.string] = Number(val.value)
+    }
+  });
+}
+
 export function setStatsControl (state, val) {
   val.forEach(function(x) {
     x.orderTime = dayjs(x.orderTime).format('DD.MM.YYYY');
