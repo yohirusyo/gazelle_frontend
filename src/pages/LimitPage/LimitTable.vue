@@ -168,7 +168,7 @@
         <q-td class="text-center">100</q-td>
         <q-td class="text-center">{{ planVolume.toFixed(2) }}</q-td>
         <q-td class="text-center">{{ _technologicalTransport.toFixed(2) }}</q-td>
-        <q-td class="text-center">{{ (Number(planVolume) + Number(_technologicalTransport)).toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ (Number(planVolume) - Number(_technologicalTransport)).toFixed(2) }}</q-td>
       </q-tr>
     </template>
   </q-table>
