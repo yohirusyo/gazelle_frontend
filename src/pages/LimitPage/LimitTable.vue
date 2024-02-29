@@ -151,7 +151,7 @@
             </q-popup-edit>
           </q-td>
         <q-td class="text-center">
-         {{ toFixed(Number(props.row.plan) + props.row.technologicalTransport) }}
+         {{ toFixed(Number(props.row.plan) - props.row.technologicalTransport) }}
         </q-td>
       </q-tr>
     </template>
