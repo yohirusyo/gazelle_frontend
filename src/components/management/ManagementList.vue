@@ -18,7 +18,7 @@
               {{ props.row.name }}
             </q-td>
             <q-td key="factMonthLimit" :props="props">
-              {{ round(props.row.limits[0].fact) }}
+              {{ round(props.row.limits[0].plan - props.row.limits[0].technologicalTransport) }}
             </q-td>
             <q-td key="usedMonthLimit" :props="props">
               {{ round(props.row.limits[0].used + props.row.limits[0].technologicalTransport) }}
