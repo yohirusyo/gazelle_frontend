@@ -16,3 +16,9 @@ export function setSubdivision(state, subdivisionStats) {
   state.subdivisionStats = subdivisionStats
 }
 
+
+export function setStatsIndicatorReport(state, indicatorStats) {
+  state.indicatorStats = indicatorStats
+}
+
+
