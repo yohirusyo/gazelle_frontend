@@ -43,7 +43,7 @@
             </q-td>
           </q-tr>
           <div v-if="managements.length - 1 == props.pageIndex" class="absolute q-ml-sm ">
-            <div class="q-pt-sm">
+            <div v-if="!currentUser?.role.includes('WATCHER')" class="q-pt-sm">
               <q-table
                 :title="`Запас: ${_plan.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
                 :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom flat bordered/>
