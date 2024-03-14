@@ -81,7 +81,7 @@ export default {
           field: (row) => `${row.length} (${row.overallPercentage}%)`,
           style: "width: 300px",
           classes: (row) =>
-            row.overallPercentage >= 96 ? "bg-green" : "bg-red",
+            row.overallPercentage >= 98 ? "bg-green" : "bg-red",
         },
         {
           name: "priorityLength",
@@ -93,19 +93,19 @@ export default {
           headerStyle: "white-space: normal",
           field: (row) => `${row.priorityLength} (${row.priorityPercentage}%)`,
           classes: (row) =>
-            row.priorityPercentage >= 99 ? "bg-green" : "bg-red",
+            row.priorityPercentage >= 98 ? "bg-green" : "bg-red",
         },
         {
           name: "priorityPercentageLate",
           required: true,
           label:
-            "Процент выполнения заявок с высоким приоритетом без опоздания",
+            "Заявок выполнено с опозданием (процент выполнения без опоздания)",
           align: "center",
           sortable: false,
           style: "width: 300px",
           headerStyle: "white-space: normal",
           field: (row) => `${row.priorityLateLength} (${row.percentageLate})%`,
-          classes: (row) => (row.percentageLate >= 96 ? "bg-green" : "bg-red"),
+          classes: (row) => (row.percentageLate >= 90 ? "bg-green" : "bg-red"),
         },
       ],
     };
@@ -167,7 +167,7 @@ export default {
           const number = matches.map((match) =>
             parseFloat(match.slice(1, -1))
           )[0];
-          const percent = key.includes('C') ? 99 : 96
+          const percent = key.includes('C') ? 98 : 90
           ws[key].s = {
             ...ws[key].s,
             fill: { fgColor: { rgb: number > percent ? "4CAF50" : "F44336" } },
