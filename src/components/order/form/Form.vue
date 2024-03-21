@@ -1,4 +1,4 @@
-<template>
+<template v-slot:body="props">
   <div class="col column">
     <q-form @submit="onSubmit" @reset="resetForm" class="col column justify-between"
       :class="$q.screen.xs ? 'q-pl-xs q-py-xs' : 'q-pa-md'" ref="form">
@@ -26,7 +26,7 @@
             <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason"
               :removeReason="_approvementMenuActive" />
 
-            <OrderTimePicker v-model="orderTime" class="q-mb-md" />
+            <OrderTimePicker v-model="orderTime" class="q-mb-md" :selected="selected" :isCustomer="isCustomer"/>
 
             <!-- <q-select
               v-if="$q.screen.xs"
@@ -56,37 +56,43 @@
           <q-btn text-color="white" label="Принять" unelevated class="border-none bg-blue-4 col" color="primary"
             @click="onApprove" no-caps dense />
 
-          <q-btn :disable="!declineReason" text-color="white" label="Отклонить" unelevated class="border-none bg-red col"
+          <q-btn 
+            :disable="!declineReason" 
+            text-color="white" 
+            label="Отклонить" 
+            unelevated
+            class="border-none bg-red col" 
             @click="onDecline" no-caps dense>
             <q-tooltip v-if="!declineReason" anchor="top middle">Укажите причину отклонения</q-tooltip>
           </q-btn>
         </div>
 
         <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
-          selected &&
-          selected.isRequest &&
-          selected.isApproved &&
-          !isCustomer &&
-          !currentUser?.role.includes('WATCHER')
-          ">
+        selected &&
+        selected.isRequest &&
+        selected.isApproved &&
+        !isCustomer &&
+        !currentUser?.role.includes('WATCHER')
+        ">
           <q-btn text-color="white" label="Вернуть в запрос" unelevated class="border-none bg-grey col" color="primary"
             @click="onBackToRequest" no-caps dense />
         </div>
 
         <div class="col row q-gutter-x-sm items-center">
           <q-btn v-if="_creationMode || copyMode" text-color="white" :label="_customerCreationCheck
-            ? 'У вас израсходован лимит поездок!'
-            : 'Создать'
-            " unelevated class="border-none col" :class="_customerCreationCheck
-    ? 'bg-red-3 text-black text-bold'
-    : 'bg-blue-4'
-    " type="submit" no-caps dense :loading="_addLoading" :disable="_addLoading || _customerCreationCheck" />
-          <q-btn v-if="_editMenuActive && !currentUser?.role.includes('WATCHER')" text-color="white" label="Изменить"
-            unelevated class="border-none bg-blue-4 col" type="submit" no-caps dense />
+        ? 'У вас израсходован лимит поездок!'
+        : 'Создать'
+        " unelevated class="border-none col" :class="_customerCreationCheck
+        ? 'bg-red-3 text-black text-bold'
+        : 'bg-blue-4'
+        " type="submit" no-caps dense :loading="_addLoading" :disable="_addLoading || _customerCreationCheck" />
+          <q-btn v-if="_editMenuActive && !currentUser?.role.includes('WATCHER') && !selected.isEmergency"
+            text-color="white" label="Изменить" unelevated class="border-none bg-blue-4 col" type="submit" no-caps
+            dense></q-btn>
           <q-btn v-if="isCustomer &&
-            !_creationMode &&
-            !currentUser?.role.includes('WATCHER')
-            " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
+        !_creationMode &&
+        !currentUser?.role.includes('WATCHER')
+        " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
             dense />
 
           <q-btn v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')" :disable="!removeReason"
@@ -94,16 +100,16 @@
             dense>
             <q-tooltip v-if="!removeReason" anchor="top middle">Укажите причину удаления</q-tooltip>
           </q-btn>
-          <q-btn text-color="white" label="Отмена" unelevated class="border-none bg-green col" @click="onCancel()" no-caps
-            dense />
+          <q-btn text-color="white" label="Отмена" unelevated class="border-none bg-green col" @click="onCancel()"
+            no-caps dense />
         </div>
         <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
-          selected &&
-          selected.isRequest &&
-          selected.isApproved &&
-          !isCustomer &&
-          currentUser?.id == 1
-          ">
+        selected &&
+        selected.isRequest &&
+        selected.isApproved &&
+        !isCustomer &&
+        currentUser?.id == 1
+        ">
           <q-btn text-color="white" label="Принудительно завершить" unelevated class="border-none bg-orange col"
             @click="onComplete" no-caps dense />
         </div>
@@ -290,7 +296,7 @@ export default {
           !this._isMetiz || this._orderCanBeEmergency
             ? this._orderIsEmergency
             : false,
-        transportId: this.isCustomer && this._creationMode  ? null : this.selectedTransportId,
+        transportId: this.isCustomer && this._creationMode ? null : this.selectedTransportId,
         customerPhoneNumber: this.customer.phoneNumber,
         customerFullname: this.customer.fullname,
         customerSubdivision: this.customer.subdivision,
@@ -345,7 +351,7 @@ export default {
         scenario: point.cargo.withCargo && point.cargo.weight >= 60 ? 2 : 1,
       };
     },
-
+    
     async onApprove() {
       //
       if (this.checkAlerts()) return;

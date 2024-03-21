@@ -285,7 +285,7 @@ export default {
     async onUpdateTransport() {
       await this.updateTransport({
         id: this.selected.id,
-        type: this._type,
+        type: this._type != null ? this._type : '-',
         transportTypeId: this._transportTypeId,
         transportNumber: this._transportNumber,
         placeId: this._place?.id || null,

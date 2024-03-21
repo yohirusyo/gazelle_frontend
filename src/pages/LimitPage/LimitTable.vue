@@ -111,6 +111,48 @@
             />
           </q-popup-edit>
         </q-td>
+          <q-td key="technologicalTransport" class="text-center">
+            {{ toFixed(props.row.technologicalTransport) }}
+            <q-popup-edit
+              v-model="props.row.technologicalTransport"
+              title="Изменить"
+              v-slot="scope"
+              class="bg-grey-2 text-center"
+            >
+                <q-input
+                    type="number"
+                    v-model="scope.value"
+                    dense
+                    autofocus
+                    square
+                    outlined
+                    hide-bottom-space
+                    hide-hint
+                />
+                <q-btn
+                  @click="setTechnological(scope, props, 'technologicalTransport')"
+                  text-color="white"
+                  label="Изменить"
+                  unelevated
+                  class="border-none bg-blue-4 col q-mt-sm"
+                  no-caps
+                  dense
+                />
+              <q-btn
+                  v-close-popup
+                  popup-close
+                  text-color="white"
+                  label="Отменить"
+                  unelevated
+                  class="border-none bg-red-4 col q-mt-sm q-ml-sm"
+                  no-caps
+                  dense
+              />
+            </q-popup-edit>
+          </q-td>
+        <q-td class="text-center">
+         {{ toFixed(Number(props.row.plan) - props.row.technologicalTransport) }}
+        </q-td>
       </q-tr>
     </template>
     <template v-slot:bottom-row>
@@ -118,11 +160,15 @@
         <q-td class="text-center">Запас</q-td>
         <q-td class="text-center">{{ _percentage.toFixed(2) }}</q-td>
         <q-td class="text-center">{{ _plan.toFixed(2) }}</q-td>
+        <q-td class="text-center">-</q-td>
+        <q-td class="text-center">{{ _plan.toFixed(2) }}</q-td>
       </q-tr>
       <q-tr>
         <q-td class="text-center">Общий итог </q-td>
         <q-td class="text-center">100</q-td>
         <q-td class="text-center">{{ planVolume.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ _technologicalTransport.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ (Number(planVolume) - Number(_technologicalTransport)).toFixed(2) }}</q-td>
       </q-tr>
     </template>
   </q-table>
@@ -156,7 +202,21 @@ export default {
         {
           name: "limit",
           required: true,
-          label: "Лимит",
+          label: "Транспорт общего назначения",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "technologicalTransport",
+          required: true,
+          label: "Технологический транспорт",
+          align: "center",
+          sortable: false,
+        },
+        {
+          name: "ssum",
+          required: true,
+          label: "Итого",
           align: "center",
           sortable: false,
         },
@@ -165,7 +225,7 @@ export default {
   },
   methods: {
     ...mapActions("limit", ["getMonthLimitSubdivisions"]),
-    ...mapMutations("limit", ["setLimit"]),
+    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit"]),
     toFixed(val) {
       if (val) {
         return Number(val).toFixed(2);
@@ -182,6 +242,17 @@ export default {
         scope: scope.value
       });
     },
+
+    setTechnological(scope, val, string) {
+      scope.set();
+      const rowKey = val.row[string];
+      this.setTechnologicalTransportLimit({
+        value: Number(rowKey),
+        id: val.row.id,
+        string,
+        scope: scope.value
+      });
+    }
   },
   // async mounted() {
   //   this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
@@ -213,6 +284,24 @@ export default {
         );
       },
     },
+    _technologicalTransport: {
+      get() {
+        return(
+          _.sumBy(this.monthLimitSubdivisions, function (o) {
+            return Number(o.technologicalTransport)
+          })
+        );
+      },
+    },
+    _ssum: {
+      get() {
+        return(
+          _.sumBy(this.monthLimitSubdivisions, function (o) {
+            return Number(o.technologicalTransport)
+          })
+        )
+      }
+    }
   },
 };
 </script>

@@ -1,12 +1,6 @@
-<template>
+<template v-slot:body="props">
   <div class="row items-center justify-center">
-    <q-btn
-      text-color="white"
-      no-caps
-      unelevated
-      class="border-none bg-blue-4 col col-shrink"
-      color="primary"
-    >
+    <q-btn text-color="white" no-caps unelevated class="border-none bg-blue-4 col col-shrink" color="primary">
       <div class="column">
         <div>Назначить дату поездки</div>
         <div style="font-size: 0.6rem; line-height: 12px">
@@ -21,16 +15,9 @@
         </q-date>
       </q-popup-proxy>
     </q-btn>
-
     <div class="col col-shrink">
-      <Datepicker
-        inputClassName="datepicker col "
-        menuClassName="datepicker-menu border-md"
-        v-model="_orderTime"
-        timePicker
-        selectText="Выбрать"
-        cancelText="Отмена"
-      />
+      <Datepicker inputClassName="datepicker col " menuClassName="datepicker-menu border-md" v-model="_orderTime"
+        timePicker selectText="Выбрать" cancelText="Отмена" />
     </div>
   </div>
 </template>
@@ -40,16 +27,25 @@ import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import dayjs from "dayjs";
 export default {
-  props: ["modelValue", "label"],
+  props: ["modelValue", "label", "selected", 'isCustomer'],
   computed: {
     _modelValue: {
       get() {
-        return this.modelValue;
+        let CurrentTime = new Date();
+        CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
+        if (this.modelValue < CurrentTime && this.isCustomer) {
+          return CurrentTime
+        }
+        return this.modelValue
       },
       set(val) {
-        if (val < new Date())
-          return this.$emit("update:modelValue", new Date());
-        this.$emit("update:modelValue", val);
+        let CurrentTime = new Date();
+        CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
+        if (val < CurrentTime && this.isCustomer) {
+          return this.$emit("update:modelValue", CurrentTime);
+        } else {
+          this.$emit("update:modelValue", val);
+        }
       },
     },
     _orderTime: {
@@ -61,7 +57,7 @@ export default {
         };
       },
       set(val) {
-        const d = new Date(this._selectedDate);
+        let d = new Date(this._selectedDate);
         d.setHours(val.hours);
         d.setMinutes(val.minutes);
         d.setSeconds(0);
@@ -74,7 +70,7 @@ export default {
         return this._modelValue;
       },
       set(val) {
-        const d = new Date(val);
+        let d = new Date(val);
         d.setHours(this._orderTime.hours);
         d.setMinutes(this._orderTime.minutes);
         d.setSeconds(0);

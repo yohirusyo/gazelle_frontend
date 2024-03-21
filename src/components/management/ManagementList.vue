@@ -21,7 +21,7 @@
               {{ round(props.row.limits[0].fact) }}
             </q-td>
             <q-td key="usedMonthLimit" :props="props">
-              {{ round(props.row.limits[0].used) }}
+              {{ round(props.row.limits[0].used + props.row.limits[0].technologicalTransport) }}
             </q-td>
             <!-- <q-td key="isMinutes" :props="props">
               {{ props.row.isMinutes ? "Минуты" : "Километры" }}
@@ -33,7 +33,7 @@
               {{ findWhileDriving(props.row.id) }}
             </q-td>
             <q-td key="whileDriving" :props="props">
-              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id)) }}
+              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id) + props.row.limits[0].technologicalTransport) }}
             </q-td>
           </q-tr>
           <q-tr v-if="props.expand">
@@ -43,7 +43,7 @@
             </q-td>
           </q-tr>
           <div v-if="managements.length - 1 == props.pageIndex" class="absolute q-ml-sm ">
-            <div class="q-pt-sm">
+            <div v-if="!currentUser?.role.includes('WATCHER')" class="q-pt-sm">
               <q-table
                 :title="`Запас: ${_plan.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
                 :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom flat bordered/>

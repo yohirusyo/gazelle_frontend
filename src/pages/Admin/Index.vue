@@ -51,6 +51,17 @@
         this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
       "
     />
+    <q-btn
+      label="Отчёт по показателям"
+      class="row text-black border-none bg-white q-ma-sm"
+      outline
+      unelevated
+      to="/report-indicator"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
+    />
  </q-page>
 </template>
 

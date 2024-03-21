@@ -120,7 +120,7 @@ const getexcel = (element, sheetName, name) => {
   // Extract Data (create a workbook object from the table)
   const ws = XLSX.utils.table_to_sheet(element, {dateNF:'dd.mm.yyyy@',cellDates:true, raw: true});
   var sizes = XLSX.utils.decode_range(ws["!ref"]);
-  deleteRow(ws, 1);
+  // deleteRow(ws, 0);
   delete_cols(ws, 0, 1);
 
   ws["!cols"] = [];
