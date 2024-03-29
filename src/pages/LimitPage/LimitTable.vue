@@ -172,6 +172,7 @@
       </q-tr>
     </template>
   </q-table>
+  {{ plan }}
 </template>
 
 <script>
@@ -225,7 +226,7 @@ export default {
   },
   methods: {
     ...mapActions("limit", ["getMonthLimitSubdivisions"]),
-    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit"]),
+    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit", "setAllControlLimitsWithPlanVolume"]),
     toFixed(val) {
       if (val) {
         return Number(val).toFixed(2);
@@ -235,6 +236,7 @@ export default {
       scope.set();
       const rowKey = val.row[string];
       const value = (rowKey / Number(scope.initialValue)) * scope.value;
+      console.log(value);
       this.setLimit({
         value: Number(value),
         id: val.row.id,
@@ -246,6 +248,7 @@ export default {
     setTechnological(scope, val, string) {
       scope.set();
       const rowKey = val.row[string];
+      console.log(rowKey);
       this.setTechnologicalTransportLimit({
         value: Number(rowKey),
         id: val.row.id,
@@ -254,9 +257,6 @@ export default {
       });
     }
   },
-  // async mounted() {
-  //   this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
-  // },
   computed: {
     ...mapState("limit", ["monthLimitSubdivisions"]),
     planVolume: {
@@ -303,5 +303,10 @@ export default {
       }
     }
   },
+  watch: {
+    planVolume() {
+     this.setAllControlLimitsWithPlanVolume(this.planVolume)
+    }
+  }
 };
 </script>
