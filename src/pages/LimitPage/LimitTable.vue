@@ -236,7 +236,6 @@ export default {
       scope.set();
       const rowKey = val.row[string];
       const value = (rowKey / Number(scope.initialValue)) * scope.value;
-      console.log(value);
       this.setLimit({
         value: Number(value),
         id: val.row.id,
@@ -248,7 +247,6 @@ export default {
     setTechnological(scope, val, string) {
       scope.set();
       const rowKey = val.row[string];
-      console.log(rowKey);
       this.setTechnologicalTransportLimit({
         value: Number(rowKey),
         id: val.row.id,
