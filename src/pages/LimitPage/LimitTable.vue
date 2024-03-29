@@ -172,7 +172,6 @@
       </q-tr>
     </template>
   </q-table>
-  {{ plan }}
 </template>
 
 <script>
