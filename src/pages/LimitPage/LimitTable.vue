@@ -225,7 +225,7 @@ export default {
   },
   methods: {
     ...mapActions("limit", ["getMonthLimitSubdivisions"]),
-    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit"]),
+    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit", "setAllControlLimitsWithPlanVolume"]),
     toFixed(val) {
       if (val) {
         return Number(val).toFixed(2);
@@ -254,9 +254,6 @@ export default {
       });
     }
   },
-  // async mounted() {
-  //   this.getMonthLimitSubdivisions({ year: this.year, month: this.month });
-  // },
   computed: {
     ...mapState("limit", ["monthLimitSubdivisions"]),
     planVolume: {
@@ -303,5 +300,10 @@ export default {
       }
     }
   },
+  watch: {
+    planVolume() {
+     this.setAllControlLimitsWithPlanVolume(this.planVolume)
+    }
+  }
 };
 </script>
