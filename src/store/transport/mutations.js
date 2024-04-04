@@ -46,3 +46,7 @@ export function setTransportRecommendationList(
 ) {
   state.transportRecommendationList = transportRecommendationList;
 }
+
+export function setPlaces(state, places) {
+  state.places = places;
+}
