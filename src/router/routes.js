@@ -154,6 +154,14 @@ const routes = [
         },
       },
       {
+        path: "places",
+        component: () => import("src/pages/Admin/Places.vue"),
+        meta: {
+          roles: ["ADMIN"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: ":id/:copy?",
         component: () => import("pages/Index.vue"),
         meta: {

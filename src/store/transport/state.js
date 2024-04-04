@@ -5,5 +5,7 @@ export default function () {
 
     isLoaded: false,
     isLoading: false,
+
+    places: []
   };
 }
