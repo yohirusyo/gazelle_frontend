@@ -149,7 +149,19 @@
               currentUser?.role.includes('ADMIN') && connection == 'mmkmetiz'
             "
           >
-            <q-tooltip> Рекоммендации </q-tooltip>
+            <q-tooltip> Рекомендации </q-tooltip>
+          </q-btn>
+
+          <q-btn
+            icon="las la-people-carry"
+            to="/places"
+            flat
+            dense
+            v-if="
+              currentUser?.role.includes('ADMIN') && connection == 'mmkmetiz'
+            "
+          >
+            <q-tooltip> Места погрузки-разгрузки </q-tooltip>
           </q-btn>
 
           <!-- <q-btn
