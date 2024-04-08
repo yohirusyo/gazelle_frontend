@@ -284,6 +284,11 @@ export default {
       this.resetForm();
     },
     buildRoute(ignoreDateTime = false) {
+      let CurrentTime = new Date();
+        CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
+      if(this.orderTime < CurrentTime) {
+        this.orderTime = CurrentTime;
+      }
       return {
         // orderTime: ignoreDateTime
         //   ? this.orderTime
