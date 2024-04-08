@@ -313,6 +313,7 @@ export default {
         isDeclined: this.copyMode ? false : this.selected?.isDeclined,
       };
     },
+    
     buildPoint(point) {
       return {
         destinationName: point.destinationName,
