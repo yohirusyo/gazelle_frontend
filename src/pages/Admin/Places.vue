@@ -1,7 +1,7 @@
 <template>
   <q-page class="row bg-white">
     <q-table style="border-top: 1px solid rgba(0, 0, 0, 0.12)" separator="cell" flat dense :filter="filter" wrap-cells
-      :rows-per-page-options="[0]" hide-bottom :rows="places" :columns="columns">
+      :rows-per-page-options="[0]" hide-bottom :rows="filteredPlaces" :columns="columns">
       <template v-slot:top>
         <div style="font-size: 20px; letter-spacing: 0.005em; font-weight: 400;">
           Места погрузки-разгрузки
@@ -231,6 +231,10 @@ export default {
   },
   computed: {
     ...mapState("place", ["places"]),
+    filteredPlaces: {
+      get() {
+        return this.places.filter((p) => !p.isDeleted && p.addedManualy);
+      }},
   },
   async mounted() {
     Loading.show();
