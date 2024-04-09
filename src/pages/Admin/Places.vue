@@ -195,7 +195,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("transport", ["requestPlaces", "addPlace", "updatePlace", "deletePlace"]),
+    ...mapActions("place", ["requestPlaces", "addPlace", "updatePlace", "removePlace"]),
     openAddPopup() {
       this.editFlag = false
       this.place = {
@@ -215,26 +215,26 @@ export default {
     },
     async addRow() {
       await this.addPlace(this.place);
-      await this.requestPlaces();
+      await this.requestPlaces(true);
       this.dialog = false
     },
     async updateRow(el) {
       await this.updatePlace(el);
-      await this.requestPlaces();
+      await this.requestPlaces(true);
       this.dialog = false
     },
     async removeRow(el) {
-      await this.deletePlace(el);
-      await this.requestPlaces();
+      await this.removePlace(el);
+      await this.requestPlaces(true);
       this.dialog = false
     }
   },
   computed: {
-    ...mapState("transport", ["places"]),
+    ...mapState("place", ["places"]),
   },
   async mounted() {
     Loading.show();
-    await this.requestPlaces();
+    await this.requestPlaces(true);
     const { data } = await api.get("/recommendation/transport-types");
     this.transportTypes = data;
     Loading.hide();
