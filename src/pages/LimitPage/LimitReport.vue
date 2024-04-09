@@ -19,7 +19,20 @@
           size="lg"
           icon="download"
           @click="getReport(0)"
-        />
+        >
+          <q-tooltip>Отчет по номерам машин</q-tooltip>
+        </q-btn>
+        <q-btn
+          :disable="!checkFormatPropsDate30"
+          dense
+          flat
+          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="(mvz = true), getReport(0)"
+        >
+          <q-tooltip>Отчет по МВЗ машин</q-tooltip>
+        </q-btn>
       </template>
     </q-input>
     <q-input
@@ -41,7 +54,20 @@
           size="lg"
           icon="download"
           @click="getReport(1)"
-        />
+        >
+          <q-tooltip>Отчет по номерам машин</q-tooltip>
+        </q-btn>
+        <q-btn
+          :disable="!checkFormatPropsDate30"
+          dense
+          flat
+          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="(mvz = true), getReport(1)"
+        >
+          <q-tooltip>Отчет по МВЗ машин</q-tooltip>
+        </q-btn>
       </template>
     </q-input>
     <q-input
@@ -63,7 +89,20 @@
           size="lg"
           icon="download"
           @click="getReport(2)"
-        />
+        >
+          <q-tooltip>Отчет по номерам машин</q-tooltip>
+        </q-btn>
+        <q-btn
+          :disable="!checkFormatPropsDate30"
+          dense
+          flat
+          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          size="lg"
+          icon="download"
+          @click="(mvz = true), getReport(2)"
+        >
+          <q-tooltip>Отчет по МВЗ машин</q-tooltip>
+        </q-btn>
       </template>
     </q-input>
     <table
@@ -93,13 +132,15 @@
       </tr>
       <tr>
         <td>Дата</td>
-        <td>ТС</td>
+        <td>{{ !!mvz ? "МВЗ" : "ТС" }}</td>
         <td>КМ</td>
         <td>Руб</td>
       </tr>
       <tr v-for="item of statsControl" :key="item.id">
         <td>{{ item.orderTime }}</td>
-        <td>{{ item.stats.transportNumber }}</td>
+        <td>
+          {{ mvz == true ? item.transport.mvz : item.stats.transportNumber }}
+        </td>
         <td>{{ item.routeLength }}</td>
         <td>{{ (item.routeLength * cost).toFixed(2) }}</td>
       </tr>
@@ -130,6 +171,7 @@ export default {
       first: null,
       second: null,
       third: null,
+      mvz: false,
     };
   },
   mounted() {
@@ -137,6 +179,7 @@ export default {
       period: 0,
       year: this.year,
       month: this.month,
+      mvz: this.mvz,
     });
   },
   watch: {
@@ -146,6 +189,7 @@ export default {
           period: 0,
           year: this.year,
           month: this.month,
+          mvz: this.mvz,
         });
         this.first = this.statsControl;
         if (this.checkFormatPropsDate15) {
@@ -153,6 +197,7 @@ export default {
             period: 1,
             year: this.year,
             month: this.month,
+            mvz: this.mvz,
           });
           this.second = this.statsControl;
         } else this.second = null;
@@ -161,6 +206,7 @@ export default {
             period: 2,
             year: this.year,
             month: this.month,
+            mvz: this.mvz,
           });
           this.third = this.statsControl;
         } else this.third = null;
@@ -293,7 +339,9 @@ export default {
       return dayjs({
         year: this.year,
         month: this.month,
-      }).endOf('month').format("YYYYMMDDHHmm");
+      })
+        .endOf("month")
+        .format("YYYYMMDDHHmm");
     },
     async getReport(period) {
       period == 0
@@ -305,7 +353,9 @@ export default {
         period: period,
         year: this.year,
         month: this.month,
+        mvz: this.mvz,
       });
+      this.mvz = false;
       this.createExcel();
     },
     createExcel() {
