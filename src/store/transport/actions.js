@@ -69,7 +69,7 @@ export async function removeTransport({ commit }, { id }) {
 
 export async function requestPlaces({ commit }) {
   return api
-    .get("loading")
+    .get("place")
     .then((res) => res.data)
     .then((places) => {
       commit("setPlaces", places);
@@ -78,7 +78,7 @@ export async function requestPlaces({ commit }) {
 
 export async function addPlace({ commit }, form) {
   return api
-    .post(`loading`, form)
+    .post(`place`, form)
     .then(({ data }) => {
       showNotifyResult(true, "Место успешно создано!");
     })
@@ -89,7 +89,7 @@ export async function addPlace({ commit }, form) {
 
 export async function updatePlace({ commit }, form) {
   return api
-    .post(`loading/${form.id}`, form)
+    .patch(`place/${form.id}`, form)
     .then(({ data }) => {
       showNotifyResult(true, "Место успешно изменено!");
     })
@@ -100,7 +100,7 @@ export async function updatePlace({ commit }, form) {
 
 export async function deletePlace({ commit }, form) {
   return api
-    .delete(`loading/${form.id}`)
+    .delete(`place/${form.id}`)
     .then(({ data }) => {
       showNotifyResult(true, "Место успешно удалено!");
     })
