@@ -26,7 +26,7 @@ export default {
     },
     filteredPlaces: {
       get() {
-        return this.places.filter((p) => !p.isDeleted);
+        return this.places.filter((p) => !p.isDeleted && p.addedManualy);
       },
     },
   },
