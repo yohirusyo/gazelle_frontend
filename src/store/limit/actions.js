@@ -25,7 +25,7 @@ export async function postEditControl(context, item) {
 export async function getStatsContorlLimits(context, item) {
   return api
     .get(
-      `order/stats-control?period=${item.period}&month=${item.month}&year=${item.year}`
+      `order/stats-control?period=${item.period}&month=${item.month}&year=${item.year}&mvz=${item.mvz}`
     )
     .then(({ data }) => {
       context.commit("setStatsControl", data);
