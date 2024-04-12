@@ -1,17 +1,12 @@
 <template>
-  <ISelect
-    :options="filteredPlaces"
-    v-model="_modelValue"
-    :labelFn="(item) => item.name"
-    :label="label"
-    @selected="setPlace"
-    :required="true"
-  />
+  <ISelect :options="filteredPlaces" v-model="_modelValue" :labelFn="(item) => item.name" :label="label"
+    @selected="setPlace" :required="true" />
 </template>
 
 <script>
 import ISelect from "components/base/ISelect.vue";
 import { mapState } from "vuex";
+import { getConnection } from "src/boot/axios";
 export default {
   props: ["modelValue", "label"],
   computed: {
@@ -26,9 +21,20 @@ export default {
     },
     filteredPlaces: {
       get() {
-        return this.places.filter((p) => !p.isDeleted && p.addedManualy);
+        return this.places.filter((p) => {
+          if (this._isMetiz) {
+            return !p.isDeleted && p.addedManualy
+          } else {
+            return !p.isDeleted && !p.addedManualy
+          }
+        });
       },
     },
+    _isMetiz: {
+      get() {
+        return getConnection() == "mmkmetiz";
+      },
+    }
   },
   components: {
     ISelect,
