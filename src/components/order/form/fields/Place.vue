@@ -1,6 +1,6 @@
 <template>
   <ISelect :options="filteredPlaces" v-model="_modelValue" :labelFn="(item) => item.name" :label="label"
-    @selected="setPlace" :required="true" />
+    @selected="setPlace" :required="true" :noWrite="true"/>
 </template>
 
 <script>
