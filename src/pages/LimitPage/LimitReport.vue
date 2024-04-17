@@ -23,13 +23,13 @@
           <q-tooltip>Отчет по номерам машин</q-tooltip>
         </q-btn>
         <q-btn
-          :disable="!checkFormatPropsDate30"
+          :disable="!checkFormatPropsDate15"
           dense
           flat
-          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          :text-color="checkFormatPropsDate15 ? 'primary' : 'black'"
           size="lg"
           icon="download"
-          @click="(mvz = true), getReport(0)"
+          @click="getReport(0, true)"
         >
           <q-tooltip>Отчет по МВЗ машин</q-tooltip>
         </q-btn>
@@ -58,13 +58,13 @@
           <q-tooltip>Отчет по номерам машин</q-tooltip>
         </q-btn>
         <q-btn
-          :disable="!checkFormatPropsDate30"
+          :disable="!checkFormatPropsDate20"
           dense
           flat
-          :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
+          :text-color="checkFormatPropsDate20 ? 'primary' : 'black'"
           size="lg"
           icon="download"
-          @click="(mvz = true), getReport(1)"
+          @click="getReport(1, true)"
         >
           <q-tooltip>Отчет по МВЗ машин</q-tooltip>
         </q-btn>
@@ -99,7 +99,7 @@
           :text-color="checkFormatPropsDate30 ? 'primary' : 'black'"
           size="lg"
           icon="download"
-          @click="(mvz = true), getReport(2)"
+          @click="getReport(2, true)"
         >
           <q-tooltip>Отчет по МВЗ машин</q-tooltip>
         </q-btn>
@@ -132,14 +132,14 @@
       </tr>
       <tr>
         <td>Дата</td>
-        <td>{{ !!mvz ? "МВЗ" : "ТС" }}</td>
+        <td>{{ "ТС" }}</td>
         <td>КМ</td>
         <td>Руб</td>
       </tr>
       <tr v-for="item of statsControl" :key="item.id">
         <td>{{ item.orderTime }}</td>
         <td>
-          {{ mvz == true ? item.transport.mvz : item.stats.transportNumber }}
+          {{ item.stats.transportNumber }}
         </td>
         <td>{{ item.routeLength }}</td>
         <td>{{ (item.routeLength * cost).toFixed(2) }}</td>
@@ -148,6 +148,32 @@
         <td>Общий итог</td>
         <td></td>
         <td>{{ totalRouteLength.toFixed(2) }}</td>
+        <td>{{ (totalRouteLength * cost).toFixed(2) }}</td>
+      </tr>
+    </table>
+    <table
+      class="text-center"
+      ref="exportmvz"
+      style="border-collapse: collapse; display: none"
+    >
+      <tr class="text-center">
+        <td>
+          Счет-реестр автоуслуг по управлению снабжения за период  {{ _period }}
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>МВЗ</td>
+        <td>Руб</td>
+      </tr>
+      <tr v-for="item of statsControl" :key="item.id">
+        <td>
+          {{ item.transport.mvz }}
+        </td>
+        <td>{{ (item.routeLength * cost).toFixed(2) }}</td>
+      </tr>
+      <tr>
+        <td>Общий итог</td>
         <td>{{ (totalRouteLength * cost).toFixed(2) }}</td>
       </tr>
     </table>
@@ -171,17 +197,9 @@ export default {
       first: null,
       second: null,
       third: null,
-      mvz: false,
     };
   },
-  mounted() {
-    this.getStatsContorlLimits({
-      period: 0,
-      year: this.year,
-      month: this.month,
-      mvz: this.mvz,
-    });
-  },
+
   watch: {
     month: {
       async handler(newVal, oldVal) {
@@ -189,7 +207,6 @@ export default {
           period: 0,
           year: this.year,
           month: this.month,
-          mvz: this.mvz,
         });
         this.first = this.statsControl;
         if (this.checkFormatPropsDate15) {
@@ -197,7 +214,6 @@ export default {
             period: 1,
             year: this.year,
             month: this.month,
-            mvz: this.mvz,
           });
           this.second = this.statsControl;
         } else this.second = null;
@@ -206,7 +222,6 @@ export default {
             period: 2,
             year: this.year,
             month: this.month,
-            mvz: this.mvz,
           });
           this.third = this.statsControl;
         } else this.third = null;
@@ -343,7 +358,9 @@ export default {
         .endOf("month")
         .format("YYYYMMDDHHmm");
     },
-    async getReport(period) {
+
+
+    async getReport(period, mvz = false) {
       period == 0
         ? (this._period = `c 01.${this.monthLabel}.${this.year} по 14.${this.monthLabel}.${this.year}`)
         : period == 1
@@ -353,10 +370,50 @@ export default {
         period: period,
         year: this.year,
         month: this.month,
-        mvz: this.mvz,
+        mvz: mvz,
       });
-      this.mvz = false;
-      this.createExcel();
+      mvz ? this.createExcelMvz() : this.createExcel()
+    },
+
+    createExcelMvz(){
+      const excel = this.$refs.exportmvz
+      const ws = XLSX.utils.table_to_sheet(excel, { raw: true });
+
+      ws["!cols"] = [{wch: 24}, {wch: 24}]
+      
+      ws['!merges'] = [ { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }]
+
+      ws["!rows"] = [
+        {
+          hpt: 30,
+        },
+      ];      
+
+      const border = {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } },
+      };
+
+      for (const key of Object.keys(ws)) {
+        if (!key.includes("!")) {
+          ws[key].s = {
+            border,
+            alignment: {
+              horizontal: "center",
+              wrapText: true,
+              vertical: "center",
+            },
+          };
+        }
+      }
+      
+      const wb = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(wb, ws, "Отчет по МВЗ ТС");
+
+      XLSX.writeFile(wb, `Отчет по МВЗ ТС ${dayjs().format("DD.MM.YYYY HH:mm")}.xlsx`);
     },
     createExcel() {
       let excel = this.$refs.export;
