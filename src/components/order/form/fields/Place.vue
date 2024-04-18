@@ -1,6 +1,6 @@
 <template>
   <ISelect :options="filteredPlaces" v-model="_modelValue" :labelFn="(item) => item.name" :label="label"
-    @selected="setPlace" :required="true" :noWrite="true"/>
+    @selected="setPlace" :required="true" :noWrite="checkNoWriteForMetiz()"/>
 </template>
 
 <script>
@@ -43,6 +43,13 @@ export default {
     setPlace(item) {
       this.$emit("update:modelValue", item?.name);
     },
+    checkNoWriteForMetiz() {
+      if (this._isMetiz) {
+            return true
+          } else {
+            return false
+          }
+    }
   },
 };
 </script>
