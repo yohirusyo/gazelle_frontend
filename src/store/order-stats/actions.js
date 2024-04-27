@@ -15,8 +15,8 @@ export async function requestOrderStatsDates({ commit }) {
   });
 }
 
-export async function requestMvzStats({commit}, {from, to}) {
-  return api.get(`order/mvz?from=${from}&to=${to}`).then(({ data }) => {
+export async function requestMvzStats({commit}, {from, to, toggle},) {
+  return api.get(`order/mvz?from=${from}&to=${to}&transport=${toggle}`).then(({ data }) => {
     commit("setMvz", data);
   });
 }
