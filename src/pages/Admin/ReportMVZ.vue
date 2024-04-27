@@ -3,6 +3,7 @@
     <div class="column fit" style="flex-wrap: nowrap !important">
       <div class="col col-shrink">
         <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
+          <q-toggle color="primary" v-model="mvzToggle" :label="`${mvzToggle ? 'Траснпорт': 'Заказчик'}`" class="q-pr-sm"/>
           <q-input outlined label="Введите общую сумму" class="col" flat dense type="number" v-model="sum"></q-input>
           <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
             class="col bg-white text-black border-none" flat no-caps @click="createExcel" />
@@ -11,7 +12,7 @@
             <q-popup-proxy transition-show="scale" transition-hide="scale">
               <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
                 <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Применить" color="primary" flat @click="requestMvzStats(_selectedDate)" />
+                  <q-btn v-close-popup label="Применить" color="primary" flat @click="getMvzStats()" />
                   <q-btn v-close-popup label="Закрыть" color="primary" flat />
                 </div>
               </q-date>
@@ -95,6 +96,7 @@ export default {
   data() {
     return {
       _selectedDate: null,
+      mvzToggle: false,
       sum: 0,
       columns: [
         {
@@ -130,6 +132,9 @@ export default {
   },
   methods: {
     ...mapActions("orderStats", ["requestMvzStats"]),
+    async getMvzStats(){
+      await this.requestMvzStats({ from: this._selectedDate.from, to: this._selectedDate.to, toggle: this.mvzToggle });
+    },
     createExcel() {
       let excel = this.$refs.export;
       const ws = XLSX.utils.table_to_sheet(excel, { raw: true });
@@ -227,7 +232,7 @@ export default {
       const cells3 = Array.from({ length: cellCountMvz }, (_, index) => {
         const nextRow = parseInt(startRow) + index * 2;
         return `${startColumn}${nextRow}`;
-      }); 
+      });
 
       // Определение стилей ячеек МВЗ
       cells3.forEach((cell) => {
@@ -265,7 +270,7 @@ export default {
       from: dayjs().format("DD.MM.YYYY"),
       to: dayjs().format("DD.MM.YYYY"),
     };
-    await this.requestMvzStats(this._selectedDate);
+    await this.requestMvzStats({ from: this._selectedDate.from, to: this._selectedDate.to, toggle: this.mvzToggle });
   },
   watch: {
     _selectedDate() {
@@ -276,6 +281,9 @@ export default {
         };
       }
     },
+    async mvzToggle() {
+      await this.requestMvzStats({ from: this._selectedDate.from, to: this._selectedDate.to, toggle: this.mvzToggle });
+    }
   },
 };
 </script>
