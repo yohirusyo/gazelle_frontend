@@ -81,7 +81,7 @@ export default {
           field: (row) => `${row.length} (${row.overallPercentage}%)`,
           style: "width: 300px",
           classes: (row) =>
-            row.overallPercentage >= 98 ? "bg-green" : "bg-red",
+            row.overallPercentage >= 96 ? "bg-green" : "bg-red",
         },
         {
           name: "priorityLength",
