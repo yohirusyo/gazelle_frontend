@@ -64,9 +64,9 @@
           </q-popup-edit>
         </q-td>
         <q-td key="limit" :props="props"
-          >{{ toFixed(props.row.plan) }}
+          >{{ toFixed(props.row.fact) }}
           <q-popup-edit
-            v-model="props.row.plan"
+            v-model="props.row.fact"
             title="Изменить долю"
             v-slot="scope"
             class="bg-grey-2 text-center"
@@ -151,7 +151,7 @@
             </q-popup-edit>
           </q-td>
         <q-td class="text-center">
-         {{ toFixed(Number(props.row.plan) - props.row.technologicalTransport) }}
+         {{ toFixed(Number(props.row.fact) - props.row.technologicalTransport) }}
         </q-td>
       </q-tr>
     </template>
