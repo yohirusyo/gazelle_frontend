@@ -17,10 +17,10 @@
       <Customer :customerId="order.customerId" />
     </q-td>
 
-    <q-td key="departurePoint" :props="props">
+    <q-td key="departurePoint" :props="props" :class="_endTimeWorkClass(order.departurePointId)">
       <Place :placeId="order.departurePointId" />
     </q-td>
-    <q-td key="destination" :props="props">
+    <q-td key="destination" :props="props" :class="_endTimeWorkClass(order.destinationId)">
       <Place :placeId="order.destinationId" />
     </q-td>
 
@@ -32,11 +32,11 @@
     </q-td>
 
     <q-td key="cargoPriority" :props="props" :class="getPriorityColor(
-      _isParent && !_modelValue
-        ? priority
-        : getCargoTypePriority(order.cargoTypeId)
-    )
-      ">
+    _isParent && !_modelValue
+      ? priority
+      : getCargoTypePriority(order.cargoTypeId)
+  )
+    ">
       <span v-if="_isParent && !_modelValue">
         {{ getDescriptionByPriority(priority) }}
       </span>
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapMutations, mapState, mapGetters } from "vuex";
 import Time from "./Time.vue";
 import Customer from "./Customer.vue";
 import Place from "./Place.vue";
@@ -61,7 +61,8 @@ dayjs.extend(duration);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { getConnection } from "src/boot/axios";
-
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat)
 const priorityNames = {
   3: "В",
   2: "С",
@@ -109,6 +110,29 @@ export default {
     getPriorityColor(priority) {
       return priorityColors[priority];
     },
+    _endTimeWorkClass(id) {
+      // if (id == 2119) {
+        const dateStart = dayjs(this.getPlaceById(id)?.startTimeWork, 'HH:mm:ss')
+        const dateEnd = dayjs(this.getPlaceById(id)?.endTimeWork, 'HH:mm:ss')
+        const dateNow = dayjs();
+        // const dateNow = dayjs("23:59:00", 'HH:mm:ss')
+        const diffToNow = dateEnd.diff(dateNow, "hour", true)
+        if (dateStart < dateEnd && (dateNow < dateStart || dateNow > dateEnd)) {
+          return "bg-red-2";
+        }
+        if (dateStart < dateEnd) {
+          if (diffToNow <= 1.5) return "bg-red-2";
+          if (diffToNow <= 2) return "bg-yellow-2";
+        }
+        if ((dateStart > dateEnd && dateNow > dateStart) || (dateStart > dateEnd && dateNow < dateEnd)) { 
+          if ((diffToNow <= 1.5 && diffToNow >= 0) || (diffToNow <= -22.5 && diffToNow > -24)) return "bg-red-2";
+          if ((diffToNow <= 2 && diffToNow >= 0) || (diffToNow <= -22 && diffToNow > -22.5)) return "bg-yellow-2";
+        }
+        if ((dateStart > dateEnd && dateNow < dateStart) || (dateStart > dateEnd && dateNow > dateEnd)) { 
+          return "bg-red-2";
+        }
+      // }
+    },
   },
   components: {
     Time,
@@ -125,6 +149,7 @@ export default {
       "orderIsEmergency",
       "currentUser",
     ]),
+    ...mapGetters('place', ['getPlaceById']),
     _isMetiz: {
       get() {
         return getConnection() == "mmkmetiz";
@@ -171,9 +196,9 @@ export default {
       const date2 = dayjs();
       const diffToNow = date1.diff(date2, "hour", true)
       if (this.props.row.orders[0].statusId == 2 && this.priority === 3 && diffToNow <= 1.5) {
-          const diffTime = Math.abs(date1.diff(date2, "hour", true));
-          if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
-          if (diffTime > 2) return "bg-red-2";
+        const diffTime = Math.abs(date1.diff(date2, "hour", true));
+        if (diffTime > 1.5 && diffTime <= 2) return "bg-yellow-2";
+        if (diffTime > 2) return "bg-red-2";
       }
     },
     _class() {
