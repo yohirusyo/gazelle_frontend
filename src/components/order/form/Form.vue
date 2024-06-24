@@ -249,6 +249,7 @@ export default {
   methods: {
     ...mapActions("order", [
       "updateRoute",
+      "backRoute",
       "completeRoute",
       "removeRoute",
       "addRoute",
@@ -381,12 +382,13 @@ export default {
       this.$refs.form.reset();
     },
     async onBackToRequest() {
-      await this.updateRoute({
+      await this.backRoute({
         id: this.selected.id,
         ...this.buildRoute(),
         isApproved: false,
         isDeclined: false,
         isRequest: true,
+        isDone: false
       });
       this.$refs.form.reset();
     },

@@ -57,6 +57,14 @@ export function updateRoute(state, route) {
   }
 }
 
+export function backRoute(state, route) {
+  const index = state.orders.findIndex((r) => r.id == route.id);
+  if (index != -1) {
+    state.orders[index] = route;
+    sort(state);
+  }
+}
+
 export function completeRoute(state, route, id) {
   const index = state.orders.findIndex((r) => r.id == id);
   if (index != -1) {
