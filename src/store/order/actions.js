@@ -17,6 +17,7 @@ export async function requestOrders(context, ignore = false) {
       });
       socketio.on("order_update", (order) => context.commit("update", order));
       socketio.on("route_create", (route) => context.commit("addRoute", route));
+      socketio.on("route_back", (route) => context.commit("backRoute", route));
       socketio.on("route_update", (route) =>
         context.commit("updateRoute", route)
       );
@@ -61,6 +62,17 @@ export async function updateRoute({ commit }, { id, ...form }) {
     .catch((err) => {
       showNotifyResult(false, "Ошибка изменения маршрута!");
     });
+}
+
+export async function backRoute({ commit }, { id, ...form }) {
+  return api
+  .patch(`order/backToRequest/${id}`, form)
+  .then(({ data }) => {
+    showNotifyResult(true, "Маршрут успешно изменен!");
+  })
+  .catch((err) => {
+    showNotifyResult(false, "Ошибка изменения маршрута!");
+  });
 }
 
 export async function completeRoute({commit}, {id, ...form}) {
