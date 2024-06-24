@@ -6,6 +6,11 @@
           Только активные за все время
         </q-tooltip>
       </q-checkbox>
+      <q-checkbox class="bg-white q-mr-sm" v-model="_myCustomerOrder">
+        <q-tooltip anchor="center left" self="center right">
+          Все заявки {{ currentUser.subdivision }}
+        </q-tooltip>
+      </q-checkbox>
 
       <q-btn :disabled="_activeOrder" text-color="white" :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`"
         unelevated class="col bg-white text-black border-none" flat no-caps>
@@ -81,6 +86,7 @@ export default {
       height: 0,
       onlyMy: null,
       _activeOrder: true,
+      _myCustomerOrder: false,
       _selectedDate: null,
     };
   },
@@ -94,7 +100,7 @@ export default {
       onlyActiveOrderFlag: this._activeOrder, from: new Date(dayjs(this._selectedDate?.from, "DD.MM.YYYY")),
       to: new Date(
         dayjs(this._selectedDate?.to, "DD.MM.YYYY") + 3600 * 1000 * 24
-      ),
+      ), myCustomerOrderFlag: false
     });
     await this.subscribeHistorySockets();
     this.height = this.$refs.history.clientHeight - 65;
@@ -136,6 +142,7 @@ export default {
           dayjs(this._selectedDate?.to, "DD.MM.YYYY") + 3600 * 1000 * 24
         ),
         onlyActiveOrderFlag: this._activeOrder,
+        myCustomerOrderFlag: this._myCustomerOrder,
       });
       await this.subscribeHistorySockets();
       this.height = this.$refs.history.clientHeight - 65;
@@ -151,6 +158,9 @@ export default {
       }
     },
     _activeOrder() {
+      this.getOrderHistory();
+    },
+    _myCustomerOrder() {
       this.getOrderHistory();
     },
   },
