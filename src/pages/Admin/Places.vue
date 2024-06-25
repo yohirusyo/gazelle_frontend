@@ -1,7 +1,6 @@
 <template>
-  <q-page class="row bg-white">
+  <q-page class="bg-white">
     <q-table
-      style="border-top: 1px solid rgba(0, 0, 0, 0.12)"
       separator="cell"
       flat
       dense
@@ -18,6 +17,7 @@
         </div>
         <q-space />
         <q-btn
+          v-if="currentUser.role == 'ADMIN'"
           size="sm"
           color="primary"
           round
@@ -28,7 +28,6 @@
         >
           <q-tooltip>Создать</q-tooltip>
         </q-btn>
-
         <q-input
           borderless
           dense
@@ -43,33 +42,39 @@
         </q-input>
       </template>
       <template v-slot:body="props">
-        <q-tr :props="props">
+        <q-tr
+          :props="props"
+          v-if="
+            props.row.manageId == currentUser.managementId ||
+            currentUser.role == 'ADMIN'
+          "
+        >
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             {{ col.value }}
-          </q-td>
-          <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="primary"
-              round
-              dense
-              @click="openUpdatePopup(props.row)"
-              :icon="'edit'"
+            <div
+              class="row justify-center items-center q-gutter-sm"
+              v-if="col.name == 'edit'"
             >
-              <q-tooltip>Редактировать</q-tooltip>
-            </q-btn>
-          </q-td>
-          <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="primary"
-              round
-              dense
-              @click="removeRow(props.row)"
-              :icon="'remove'"
-            >
-              <q-tooltip>Удалить</q-tooltip>
-            </q-btn>
+              <q-btn
+                class="col"
+                size="sm"
+                
+                color="primary"
+                @click="openUpdatePopup(props.row)"
+                icon="edit"
+              >
+                <q-tooltip>Редактировать</q-tooltip>
+              </q-btn>
+              <!-- <q-btn
+                size="sm"
+                color="red"
+                class="col"
+                @click="removeRow(props.row)"
+                icon="remove"
+              >
+                <q-tooltip>Удалить</q-tooltip>
+              </q-btn> -->
+            </div>
           </q-td>
         </q-tr>
       </template>
@@ -179,6 +184,7 @@
           option-value="id"
         />
         <q-select
+          v-if="currentUser.role == 'ADMIN'"
           dense
           outlined
           class="q-mt-md"
@@ -190,7 +196,6 @@
           map-options
           option-value="id"
         />
-
         <div class="justify-center q-gutter-sm row q-mt-xs">
           <q-btn
             v-if="!editFlag"
@@ -229,7 +234,6 @@ import { Loading } from "quasar";
 import dayjs from "dayjs";
 import objectSupport from "dayjs/plugin/objectSupport";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-
 
 dayjs.extend(localizedFormat);
 dayjs.extend(objectSupport);
@@ -313,7 +317,14 @@ export default {
           label: "Отвественный",
           align: "center",
           sortable: false,
-          field: (row) => this.managements.filter(m => m.id == row.manageId)[0]?.name,
+          field: (row) =>
+            this.managements.filter((m) => m.id == row.manageId)[0]?.name,
+        },
+        {
+          name: "edit",
+          align: "center",
+          label: "Редактирование",
+          style: "width: 100px"
         },
       ],
     };
@@ -363,6 +374,7 @@ export default {
   computed: {
     ...mapState("place", ["places"]),
     ...mapState("management", ["managements"]),
+    ...mapState("current", ["currentUser"]),
 
     filteredPlaces: {
       get() {
@@ -388,5 +400,8 @@ export default {
 .q-field--outlined.q-field--readonly .q-field__control:before {
   border-style: solid;
   border: 1px solid black;
+}
+.q-table--dense .q-table thead tr, .q-table--dense .q-table tbody tr, .q-table--dense .q-table tbody td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 </style>

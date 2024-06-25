@@ -157,9 +157,7 @@
             to="/places"
             flat
             dense
-            v-if="
-              currentUser?.role.includes('ADMIN') && connection == 'mmkmetiz'
-            "
+            v-if="connection == 'mmkmetiz'"
           >
             <q-tooltip> Места погрузки-разгрузки </q-tooltip>
           </q-btn>
