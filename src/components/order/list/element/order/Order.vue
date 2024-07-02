@@ -16,7 +16,6 @@
     <q-td key="customer" :props="props">
       <Customer :customerId="order.customerId" />
     </q-td>
-
     <q-td key="departurePoint" :props="props" :class="_endTimeWorkClass(order.departurePointId)">
       <Place :placeId="order.departurePointId" />
     </q-td>
@@ -112,11 +111,15 @@ export default {
     },
     _endTimeWorkClass(id) {
       // if (id == 2119) {
-        const dateStart = dayjs(this.getPlaceById(id)?.startTimeWork, 'HH:mm:ss')
-        const dateEnd = dayjs(this.getPlaceById(id)?.endTimeWork, 'HH:mm:ss')
+        const place = this.getPlaceById(id)
+        const newPlace = this.getPlaceByNameAddedManualyTrue(place.name)
+        const dateStart = dayjs(newPlace?.startTimeWork, 'HH:mm:ss')
+        const dateEnd = dayjs(newPlace?.endTimeWork, 'HH:mm:ss')
         const dateNow = dayjs();
-        // const dateNow = dayjs("23:59:00", 'HH:mm:ss')
         const diffToNow = dateEnd.diff(dateNow, "hour", true)
+        // if (id = 2136) {
+        //   console.log(dayjs(place?.endTimeWork, 'HH:mm:ss').isValid(), place)
+        // }
         if (dateStart < dateEnd && (dateNow < dateStart || dateNow > dateEnd)) {
           return "bg-red-2";
         }
@@ -144,12 +147,13 @@ export default {
   },
   computed: {
     ...mapState("order", ["hovered"]),
+    ...mapState("place", ["places"]),
     ...mapState("current", [
       "selectedTransportId",
       "orderIsEmergency",
       "currentUser",
     ]),
-    ...mapGetters('place', ['getPlaceById']),
+    ...mapGetters('place', ['getPlaceById', 'getPlaceByNameAddedManualyTrue']),
     _isMetiz: {
       get() {
         return getConnection() == "mmkmetiz";
