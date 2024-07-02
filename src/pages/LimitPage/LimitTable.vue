@@ -43,7 +43,7 @@
             />
             <q-btn
               :disable="scope.value >= Number(scope.initialValue) + _percentage"
-              @click="setLimitSubdivision(scope, props, 'plan')"
+              @click="setLimitSubdivision(scope, props, 'fact')"
               text-color="white"
               label="Изменить"
               unelevated
@@ -64,9 +64,9 @@
           </q-popup-edit>
         </q-td>
         <q-td key="limit" :props="props"
-          >{{ toFixed(props.row.plan) }}
+          >{{ toFixed(props.row.fact) }}
           <q-popup-edit
-            v-model="props.row.plan"
+            v-model="props.row.fact"
             title="Изменить долю"
             v-slot="scope"
             class="bg-grey-2 text-center"
@@ -83,14 +83,14 @@
               hide-hint
               :rules="[
                 (val) =>
-                  val <= Number(scope.initialValue) + _plan ||
+                  val <= Number(scope.initialValue) + _fact ||
                   `Введите число меньше, чем ${
-                    _plan + Number(scope.initialValue)
+                    _fact + Number(scope.initialValue)
                   }`,
               ]"
             />
             <q-btn
-              :disable="scope.value >= Number(scope.initialValue) + _plan"
+              :disable="scope.value >= Number(scope.initialValue) + _fact"
               @click="setLimitSubdivision(scope, props, 'percentage')"
               text-color="white"
               label="Изменить"
@@ -151,24 +151,24 @@
             </q-popup-edit>
           </q-td>
         <q-td class="text-center">
-         {{ toFixed(Number(props.row.plan) - props.row.technologicalTransport) }}
+         {{ toFixed(Number(props.row.fact) - props.row.technologicalTransport) }}
         </q-td>
       </q-tr>
     </template>
     <template v-slot:bottom-row>
       <q-tr>
-        <q-td class="text-center">Запас</q-td>
+        <q-td class="text-center"> Запас </q-td>
         <q-td class="text-center">{{ _percentage.toFixed(2) }}</q-td>
-        <q-td class="text-center">{{ _plan.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ _fact.toFixed(2) }}</q-td>
         <q-td class="text-center">-</q-td>
-        <q-td class="text-center">{{ _plan.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ _fact.toFixed(2) }}</q-td>
       </q-tr>
       <q-tr>
         <q-td class="text-center">Общий итог </q-td>
         <q-td class="text-center">100</q-td>
-        <q-td class="text-center">{{ planVolume.toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ factVolume.toFixed(2) }}</q-td>
         <q-td class="text-center">{{ _technologicalTransport.toFixed(2) }}</q-td>
-        <q-td class="text-center">{{ (Number(planVolume) - Number(_technologicalTransport)).toFixed(2) }}</q-td>
+        <q-td class="text-center">{{ (Number(factVolume) - Number(_technologicalTransport)).toFixed(2) }}</q-td>
       </q-tr>
     </template>
   </q-table>
@@ -181,7 +181,8 @@ import _ from "lodash";
 export default {
   name: "limit-table",
   components: {},
-  props: ["plan", "year", "month"],
+  props: ["fact", "year", "month"],
+
   data() {
     return {
       columns: [
@@ -225,7 +226,7 @@ export default {
   },
   methods: {
     ...mapActions("limit", ["getMonthLimitSubdivisions"]),
-    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit", "setAllControlLimitsWithPlanVolume"]),
+    ...mapMutations("limit", ["setLimit", "setTechnologicalTransportLimit", "setAllControlLimitsWithFactVolume"]),
     toFixed(val) {
       if (val) {
         return Number(val).toFixed(2);
@@ -256,9 +257,9 @@ export default {
   },
   computed: {
     ...mapState("limit", ["monthLimitSubdivisions"]),
-    planVolume: {
+    factVolume: {
       get() {
-        return this.plan * 1.12607971119134;
+        return this.fact * 1.12607971119134;
       },
     },
     _percentage: {
@@ -271,12 +272,12 @@ export default {
         );
       },
     },
-    _plan: {
+    _fact: {
       get() {
         return (
-          this.planVolume -
+          this.factVolume -
           _.sumBy(this.monthLimitSubdivisions, function (o) {
-            return Number(o.plan);
+            return Number(o.fact);
           })
         );
       },
@@ -301,8 +302,8 @@ export default {
     }
   },
   watch: {
-    planVolume() {
-     this.setAllControlLimitsWithPlanVolume(this.planVolume)
+    factVolume() {
+     this.setAllControlLimitsWithFactVolume(this.factVolume)
     }
   }
 };

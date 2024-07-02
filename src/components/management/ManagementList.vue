@@ -45,7 +45,7 @@
           <div v-if="managements.length - 1 == props.pageIndex" class="absolute q-ml-sm ">
             <div v-if="!currentUser?.role.includes('WATCHER')" class="q-pt-sm">
               <q-table
-                :title="`Запас: ${_plan.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
+                :title="`Запас: ${_fact.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
                 :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom flat bordered/>
             </div>
           </div>
@@ -197,17 +197,17 @@ export default {
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapState("current", ["currentUser"]),
     ...mapState("limit", ["controlLimits"]),
-    planVolume: {
+    factVolume: {
       get() {
         return this.managementsReserve.factMonthLimit * 1.12607971119134;
       },
     },
-    _plan: {
+    _fact: {
       get() {
         return (
-          this.planVolume -
+          this.factVolume -
           _.sumBy(this.managements, function (o) {
-            return Number(o.limits[0].plan);
+            return Number(o.limits[0].fact);
           })
         );
       },

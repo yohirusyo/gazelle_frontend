@@ -8,11 +8,12 @@
     >
       <div class="col-6">Лимит на месяц</div>
       <div class="col-3 text-right">
-        {{ monthLimitPercentage }}
+        <!-- {{ monthLimitPercentage }} -->
+          100.0%
       </div>
 
       <div class="col-3 text-right">
-        {{ month?.fact }}
+        {{ month?.fact.toFixed(2) }}
       </div>
     </div>
 
@@ -78,12 +79,12 @@ export default {
     },
     monthLimitPercentage: {
       get() {
-        return `${((this.month?.fact / this.month?.plan) * 100).toFixed(1)}%`;
+        return `100%`;
       },
     },
     usedLimitPercentage: {
       get() {
-        return `${((this.month?.used / this.month?.plan) * 100).toFixed(1)}%`;
+        return `${((this.month?.used / this.month?.fact) * 100).toFixed(1)}%`;
       },
     },
     unusedLimit: {
@@ -93,7 +94,7 @@ export default {
     },
     unusedLimitPercentage: {
       get() {
-        return `${((this.unusedLimit / this.month?.plan) * 100).toFixed(1)}%`;
+        return `${((this.unusedLimit / this.month?.fact) * 100).toFixed(1)}%`;
       },
     },
     ...mapGetters("management", ["myManagement"]),
