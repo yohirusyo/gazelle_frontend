@@ -12,6 +12,7 @@ export function setMonthLimitSubdivisions(state, monthLimitSubdivisions) {
 }
 
 export function setLimit(state, val) {
+  console.log(val);
   state.monthLimitSubdivisions.forEach((item) => {
     if (item.id === val.id) {
       item[val.string] = Number(val.value);
@@ -42,8 +43,8 @@ export function setHoursStatsControl(state, val) {
   state.statsHoursControl = val;
 }
 
-export function setAllControlLimitsWithPlanVolume(state, val) {
+export function setAllControlLimitsWithFactVolume(state, val) {
   state.monthLimitSubdivisions.forEach((m) => {
-    m.plan = val * m.percentage / 100
+    m.fact = val * m.percentage / 100
   });
 }

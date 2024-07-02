@@ -26,7 +26,7 @@
             dense hide-bottom-space hide-hint v-model="_factSubPay" />
 
         </div>
-        <LimitTable :plan="_productionPlanVolume" :year="year" :month="month"></LimitTable>
+        <LimitTable :fact="_productionPlanVolume" :year="year" :month="month"></LimitTable>
       </div>
     </div>
     <div class="row q-ma-sm absolute-bottom">
