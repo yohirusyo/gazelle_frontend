@@ -23,9 +23,13 @@ export const getFilteredSubdivisions = (state) => (name) => {
 };
 
 export const subdivisions = (state) => {
-  return [
+  let customers = [
     ...new Set(state.customers.map((customer) => customer.subdivision)),
   ].map((s) => ({
     name: s,
-  }));
+  }))
+  customers.forEach((customer) => {
+    customer.mvz = state.customers.find((c) => c.name == customer.name && c.mvz != null)?.mvz
+  })
+  return customers;
 };

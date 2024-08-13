@@ -43,6 +43,7 @@
     label="МВЗ"
     autocomplete="off"
     :readonly="noWrite"
+    disable
   />
   <q-input
     v-model="_phoneNumber"

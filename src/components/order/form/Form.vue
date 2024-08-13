@@ -15,7 +15,7 @@
               @update:subdivision="(val) => (customer.subdivision = val)" @update:mvz="(val) => (customer.mvz = val)" />
 
             <PlaceSelect v-model="departurePointName" label="Место отправления" />
-
+            
             <PointsConstructor v-model="points" :copyMode="copyMode" :isEditMode="!!selected && !copyMode" />
 
             <DescriptionField v-model="description" :emergensy="_orderIsEmergency" />
