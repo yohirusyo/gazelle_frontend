@@ -16,6 +16,9 @@ export function setSubdivision(state, subdivisionStats) {
   state.subdivisionStats = subdivisionStats
 }
 
+export function setTime(state, timeStats) {
+  state.timeStats = timeStats
+}
 
 export function setStatsIndicatorReport(state, indicatorStats) {
   state.indicatorStats = indicatorStats

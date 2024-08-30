@@ -27,6 +27,12 @@ export async function requestSubdivisionStats({commit}, {from, to}) {
   });
 }
 
+export async function requestTimeStats({commit}, {from, to}) {
+  return api.get(`order/timeStats?from=${from}&to=${to}`).then(({ data }) => {
+    commit("setTime", data);
+  });
+}
+
 export async function getStatsIndicatorReport(context, item) {
   return api
     .get(`order/indicator-stats?month=${item.month}&year=${item.year}`)

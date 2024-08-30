@@ -62,6 +62,17 @@
         this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
       "
     />
+    <q-btn
+      label="Отчёт по времени под заявкой"
+      class="row text-black border-none bg-white q-ma-sm"
+      outline
+      unelevated
+      to="/report-time"
+      v-if="
+        this.currentUser?.role.includes('ADMIN') ||
+        this.currentUser?.role.includes('WATCHER_WITH_REPORTS')
+      "
+    />
  </q-page>
 </template>
 
