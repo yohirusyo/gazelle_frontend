@@ -1,17 +1,20 @@
 <template>
     <q-page>
         <div class="column fit" style="flex-wrap: nowrap !important">
+            {{ dayDriverShift }}
             <div class="col col-shrink">
                 <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
                     <q-btn text-color="white" label="Экспорт в exel" icon="las la-file-exel" unelevated
                         class="col bg-white text-black border-none" flat no-caps @click="createExel" />
                     <q-separator vertical />
-                    <q-btn text-color="white"
-                        :label="`c ${LabelDDMMYYYY(_selectedDate?.from)} по ${LabelDDMMYYYY(_selectedDate?.to)}`"
-                        unelevated class="col bg-white text-black border-none" flat no-caps>
+                    <q-btn :disabled="_activeOrder" text-color="white"
+                        :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`" unelevated
+                        class="col bg-white text-black border-none" flat no-caps>
                         <q-popup-proxy transition-show="scale" transition-hide="scale">
-                            <q-date v-model="_selectedDate" mask="DD.MM.YYYY HH:mm" minimal :options="optionsFn" range>
+                            <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
                                 <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Применить" color="primary" flat
+                                        @click="requestDayDriverShiftWithLoading()" />
                                     <q-btn v-close-popup label="Закрыть" color="primary" flat />
                                 </div>
                             </q-date>
@@ -30,7 +33,7 @@
 import dayjs from 'dayjs';
 import { mapActions, mapState } from 'vuex';
 import * as XLSX from "xlsx-js-style";
-
+import { Loading } from "quasar";
 
 export default {
     name: "report-time",
@@ -38,7 +41,7 @@ export default {
         return {
             _selectedDate: null,
             columns: [
-            {
+                {
                     name: "date",
                     required: false,
                     label: "Дата",
@@ -163,7 +166,7 @@ export default {
     },
 
     methods: {
-        ...mapActions("orderStats", ["requestTimeStats"]),
+        ...mapActions("userStats", ["requestDayDriverShift"]),
         LabelDDMMYYYY(val) {
             return dayjs(val, "DD.MM.YYYY HH:mm").format("DD.MM.YYYY")
         },
@@ -225,18 +228,23 @@ export default {
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Отчет по подразделеням");
             XLSX.writeFile(wb, `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}.xlsx`);
+        },
+        async requestDayDriverShiftWithLoading() {
+            Loading.show()
+            await this.requestDayDriverShift(this._selectedDate);
+            Loading.hide()
         }
     },
 
     computed: {
-        ...mapState("orderStats", ["timeStats"])
+        ...mapState("userStats", ["dayDriverShift"])
     },
     async mounted() {
         this._selectedDate = {
-            from: dayjs().startOf("day").format("DD.MM.YYYY HH:mm"),
-            to: dayjs().endOf("day").format("DD.MM.YYYY HH:mm"),
+            from: dayjs(dayjs()).subtract(1, 'weeks').format("DD.MM.YYYY"),
+            to: dayjs(dayjs()).format("DD.MM.YYYY"),
         };
-        await this.requestTimeStats(this._selectedDate);
+        this.requestDayDriverShiftWithLoading()
     },
     watch: {
         _selectedDate() {

@@ -6,5 +6,6 @@ export default function () {
     operatorShiftStats: [],
     operatorShiftMin: null,
     operatorShiftMax: null,
+    dayDriverShift: []
   };
 }

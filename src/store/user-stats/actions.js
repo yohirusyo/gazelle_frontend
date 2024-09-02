@@ -35,3 +35,12 @@ export async function requestOperatorShiftStatsDates({ commit }) {
     commit("setMinMaxOperator", data);
   });
 }
+
+
+export async function requestDayDriverShift({ commit }, dates) {
+  return api.get(`user/day-driver-shift`, {
+    params: dates
+  }).then(({ data }) => {
+    commit("setDayDriverShift", data);
+  });
+}
