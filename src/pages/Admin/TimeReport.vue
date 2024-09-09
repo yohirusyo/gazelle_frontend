@@ -4,11 +4,11 @@
             <table>
                 <tr>
                     <th>Дата</th>
-                    <th v-for="d of dayDriverShift" :key="index">{{ d.type }}</th>
+                    <th v-for="d of dayDriverShift" :key="index">{{ d.transportType }}</th>
                 </tr>
                 <tr v-for="(date, index) of dayDriverShift[0]?.dates.length" :key="index">
                     <td>{{ dayjs(dayDriverShift[0]?.dates[index].date).locale("ru").format("D MMM, dddd") }}</td>
-                    <td v-for="d of dayDriverShift" :key="d.transportId">
+                    <td v-for="d of dayDriverShift" :key="d.transportType">
                         {{ Math.round(d.dates[index]?.percentageOnOrder * 100) / 100 }}</td>
                 </tr>
             </table>
