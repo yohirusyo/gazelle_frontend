@@ -6,6 +6,7 @@ export default function () {
     mvzStats: [],
     excelData: [],
     subdivisionStats: [],
-    indicatorStats: []
+    indicatorStats: [],
+    timeStats: []
   };
 }

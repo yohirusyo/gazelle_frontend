@@ -90,6 +90,14 @@ const routes = [
         },
       },
       {
+        path: "report-time",
+        component: () => import("src/pages/Admin/TimeReport.vue"),
+        meta: {
+          roles: ["ADMIN", "OPERATOR", "WATCHER_WITH_REPORTS"],
+          requiresAuth: true,
+        },
+      },
+      {
         path: "reports",
         component: () => import("src/pages/Admin/Index.vue"),
         meta: {
