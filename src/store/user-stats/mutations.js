@@ -15,3 +15,7 @@ export function setMinMaxOperator(state, shiftMinMax) {
   state.operatorShiftMin = shiftMinMax.min;
   state.operatorShiftMax = shiftMinMax.max;
 }
+
+export function setDayDriverShift(state, dayDriverShift) {
+  state.dayDriverShift = dayDriverShift;
+}
