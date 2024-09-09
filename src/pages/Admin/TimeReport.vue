@@ -1,12 +1,22 @@
 <template>
     <q-page>
         <div class="column fit" style="flex-wrap: nowrap !important">
-            {{ dayDriverShift }}
+            <table>
+                <tr>
+                    <th>Дата</th>
+                    <th v-for="d of dayDriverShift" :key="index">{{ d.type }}</th>
+                </tr>
+                <tr v-for="(date, index) of dayDriverShift[0]?.dates.length" :key="index">
+                    <td>{{ dayjs(dayDriverShift[0]?.dates[index].date).locale("ru").format("D MMM, dddd") }}</td>
+                    <td v-for="d of dayDriverShift" :key="d.transportId">
+                        {{ Math.round(d.dates[index]?.percentageOnOrder * 100) / 100 }}</td>
+                </tr>
+            </table>
             <div class="col col-shrink">
                 <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
-                    <q-btn text-color="white" label="Экспорт в exel" icon="las la-file-exel" unelevated
+                    <!-- <q-btn text-color="white" label="Экспорт в exel" icon="las la-file-exel" unelevated
                         class="col bg-white text-black border-none" flat no-caps @click="createExel" />
-                    <q-separator vertical />
+                    <q-separator vertical /> -->
                     <q-btn :disabled="_activeOrder" text-color="white"
                         :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`" unelevated
                         class="col bg-white text-black border-none" flat no-caps>
@@ -23,8 +33,8 @@
                     <q-separator vertical />
                 </div>
             </div>
-            <q-table separator="cell" flat dense :rows="timeStats" :columns="columns" id="report-table"
-                :rows-per-page-options="[0]" hide-bottom />
+            <!-- <q-table separator="cell" flat dense :rows="timeStats" :columns="columns" id="report-table"
+                :rows-per-page-options="[0]" hide-bottom /> -->
         </div>
     </q-page>
 </template>
@@ -233,7 +243,8 @@ export default {
             Loading.show()
             await this.requestDayDriverShift(this._selectedDate);
             Loading.hide()
-        }
+        },
+        dayjs
     },
 
     computed: {
@@ -259,3 +270,16 @@ export default {
 
 }
 </script>
+
+<style scoped>
+   TABLE {
+    border-collapse: collapse;
+   }
+   TD, TH {
+    padding: 3px;
+    border: 1px solid black;
+   }
+   TH {
+    background: #a2bcb3;
+   }
+</style>
