@@ -1,5 +1,8 @@
 <template>
     <q-page>
+        <q-select :options="limitMonths" v-model="_selectedMonth" label="Месяц" square outlined dense
+                @update:model-value="(val) => updateData(val)" :option-label="(item) => monthLabel(item)"
+                class="col text-black border-none" />
         <div class="column fit" style="flex-wrap: nowrap !important">
             <table>
                 <tr>
@@ -12,176 +15,53 @@
                         {{ Math.round(d.dates[index]?.percentageOnOrder * 100) / 100 }}</td>
                 </tr>
             </table>
-            <div class="col col-shrink">
-                <div class="row" style="border-bottom: 1px solid rgba(0, 0, 0, 0.12)">
-                    <!-- <q-btn text-color="white" label="Экспорт в exel" icon="las la-file-exel" unelevated
-                        class="col bg-white text-black border-none" flat no-caps @click="createExel" />
-                    <q-separator vertical /> -->
-                    <q-btn :disabled="_activeOrder" text-color="white"
-                        :label="`с ${_selectedDate?.from} по ${_selectedDate?.to}`" unelevated
-                        class="col bg-white text-black border-none" flat no-caps>
-                        <q-popup-proxy transition-show="scale" transition-hide="scale">
-                            <q-date v-model="_selectedDate" mask="DD.MM.YYYY" minimal range>
-                                <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Применить" color="primary" flat
-                                        @click="requestDayDriverShiftWithLoading()" />
-                                    <q-btn v-close-popup label="Закрыть" color="primary" flat />
-                                </div>
-                            </q-date>
-                        </q-popup-proxy>
-                    </q-btn>
-                    <q-separator vertical />
-                </div>
-            </div>
-            <!-- <q-table separator="cell" flat dense :rows="timeStats" :columns="columns" id="report-table"
-                :rows-per-page-options="[0]" hide-bottom /> -->
         </div>
     </q-page>
 </template>
 
 <script>
 import dayjs from 'dayjs';
+import objectSupport from "dayjs/plugin/objectSupport";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import { mapActions, mapState } from 'vuex';
 import * as XLSX from "xlsx-js-style";
 import { Loading } from "quasar";
+import _ from "lodash";
+dayjs.extend(localizedFormat);
+dayjs.extend(objectSupport);
 
 export default {
     name: "report-time",
     data() {
         return {
             _selectedDate: null,
-            columns: [
-                {
-                    name: "date",
-                    required: false,
-                    label: "Дата",
-                    align: "center",
-                    // fields: (row) => row.date, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "vis",
-                    required: false,
-                    label: "ВИС",
-                    align: "center",
-                    // fields: (row) => row.vis, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "gazOpen",
-                    required: false,
-                    label: "Газель открытая",
-                    align: "center",
-                    // fields: (row) => row.gazOpen, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "gazTent",
-                    required: false,
-                    label: "Газель тентованная",
-                    align: "center",
-                    // fields: (row) => row.gazTent, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "gazFur",
-                    required: false,
-                    label: "Газель фургон",
-                    align: "center",
-                    // fields: (row) => row.gazFur, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "bort5",
-                    required: false,
-                    label: "Бортовой 5т",
-                    align: "center",
-                    // fields: (row) => row.bort5, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "bort5opg",
-                    required: false,
-                    label: "Бортовой 5т ОПГ",
-                    align: "center",
-                    // fields: (row) => row.bort5opg, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "bort10",
-                    required: false,
-                    label: "Бортовой 10т",
-                    align: "center",
-                    // fields: (row) => row.bort10, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "sam13tNoBort",
-                    required: false,
-                    label: "Самосвал 13т без борта",
-                    align: "center",
-                    // fields: (row) => row.sam13tNoBort, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "sam15tNoBort",
-                    required: false,
-                    label: "Самосвал 15т без борта",
-                    align: "center",
-                    // fields: (row) => row.sam15tNoBort, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "sam20tNoBort",
-                    required: false,
-                    label: "Самосвал 20т без борта",
-                    align: "center",
-                    // fields: (row) => row.sam20tNoBort, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "sam15tWithBort",
-                    required: false,
-                    label: "Самосвал 15т с бортом",
-                    align: "center",
-                    // fields: (row) => row.sam15tWithBort, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "sam20tWithBort",
-                    required: false,
-                    label: "Самосвал 20т с бортом",
-                    align: "center",
-                    // fields: (row) => row.sam20tWithBort, summaryOnTransportType
-                    sortable: false,
-                },
-                {
-                    name: "SedTag",
-                    required: false,
-                    label: "Седельный тягач",
-                    align: "center",
-                    // fields: (row) => row.SedTag,
-                    sortable: false,
-                },
-                {
-                    name: "Bort15tLong",
-                    required: false,
-                    label: "Бортовой 15т удлиненный",
-                    align: "center",
-                    // fields: (row) => row.Bort15tLong, summaryOnTransportType
-                    sortable: false,
-                },
-            ]
+            _selectedMonth: null,
         }
     },
 
     methods: {
         ...mapActions("userStats", ["requestDayDriverShift"]),
+        ...mapActions("limit", ["getAllControlLimits"]),
         LabelDDMMYYYY(val) {
             return dayjs(val, "DD.MM.YYYY HH:mm").format("DD.MM.YYYY")
         },
         LabelHHmm(val) {
             return dayjs(val, "DD.MM.YYYY HH:mm").format("HH:mm");
+        },
+        updateData(item) {
+            console.log(item)
+            this._selectedDate = {
+                from: dayjs(new Date(item.year, item.month, 0), "DD.MM.YYYY HH:mm").startOf('month').format("DD.MM.YYYY HH:mm"),
+                to: dayjs(new Date(item.year, item.month, 0), "DD.MM.YYYY HH:mm").endOf('month').format("DD.MM.YYYY HH:mm")
+            };
+            this.requestDayDriverShiftWithLoading()
+        },
+        monthLabel(item) {
+            return _.capitalize(
+                dayjs({ year: item.year, month: item.month })
+                    .locale("ru")
+                    .format("MMMM YYYY")
+            );
         },
         createExel() {
             let excel = document.querySelector("#report-table");
@@ -248,38 +128,41 @@ export default {
     },
 
     computed: {
-        ...mapState("userStats", ["dayDriverShift"])
+        ...mapState("userStats", ["dayDriverShift"]),
+        ...mapState("limit", ["controlLimits"]),
+        limitMonths: {
+            get() {
+                return this.controlLimits;
+            },
+        },
     },
     async mounted() {
         this._selectedDate = {
-            from: dayjs(dayjs()).subtract(1, 'weeks').format("DD.MM.YYYY"),
-            to: dayjs(dayjs()).format("DD.MM.YYYY"),
+            from: dayjs(dayjs()).startOf('month').format("DD.MM.YYYY"),
+            to: dayjs(dayjs()).endOf('month').format("DD.MM.YYYY"),
         };
         this.requestDayDriverShiftWithLoading()
+        this.getAllControlLimits();
     },
     watch: {
-        _selectedDate() {
-            if (typeof this._selectedDate == 'string') {
-                this._selectedDate = {
-                    from: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm").startOf("day").format("DD.MM.YYYY HH:mm"),
-                    to: dayjs(this._selectedDate, "DD.MM.YYYY HH:mm").endOf("day").format("DD.MM.YYYY HH:mm"),
-                }
-            }
-        }
+
     }
 
 }
 </script>
 
 <style scoped>
-   TABLE {
+TABLE {
     border-collapse: collapse;
-   }
-   TD, TH {
+}
+
+TD,
+TH {
     padding: 3px;
     border: 1px solid black;
-   }
-   TH {
+}
+
+TH {
     background: #a2bcb3;
-   }
+}
 </style>
