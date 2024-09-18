@@ -49,10 +49,9 @@ export default {
             return dayjs(val, "DD.MM.YYYY HH:mm").format("HH:mm");
         },
         updateData(item) {
-            console.log(item)
             this._selectedDate = {
-                from: dayjs(new Date(item.year, item.month, 0), "DD.MM.YYYY HH:mm").startOf('month').format("DD.MM.YYYY HH:mm"),
-                to: dayjs(new Date(item.year, item.month, 0), "DD.MM.YYYY HH:mm").endOf('month').format("DD.MM.YYYY HH:mm")
+                from: dayjs(new Date(item.year, item.month+1, 0), "DD.MM.YYYY HH:mm").startOf('month').format("DD.MM.YYYY HH:mm"),
+                to: dayjs(new Date(item.year, item.month+1, 0), "DD.MM.YYYY HH:mm").endOf('month').format("DD.MM.YYYY HH:mm")
             };
             this.requestDayDriverShiftWithLoading()
         },
