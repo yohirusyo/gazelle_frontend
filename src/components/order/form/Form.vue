@@ -15,7 +15,7 @@
               @update:subdivision="(val) => (customer.subdivision = val)" @update:mvz="(val) => (customer.mvz = val)" />
 
             <PlaceSelect v-model="departurePointName" label="Место отправления" />
-            
+
             <PointsConstructor v-model="points" :copyMode="copyMode" :isEditMode="!!selected && !copyMode" />
 
             <DescriptionField v-model="description" :emergensy="_orderIsEmergency" />
@@ -68,11 +68,11 @@
         </div>
 
         <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
-        selected &&
-        selected.isRequest &&
-        selected.isApproved &&
-        !isCustomer &&
-        !currentUser?.role.includes('WATCHER')
+          selected &&
+          selected.isRequest &&
+          selected.isApproved &&
+          !isCustomer &&
+          !currentUser?.role.includes('WATCHER')
         ">
           <q-btn text-color="white" label="Вернуть в запрос" unelevated class="border-none bg-grey col" color="primary"
             @click="onBackToRequest" no-caps dense />
@@ -80,35 +80,35 @@
 
         <div class="col row q-gutter-x-sm items-center">
           <q-btn v-if="_creationMode || copyMode" text-color="white" :label="_customerCreationCheck
-        ? 'У вас израсходован лимит поездок!'
-        : 'Создать'
-        " unelevated class="border-none col" :class="_customerCreationCheck
-        ? 'bg-red-3 text-black text-bold'
-        : 'bg-blue-4'
-        " type="submit" no-caps dense :loading="_addLoading" :disable="_addLoading || _customerCreationCheck" />
+            ? 'У вас израсходован лимит поездок!'
+            : 'Создать'
+            " unelevated class="border-none col" :class="_customerCreationCheck
+              ? 'bg-red-3 text-black text-bold'
+              : 'bg-blue-4'
+              " type="submit" no-caps dense :loading="_addLoading" :disable="_addLoading || _customerCreationCheck" />
           <q-btn v-if="_editMenuActive && !currentUser?.role.includes('WATCHER') && !selected.isEmergency"
             text-color="white" label="Изменить" unelevated class="border-none bg-blue-4 col" type="submit" no-caps
             dense></q-btn>
-          <q-btn v-if="isCustomer &&
-        !_creationMode &&
-        !currentUser?.role.includes('WATCHER')
-        " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
-            dense />
+          <!-- <q-btn v-if="isCustomer &&
+            !_creationMode &&
+            !currentUser?.role.includes('WATCHER')
+          " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
+            dense /> -->
 
-          <q-btn v-if="_removeMenuActive && !currentUser?.role.includes('WATCHER')" :disable="!removeReason"
-            text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onRemoveOrder" no-caps
-            dense>
+          <q-btn v-if="_removeMenuActive && !copyMode && !currentUser?.role.includes('WATCHER')"
+            :disable="!removeReason" text-color="white" label="Удалить" unelevated class="border-none bg-red col"
+            @click="onRemoveOrder" no-caps dense>
             <q-tooltip v-if="!removeReason" anchor="top middle">Укажите причину удаления</q-tooltip>
           </q-btn>
           <q-btn text-color="white" label="Отмена" unelevated class="border-none bg-green col" @click="onCancel()"
             no-caps dense />
         </div>
         <div class="col row q-gutter-x-sm items-center" v-if="!_creationMode &&
-        selected &&
-        selected.isRequest &&
-        selected.isApproved &&
-        !isCustomer &&
-        currentUser?.id == 1
+          selected &&
+          selected.isRequest &&
+          selected.isApproved &&
+          !isCustomer &&
+          currentUser?.id == 1
         ">
           <q-btn text-color="white" label="Принудительно завершить" unelevated class="border-none bg-orange col"
             @click="onComplete" no-caps dense />
@@ -216,15 +216,24 @@ export default {
     },
     _removeMenuActive: {
       get() {
-        if (this.isCustomer) return false;
-        return (
-          !this._creationMode &&
-          this.selected &&
-          ((this.selected.isRequest &&
-            this.selected.isApproved &&
-            !this.selected.isDeclined) ||
-            !this.selected.isRequest)
-        );
+        if (this.isCustomer) {
+          return (
+            !this._creationMode &&
+            this.selected &&
+            ((this.selected.isRequest &&
+              !this.selected.isDeclined) ||
+              !this.selected.isRequest)
+          );
+        } else {
+          return (
+            !this._creationMode &&
+            this.selected &&
+            ((this.selected.isRequest &&
+              this.selected.isApproved &&
+              !this.selected.isDeclined) ||
+              !this.selected.isRequest)
+          );
+        }
       },
       set(newVal) {
         this.setRemoveOrderReason(newVal);
@@ -286,7 +295,7 @@ export default {
     },
     buildRoute(ignoreDateTime = false) {
       let CurrentTime = new Date();
-        CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
+      CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
       if(this.orderTime < CurrentTime) {
         this.orderTime = CurrentTime;
       }
@@ -314,7 +323,7 @@ export default {
         isDeclined: this.copyMode ? false : this.selected?.isDeclined,
       };
     },
-    
+
     buildPoint(point) {
       return {
         destinationName: point.destinationName,
@@ -358,7 +367,7 @@ export default {
         scenario: point.cargo.withCargo && point.cargo.weight >= 60 ? 2 : 1,
       };
     },
-    
+
     async onApprove() {
       //
       if (this.checkAlerts()) return;
