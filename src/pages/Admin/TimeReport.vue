@@ -1,15 +1,21 @@
 <template>
     <q-page>
-        <q-select :options="limitMonths" v-model="_selectedMonth" label="Месяц" square outlined dense
+        <div class="row">
+            <q-btn text-color="white" label="Экспорт в excel" icon="las la-file-excel" unelevated
+                class="col bg-white text-black border-none " flat no-caps @click="createExcel" />
+            <q-select :options="limitMonths" v-model="_selectedMonth" label="Месяц" square outlined dense
                 @update:model-value="(val) => updateData(val)" :option-label="(item) => monthLabel(item)"
-                class="col text-black border-none" />
+                class="col bg-white text-black border-none" />
+        </div>
         <div class="column fit" style="flex-wrap: nowrap !important">
-            <table>
+            <table id="report-table">
                 <tr>
+                    <th style="display: none;"></th>
                     <th>Дата</th>
                     <th v-for="d of dayDriverShift" :key="index">{{ d.transportType }}</th>
                 </tr>
                 <tr v-for="(date, index) of dayDriverShift[0]?.dates.length" :key="index">
+                    <td style="display: none;"></td>
                     <td>{{ dayjs(dayDriverShift[0]?.dates[index].date).locale("ru").format("D MMM, dddd") }}</td>
                     <td v-for="d of dayDriverShift" :key="d.transportType">
                         {{ Math.round(d.dates[index]?.percentageOnOrder * 100) / 100 }}</td>
@@ -29,7 +35,7 @@ import { Loading } from "quasar";
 import _ from "lodash";
 dayjs.extend(localizedFormat);
 dayjs.extend(objectSupport);
-
+import { getexcel } from "src/helpers/excel";
 export default {
     name: "report-time",
     data() {
@@ -50,8 +56,8 @@ export default {
         },
         updateData(item) {
             this._selectedDate = {
-                from: dayjs(new Date(item.year, item.month+1, 0), "DD.MM.YYYY HH:mm").startOf('month').format("DD.MM.YYYY HH:mm"),
-                to: dayjs(new Date(item.year, item.month+1, 0), "DD.MM.YYYY HH:mm").endOf('month').format("DD.MM.YYYY HH:mm")
+                from: dayjs(new Date(item.year, item.month + 1, 0), "DD.MM.YYYY HH:mm").startOf('month').format("DD.MM.YYYY HH:mm"),
+                to: dayjs(new Date(item.year, item.month + 1, 0), "DD.MM.YYYY HH:mm").endOf('month').format("DD.MM.YYYY HH:mm")
             };
             this.requestDayDriverShiftWithLoading()
         },
@@ -62,61 +68,12 @@ export default {
                     .format("MMMM YYYY")
             );
         },
-        createExel() {
-            let excel = document.querySelector("#report-table");
-            const ws = XLSX.utils.table_to_sheet(excel, { raw: true });
-            const border = {
-                top: { style: "thin", color: { rgb: "000000" } },
-                bottom: { style: "thin", color: { rgb: "000000" } },
-                left: { style: "thin", color: { rgb: "000000" } },
-                right: { style: "thin", color: { rgb: "000000" } },
-            };
-            ws["!cols"] = [
-                { wch: 24 },
-                { wch: 24 },
-                { wch: 24 },
-                { wch: 24 },
-                { wch: 24 },
-                { wch: 10 },
-                { wch: 14 },
-                { wch: 14 },
-            ];
-
-            ws["G1"] = {
-                t: "s",
-                v: "Дата",
-            };
-
-            ws["G2"] = {
-                t: "s",
-                v: `c ${this._selectedDate.from}`,
-            };
-
-            ws["H2"] = {
-                t: "s",
-                v: `по ${this._selectedDate.to}`,
-            };
-
-            for (let i = 1; i <= this.timeStats.length + 1; i++) {
-                const cell = ["A", "B", "C", "D", "E", "G", "H"];
-                cell.forEach((m) =>
-                    !!ws[`${m}${i}`]
-                        ? (ws[`${m}${i}`].s = {
-                            border,
-                            alignment: {
-                                horizontal: "center",
-                            },
-                        })
-                        : ""
-                );
-            }
-
-            ws["!ref"] = `A1:H${this.timeStats.length + 1}`;
-            ws["!fullref"] = `A1:H${this.timeStats.length + 1}`;
-
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Отчет по подразделеням");
-            XLSX.writeFile(wb, `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}.xlsx`);
+        createExcel() {
+            getexcel(
+                document.querySelector("#report-table"),
+                "Отчет по времени под заявкой",
+                `Отчет ${dayjs().format("DD.MM.YYYY HH:mm")}`
+            );
         },
         async requestDayDriverShiftWithLoading() {
             Loading.show()
