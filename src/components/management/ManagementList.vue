@@ -33,7 +33,8 @@
               {{ findWhileDriving(props.row.id) }}
             </q-td>
             <q-td key="whileDriving" :props="props">
-              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id) + props.row.limits[0].technologicalTransport) }}
+              {{ round(props.row.limits[0].used - findWhileDriving(props.row.id) +
+                props.row.limits[0].technologicalTransport) }}
             </q-td>
           </q-tr>
           <q-tr v-if="props.expand">
@@ -46,11 +47,59 @@
             <div v-if="!currentUser?.role.includes('WATCHER')" class="q-pt-sm">
               <q-table
                 :title="`Запас: ${_fact.toFixed(2)} (лимит на месяц), ${managementsReserve.usedMonthLimit.toFixed(2)} (израсходованный лимит)`"
-                :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom flat bordered/>
+                :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom
+                flat bordered />
             </div>
+
           </div>
         </template>
       </VScrolltable>
+    </div>
+    <div class="col" v-if="currentUser?.role.includes('ADMIN')">
+      <div>
+        <div class="text-h5 text-center">Пренос лимитов</div>
+        <div class="row">
+          <q-select 
+            label="Откуда" 
+            class="text-black border-none q-pa-sm col" 
+            :options="_subdivisions" 
+            :option-label="(item) => updateSubFrom(item)"
+            v-model="_selectedSubdivision"
+          />
+          <q-input 
+            label="Сколько" 
+            class="text-black border-none q-pa-md col" 
+            square 
+            outlined 
+            dense 
+            hide-bottom-space
+            hide-hint 
+            v-model="_limitTransfer"
+          />
+          <q-select 
+            label="Куда" 
+            class="text-black border-none q-pa-sm col" 
+            :options="_subdivisions" 
+            :option-label="(item) => updateSubFrom(item)"
+          />
+        </div>
+        <div class="row q-ma-sm ">
+          <q-btn 
+            @click="saveLimitTransfer" 
+            class="border-none bg-blue-4 col" 
+            text-color="white" 
+            label="Перенести" 
+            unelevated 
+            no-caps 
+            dense 
+          />
+        </div>
+      </div>
+      <div>
+        <div class="text-h6 text-center">История переносов:</div>
+        {{ saveLimitTransfer() }}
+        <!-- {{ managements }} -->
+      </div>
     </div>
   </div>
 </template>
@@ -88,11 +137,23 @@ export default {
     findWhileDriving(id) {
       return this.managementsWhileDriving[id];
     },
+    async loadData() {
+    },
+    saveLimitTransfer(){
+      const fromSubdivision = this.managements.map((e) => e.defaultLimit);
+      console.log(fromSubdivision);
+      return this.fromSubdivision;
+    },
+    updateSubFrom(item){
+      // console.log(_.capitalize(item))
+      return _.capitalize(item)
+    }
   },
   data() {
     return {
+      _limitTransfer: null,
       options: [],
-      columnsReserve: [  
+      columnsReserve: [
         {
           name: 'subdivision',
           required: true,
@@ -212,13 +273,23 @@ export default {
         );
       },
     },
+    _subdivisions: {
+      get() {
+        return this.managements.map((e) => e.name)
+      },
+    },
   },
   async mounted() {
     await this.getAllControlLimits();
+    await this.loadData();
   },
   watch: {
     _selectedMonth() {
       this._key = new Date().getTime()
+    },
+    _selectedSubdivision() {
+      this._key
+      console.log(this._key)
     }
   }
 };
