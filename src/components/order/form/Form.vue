@@ -20,7 +20,7 @@
 
             <DescriptionField v-model="description" :emergensy="_orderIsEmergency" />
 
-            <RemoveReasonField v-if="_removeMenuActive && !_creationMode" v-model="removeReason"
+            <RemoveReasonField v-if="!isCustomer && _removeMenuActive && !_creationMode" v-model="removeReason"
               :removeReason="_removeMenuActive" />
 
             <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason"
@@ -95,7 +95,7 @@
           " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
             dense /> -->
 
-          <q-btn v-if="_removeMenuActive && !copyMode && !currentUser?.role.includes('WATCHER')"
+          <q-btn v-if="!isCustomer && _removeMenuActive && !copyMode && !currentUser?.role.includes('WATCHER')"
             :disable="!removeReason" text-color="white" label="Удалить" unelevated class="border-none bg-red col"
             @click="onRemoveOrder" no-caps dense>
             <q-tooltip v-if="!removeReason" anchor="top middle">Укажите причину удаления</q-tooltip>
