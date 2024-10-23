@@ -26,7 +26,7 @@
             <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason"
               :removeReason="_approvementMenuActive" />
 
-            <OrderTimePicker v-model="orderTime" class="q-mb-md" :selected="selected" :isCustomer="isCustomer"/>
+            <OrderTimePicker v-model="orderTime" class="q-mb-md" :selected="selected" :isCustomer="isCustomer" />
 
             <!-- <q-select
               v-if="$q.screen.xs"
@@ -56,13 +56,8 @@
           <q-btn text-color="white" label="Принять" unelevated class="border-none bg-blue-4 col" color="primary"
             @click="onApprove" no-caps dense />
 
-          <q-btn 
-            :disable="!declineReason" 
-            text-color="white" 
-            label="Отклонить" 
-            unelevated
-            class="border-none bg-red col" 
-            @click="onDecline" no-caps dense>
+          <q-btn :disable="!declineReason" text-color="white" label="Отклонить" unelevated
+            class="border-none bg-red col" @click="onDecline" no-caps dense>
             <q-tooltip v-if="!declineReason" anchor="top middle">Укажите причину отклонения</q-tooltip>
           </q-btn>
         </div>
@@ -89,11 +84,11 @@
           <q-btn v-if="_editMenuActive && !currentUser?.role.includes('WATCHER') && !selected.isEmergency"
             text-color="white" label="Изменить" unelevated class="border-none bg-blue-4 col" type="submit" no-caps
             dense></q-btn>
-          <!-- <q-btn v-if="isCustomer &&
+          <q-btn v-if="isCustomer &&
             !_creationMode &&
             !currentUser?.role.includes('WATCHER')
           " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
-            dense /> -->
+            dense />
 
           <q-btn v-if="_removeMenuActive && !copyMode && !currentUser?.role.includes('WATCHER')"
             :disable="!removeReason" text-color="white" label="Удалить" unelevated class="border-none bg-red col"
@@ -216,24 +211,15 @@ export default {
     },
     _removeMenuActive: {
       get() {
-        if (this.isCustomer) {
-          return (
-            !this._creationMode &&
-            this.selected &&
-            ((this.selected.isRequest &&
-              !this.selected.isDeclined) ||
-              !this.selected.isRequest)
-          );
-        } else {
-          return (
-            !this._creationMode &&
-            this.selected &&
-            ((this.selected.isRequest &&
-              this.selected.isApproved &&
-              !this.selected.isDeclined) ||
-              !this.selected.isRequest)
-          );
-        }
+        if (this.isCustomer) return false;
+        return (
+          !this._creationMode &&
+          this.selected &&
+          ((this.selected.isRequest &&
+            this.selected.isApproved &&
+            !this.selected.isDeclined) ||
+            !this.selected.isRequest)
+        );
       },
       set(newVal) {
         this.setRemoveOrderReason(newVal);
@@ -296,7 +282,7 @@ export default {
     buildRoute(ignoreDateTime = false) {
       let CurrentTime = new Date();
       CurrentTime.setMinutes(CurrentTime.getMinutes() + 15);
-      if(this.orderTime < CurrentTime) {
+      if (this.orderTime < CurrentTime) {
         this.orderTime = CurrentTime;
       }
       return {
