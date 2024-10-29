@@ -45,7 +45,7 @@
               clearable
               autocomplete="off"
               class="col-2"
-            /> мать micro-atx 244*244 --> 
+            />--> 
             <q-checkbox v-model="_orderIsEmergency" label="Аварийная (укажите причину аварийности в комментарии)" dense
               class="q-mb-md" v-if="!_isMetiz || _orderCanBeEmergency" />
           </div>
