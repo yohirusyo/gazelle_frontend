@@ -23,7 +23,7 @@
             <RemoveReasonField v-if="!isCustomer && _removeMenuActive && !_creationMode" v-model="removeReason"
               :removeReason="_removeMenuActive" />
 
-            <RemoveReasonField v-if="_approvementMenuActive && !_creationMode" v-model="declineReason"
+            <RemoveReasonField v-if="_approvementMenuActive && !copyMode && !_creationMode" v-model="declineReason"
               :removeReason="_approvementMenuActive" />
 
             <OrderTimePicker v-model="orderTime" class="q-mb-md" :selected="selected" :isCustomer="isCustomer" />
@@ -45,14 +45,14 @@
               clearable
               autocomplete="off"
               class="col-2"
-            /> -->
+            />--> 
             <q-checkbox v-model="_orderIsEmergency" label="Аварийная (укажите причину аварийности в комментарии)" dense
               class="q-mb-md" v-if="!_isMetiz || _orderCanBeEmergency" />
           </div>
         </q-scroll-area>
       </div>
       <div class="col col-shrink q-gutter-y-sm column">
-        <div class="col row q-gutter-x-sm items-center" v-if="_approvementMenuActive">
+        <div class="col row q-gutter-x-sm items-center" v-if="_approvementMenuActive && !isCustomer">
           <q-btn text-color="white" label="Принять" unelevated class="border-none bg-blue-4 col" color="primary"
             @click="onApprove" no-caps dense />
 
@@ -86,10 +86,13 @@
             dense></q-btn>
           <q-btn v-if="isCustomer &&
             !_creationMode &&
+            !copyMode &&
+            _approvementMenuActive &&
             !currentUser?.role.includes('WATCHER')
           " text-color="white" label="Удалить" unelevated class="border-none bg-red col" @click="onDecline" no-caps
-            dense />
-
+            dense :disable="!declineReason">
+            <q-tooltip v-if="!declineReason">Укажите причину удаления</q-tooltip>
+          </q-btn>
           <q-btn v-if="!isCustomer && _removeMenuActive && !copyMode && !currentUser?.role.includes('WATCHER')"
             :disable="!removeReason" text-color="white" label="Удалить" unelevated class="border-none bg-red col"
             @click="onRemoveOrder" no-caps dense>
@@ -125,6 +128,7 @@ import DescriptionField from "src/components/order/form/fields/Description.vue";
 import RemoveReasonField from "./fields/RemoveReason.vue";
 import OrderTimePicker from "src/components/order/form/fields/Time.vue";
 import { api, getConnection } from "src/boot/axios";
+import { declineOrder } from "src/store/order/actions";
 export default {
   name: "OrderCreation",
   props: ["selected", "isCustomer", "copyMode", 'cargoTypes'],
@@ -181,8 +185,7 @@ export default {
           this.selected &&
           this.selected.isRequest &&
           !this.selected.isApproved &&
-          !this.selected.isDeclined &&
-          !this.isCustomer
+          !this.selected.isDeclined
         );
       },
     },
@@ -211,15 +214,23 @@ export default {
     },
     _removeMenuActive: {
       get() {
-        if (this.isCustomer) return false;
-        return (
-          !this._creationMode &&
-          this.selected &&
-          ((this.selected.isRequest &&
-            this.selected.isApproved &&
-            !this.selected.isDeclined) ||
-            !this.selected.isRequest)
-        );
+        if (this.isCustomer) {
+          return (
+            !this._creationMode &&
+            this.selected &&
+            ((!this.selected.isDeclined) ||
+              !this.selected.isRequest)
+          );
+        } else {
+          return (
+            !this._creationMode &&
+            this.selected &&
+            ((this.selected.isRequest &&
+              this.selected.isApproved &&
+              !this.selected.isDeclined) ||
+              !this.selected.isRequest)
+          );
+        }
       },
       set(newVal) {
         this.setRemoveOrderReason(newVal);
