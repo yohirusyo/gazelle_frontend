@@ -41,7 +41,7 @@ export const myUnusedLimit = (state, getters, rootState, rootGetters) => {
   const myHierarchy = getters.myHierarchy;
   if (myHierarchy?.isSubdivision) {
     const myManagement = rootGetters["management/myManagement"]?.limits[0];
-    return myManagement?.fact - myManagement?.used;
+    return myManagement?.fact - myManagement?.used - myManagement?.technologicalTransport;
   }
   const spendedToWorkers = getters.spendedToWorkers;
   return (
