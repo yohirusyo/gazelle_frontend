@@ -1,6 +1,7 @@
 export default function () {
   return {
     managements: [],
+    limitTransfer: [],
     managementsWhileDriving: {},
     managementsReserve: {},
     isLoaded: false,

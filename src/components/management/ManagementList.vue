@@ -59,46 +59,20 @@
       <div>
         <div class="text-h5 text-center">Пренос лимитов</div>
         <div class="row">
-          <q-select 
-            label="Откуда" 
-            class="text-black border-none q-pa-sm col" 
-            :options="_subdivisions" 
-            :option-label="(item) => updateSubFrom(item)"
-            v-model="_selectedSubdivision"
-          />
-          <q-input 
-            label="Сколько" 
-            class="text-black border-none q-pa-md col" 
-            square 
-            outlined 
-            dense 
-            hide-bottom-space
-            hide-hint 
-            v-model="_limitTransfer"
-          />
-          <q-select 
-            label="Куда" 
-            class="text-black border-none q-pa-sm col" 
-            :options="_subdivisions" 
-            :option-label="(item) => updateSubFrom(item)"
-          />
+          <q-select label="Откуда" class="text-black border-none q-pa-sm col" :options="managements"
+            :option-label="(item) => item.name" v-model="_selectedSubdivisionFrom" required />
+          <q-input label="Сколько" class="text-black border-none q-pa-md col" square outlined dense hide-bottom-space
+            hide-hint v-model="_limitTransfer" type="number" />
+          <q-select label="Куда" class="text-black border-none q-pa-sm col" :options="managements"
+            :option-label="(item) => item.name" v-model="_selectedSubdivisionTo" />
         </div>
         <div class="row q-ma-sm ">
-          <q-btn 
-            @click="saveLimitTransfer" 
-            class="border-none bg-blue-4 col" 
-            text-color="white" 
-            label="Перенести" 
-            unelevated 
-            no-caps 
-            dense 
-          />
+          <q-btn @click="saveLimitTransfer" class="border-none bg-blue-4 col" text-color="white" label="Перенести"
+            unelevated no-caps dense />
         </div>
       </div>
       <div>
         <div class="text-h6 text-center">История переносов:</div>
-        {{ saveLimitTransfer() }}
-        <!-- {{ managements }} -->
       </div>
     </div>
   </div>
@@ -121,6 +95,7 @@ export default {
     ...mapMutations("current", ["setManagement"]),
     ...mapActions("limit", [
       "getAllControlLimits",
+      "limitTransfer",
     ]),
     formatCustomer,
     round(num) {
@@ -139,19 +114,23 @@ export default {
     },
     async loadData() {
     },
-    saveLimitTransfer(){
-      const fromSubdivision = this.managements.map((e) => e.defaultLimit);
-      console.log(fromSubdivision);
-      return this.fromSubdivision;
+
+     async saveLimitTransfer() {
+       await this.limitTransfer({
+        senderId: this._selectedSubdivisionFrom.id,
+        receiverId: this._selectedSubdivisionTo.id,
+        amount: Number(this._limitTransfer),
+        year: this._selectedMonth.year,
+        month: this._selectedMonth.month
+      }
+      )
     },
-    updateSubFrom(item){
-      // console.log(_.capitalize(item))
-      return _.capitalize(item)
-    }
   },
   data() {
     return {
       _limitTransfer: null,
+      _selectedSubdivisionFrom: null,
+      _selectedSubdivisionTo: null,
       options: [],
       columnsReserve: [
         {
@@ -254,7 +233,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve"]),
+    ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve", "limitTransfer"]),
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapState("current", ["currentUser"]),
     ...mapState("limit", ["controlLimits"]),
@@ -273,11 +252,6 @@ export default {
         );
       },
     },
-    _subdivisions: {
-      get() {
-        return this.managements.map((e) => e.name)
-      },
-    },
   },
   async mounted() {
     await this.getAllControlLimits();
@@ -286,10 +260,6 @@ export default {
   watch: {
     _selectedMonth() {
       this._key = new Date().getTime()
-    },
-    _selectedSubdivision() {
-      this._key
-      console.log(this._key)
     }
   }
 };

@@ -39,3 +39,7 @@ export async function getHoursStatsContorlLimits(context, item) {
       context.commit("setHoursStatsControl", data);
     });
 }
+
+export async function limitTransfer(context, data) {
+  return api.post(`management/limit-transfer`, data);
+}
