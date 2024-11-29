@@ -15,7 +15,7 @@
       style="border-right: 1px solid rgba(0, 0, 0, 0.12)"
     >
       <div class="col-6" ref="tbl">
-        <OrderHistory :style="`height: ${height}px`" />
+        <OrderHistory :flagLimits="true" :selectedMonth="_selectedMonth" :style="`height: ${height}px`" />
       </div>
       <Hierarchy class="col-6" />
     </div>
@@ -30,7 +30,7 @@
     </div>
     <div class="col column" style="height: 100vh; font-size: 0.7rem">
       <div class="col-6" ref="tbl">
-        <OrderHistory :style="`height: ${height}px`" />
+        <OrderHistory :flagLimits="true" :selectedMonth="_selectedMonth" :style="`height: ${height}px`" />
       </div>
     </div>
     <div class="col q-pa-md column" style="height: 100vh">
@@ -40,13 +40,16 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import Owner from "./Owner.vue";
 import Percentage from "./Percentage.vue";
 import Hierarchy from "./hierarchy/Hierarchy.vue";
 import LimitRequests from "./LimitRequests.vue";
 import History from "./History/History.vue";
 import OrderHistory from "./History/OrderHistory.vue";
+import dayjs from "dayjs";
+import management from "src/store/management";
+
 export default {
   components: {
     Owner,
@@ -56,11 +59,15 @@ export default {
     History,
     OrderHistory,
   },
+  computed: {
+    ...mapState("management", ["managements"])
+  },
   methods: {
     ...mapActions("management", ["requestMyManagement"]),
   },
   data() {
     return {
+      _selectedMonth: { year: dayjs().year(), month: dayjs().month() },
       height: 0,
     };
   },

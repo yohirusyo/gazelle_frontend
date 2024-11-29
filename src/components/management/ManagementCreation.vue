@@ -130,7 +130,7 @@
           type="submit"
           no-caps
         />
-        <q-btn
+        <!-- <q-btn
           v-if="!_creationMode"
           text-color="white"
           label="Удалить"
@@ -138,7 +138,7 @@
           class="border-none bg-red col"
           @click="onRemoveManagement"
           no-caps
-        />
+        /> -->
         <q-btn
           text-color="white"
           label="Отмена"

@@ -117,13 +117,13 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { api } from "src/boot/axios";
-import { mapGetters, mapState } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 import VScrolltable from "src/components/base/VScrolltable.vue";
 export default {
   components: {
     VScrolltable,
   },
-  props: ["item", "operatingSpeedVariable", "isMinutes", "selectedMonth"],
+  props: ["flagLimits", "item", "operatingSpeedVariable", "isMinutes", "selectedMonth"],
   data() {
     return {
       _selectedDate: {
@@ -192,9 +192,10 @@ export default {
     };
   },
   async mounted() {
+    await this.requestMyManagement();
     this._selectedDate.from = dayjs(new Date(this.selectedMonth.year, this.selectedMonth.month)).startOf('month').format('YYYYMMDD'),
-    this._selectedDate.to = dayjs(new Date(this.selectedMonth.year, this.selectedMonth.month)).endOf('month').format('YYYYMMDD'),
-    this.fetchOrders();
+      this._selectedDate.to = dayjs(new Date(this.selectedMonth.year, this.selectedMonth.month)).endOf('month').format('YYYYMMDD'),
+      this.fetchOrders();
   },
   computed: {
     ...mapGetters("management", ["myManagement", "getManagementById"]),
@@ -206,6 +207,8 @@ export default {
     },
     _operatingSpeedVariable: {
       get() {
+        if (this.flagLimits) { return this.myManagement?.operatingSpeedVariable }
+        console.log(111, this.flagLimits)
         return this.item
           ? this.operatingSpeedVariable
           : this.myManagement?.operatingSpeedVariable;
@@ -291,6 +294,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions("management", ["requestMyManagement"]),
     toDate(val) {
       if (val) {
         dayjs.extend(customParseFormat)
@@ -332,14 +336,14 @@ export default {
       };
       if (customerIds.includes(stats.order.customerId)) {
         limit.customer = true;
-        limit.kilo = this.metersToKilo(stats.order.routeLength);
+        limit.kilo = this.metersToKilo(stats.order.routeLength); //
         limit.loadingWaitingTime =
-          this._operatingSpeedVariable * this.toHours(stats.loadingWaitingTime);
+          this._operatingSpeedVariable * this.toHours(stats.loadingWaitingTime); //
         limit.loadingTime =
-          this._operatingSpeedVariable * this.toHours(stats.loadingTime);
+          this._operatingSpeedVariable * this.toHours(stats.loadingTime); //
         limit.afterLoadingWaitingTime =
           this._operatingSpeedVariable *
-          this.toHours(stats.afterLoadingWaitingTime);
+          this.toHours(stats.afterLoadingWaitingTime); //
         limit.limit +=
           limit.kilo +
           limit.loadingWaitingTime +
@@ -386,11 +390,21 @@ export default {
       return this.parseNumber(item.driveTime) + loadingTime + unloadingTime;
     },
     async fetchOrders() {
+      if(this.flagLimits) {
       const { data } = await api.get(
-        `/order/hierarchy/orders/${this.item ? this.item : ""}/${this.selectedMonth.year}/${this.selectedMonth.month}`
+        `/order/hierarchy/orders/${this.myManagement.id ? this.myManagement.id + "/" : ""}${this.selectedMonth.year}/${this.selectedMonth.month}`
       );
       this._orders = data.orders;
       this._customerIds = data.customerIds;
+      } else {
+        const { data } = await api.get(
+        `/order/hierarchy/orders/${this.item.id ? this.item.id + "/" : ""}${this.selectedMonth.year}/${this.selectedMonth.month}`
+      );
+      this._orders = data.orders;
+      this._customerIds = data.customerIds;
+      }
+
+
     },
   },
 };
