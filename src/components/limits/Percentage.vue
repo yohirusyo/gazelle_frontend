@@ -89,7 +89,7 @@ export default {
     },
     unusedLimit: {
       get() {
-        return (this.month?.fact - this.month?.used).toFixed(2);
+        return (this.month?.fact - (this.month?.used + this.month?.technologicalTransport)).toFixed(2);
       },
     },
     unusedLimitPercentage: {
