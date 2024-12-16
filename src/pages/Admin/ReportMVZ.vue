@@ -267,8 +267,8 @@ export default {
   },
   async mounted() {
     this._selectedDate = {
-      from: dayjs().format("DD.MM.YYYY"),
-      to: dayjs().format("DD.MM.YYYY"),
+      from: dayjs().startOf('month').format("DD.MM.YYYY"),
+      to: dayjs().endOf('month').format("DD.MM.YYYY"),
     };
     await this.requestMvzStats({ from: this._selectedDate.from, to: this._selectedDate.to, toggle: this.mvzToggle });
   },
