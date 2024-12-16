@@ -67,7 +67,7 @@
             :option-label="(item) => item.name" v-model="_selectedSubdivisionTo" />
         </div>
         <div class="row q-ma-sm ">
-          <q-btn @click="saveLimitTransfer" class="border-none bg-blue-4 col" text-color="white" label="Перенести"
+          <q-btn @click="saveLimitTransfer()" class="border-none bg-blue-4 col" text-color="white" label="Перенести"
             unelevated no-caps dense />
         </div>
       </div>
@@ -115,8 +115,8 @@ export default {
     async loadData() {
     },
 
-     async saveLimitTransfer() {
-       await this.limitTransfer({
+    async saveLimitTransfer() {
+      await this.limitTransfer({
         senderId: this._selectedSubdivisionFrom.id,
         receiverId: this._selectedSubdivisionTo.id,
         amount: Number(this._limitTransfer),
@@ -233,7 +233,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve", "limitTransfer"]),
+    ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve", "limitTransferState"]),
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapState("current", ["currentUser"]),
     ...mapState("limit", ["controlLimits"]),
