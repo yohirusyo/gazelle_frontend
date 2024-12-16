@@ -1,16 +1,11 @@
 <template>
-  <MenuItem
-    :col="col"
-    label="Управления"
-    v-model="management"
-  >
+  <MenuItem :col="col" label="Управления" v-model="management">
   <template #main="{}">
-    <ManagementList @reqManagements="reqManagements"/>
+    <ManagementList @reqManagements="reqManagements" />
   </template>
   <template #create="{ onDone }">
     <ManagementCreation @done="onDone" />
   </template>
-
   </MenuItem>
 </template>
 
@@ -33,16 +28,14 @@ export default {
   methods: {
     ...mapActions('management', ['requestManagements', 'requestChangeManagements']),
     reqManagements(val) {
-      this.requestChangeManagements({year: val.year, month: val.month});
+      this.requestChangeManagements({ year: val.year, month: val.month });
     }
   },
   mounted() {
-    this.requestManagements({year: dayjs().year(), month: dayjs().month()});
-    this.requestChangeManagements({year: dayjs().year(), month: dayjs().month()});
+    this.requestManagements({ year: dayjs().year(), month: dayjs().month() });
+    this.requestChangeManagements({ year: dayjs().year(), month: dayjs().month() });
   }
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

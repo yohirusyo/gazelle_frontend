@@ -87,4 +87,8 @@ export async function removeManagement({ commit }, { id }) {
     });
 }
 
-
+export async function requestLimitTransfer(context, {year, month}) {
+  return api
+    .get(`managements/limit-transfer/${year}/${month}`).then(({data}) => 
+      context.commit("get", data))
+}
