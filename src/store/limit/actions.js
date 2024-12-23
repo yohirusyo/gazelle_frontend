@@ -43,3 +43,10 @@ export async function getHoursStatsContorlLimits(context, item) {
 export async function limitTransfer(context, data) {
   return api.post(`management/limit-transfer`, data);
 }
+
+export async function getLimitTransfer(context, item) {
+  console.log('management action')
+  return api.get(`management/get-limit-transfer/${item.year}/${item.month}`).then(({data}) => {
+    context.commit("getLimitTransfer", data);
+  })
+}

@@ -3,6 +3,7 @@ export default function () {
    controlLimits: [],
    monthLimitSubdivisions: [],
    statsControl: [],
-   statsHoursControl: null
+   statsHoursControl: null,
+   getTransferLimits: [],
   };
 }
