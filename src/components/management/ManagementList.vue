@@ -50,31 +50,33 @@
                 :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom
                 flat bordered />
             </div>
-
+            <div v-if="currentUser?.role.includes('ADMIN')">
+              <div>
+                <br>
+                <div class="text-h5 text-center">Пренос лимитов</div>
+                <div class="row">
+                  <q-select label="Откуда" class="text-black border-none q-pa-sm col" :options="managements"
+                    :option-label="(item) => item.name" v-model="_selectedSubdivisionFrom" required />
+                  <q-input label="Сколько" class="text-black border-none q-pa-md col" square outlined dense
+                    hide-bottom-space hide-hint v-model="_limitTransfer" type="number" />
+                  <q-select label="Куда" class="text-black border-none q-pa-sm col" :options="managements"
+                    :option-label="(item) => item.name" v-model="_selectedSubdivisionTo" />
+                </div>
+                <div class="row q-ma-sm ">
+                  <q-btn @click="saveLimitTransfer()" class="border-none bg-blue-4 col" text-color="white"
+                    label="Перенести" unelevated no-caps dense />
+                </div>
+              </div>
+              <div class="text-h5 text-center">История переносов:</div>
+              <q-table :rows="getTransferLimits" :columns="columnHierachy" hide-bottom flat dense :key="_key"
+                row-key="name" />
+            </div>
           </div>
+
         </template>
       </VScrolltable>
     </div>
-    <div class="col" v-if="currentUser?.role.includes('ADMIN')">
-      <div>
-        <div class="text-h5 text-center">Пренос лимитов</div>
-        <div class="row">
-          <q-select label="Откуда" class="text-black border-none q-pa-sm col" :options="managements"
-            :option-label="(item) => item.name" v-model="_selectedSubdivisionFrom" required />
-          <q-input label="Сколько" class="text-black border-none q-pa-md col" square outlined dense hide-bottom-space
-            hide-hint v-model="_limitTransfer" type="number" />
-          <q-select label="Куда" class="text-black border-none q-pa-sm col" :options="managements"
-            :option-label="(item) => item.name" v-model="_selectedSubdivisionTo" />
-        </div>
-        <div class="row q-ma-sm ">
-          <q-btn @click="saveLimitTransfer()" class="border-none bg-blue-4 col" text-color="white" label="Перенести"
-            unelevated no-caps dense />
-        </div>
-      </div>
-      <div>
-        <div class="text-h6 text-center">История переносов:</div>
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -95,6 +97,7 @@ export default {
     ...mapMutations("current", ["setManagement"]),
     ...mapActions("limit", [
       "getAllControlLimits",
+      "getLimitTransfer",
       "limitTransfer",
     ]),
     formatCustomer,
@@ -118,7 +121,9 @@ export default {
     async saveLimitTransfer() {
       await this.limitTransfer({
         senderId: this._selectedSubdivisionFrom.id,
+        senderName: this._selectedSubdivisionFrom.name,
         receiverId: this._selectedSubdivisionTo.id,
+        receiverName: this._selectedSubdivisionTo.name,
         amount: Number(this._limitTransfer),
         year: this._selectedMonth.year,
         month: this._selectedMonth.month
@@ -132,6 +137,35 @@ export default {
       _selectedSubdivisionFrom: null,
       _selectedSubdivisionTo: null,
       options: [],
+      columnHierachy: [
+        {
+          name: 'sender',
+          required: true,
+          label: 'Откуда',
+          align: 'center',
+          field: row => row.senderName,
+          format: val => `${val}`,
+          sortable: true
+        },
+        {
+          name: 'amount',
+          required: true,
+          label: 'Сколько',
+          align: 'center',
+          field: row => row.amount,
+          format: val => `${val}`,
+          sortable: false
+        },
+        {
+          name: 'receiver',
+          required: true,
+          label: 'Куда',
+          align: 'center',
+          field: row => row.receiverName,
+          format: val => `${val}`,
+          sortable: false
+        }
+      ],
       columnsReserve: [
         {
           name: 'subdivision',
@@ -236,7 +270,7 @@ export default {
     ...mapState("management", ["managements", "managementsWhileDriving", "managementsReserve", "limitTransferState"]),
     ...mapGetters("customer", ["getCustomerById"]),
     ...mapState("current", ["currentUser"]),
-    ...mapState("limit", ["controlLimits"]),
+    ...mapState("limit", ["controlLimits", "getTransferLimits"]),
     factVolume: {
       get() {
         return this.managementsReserve.factMonthLimit * 1.12607971119134;
@@ -255,6 +289,7 @@ export default {
   },
   async mounted() {
     await this.getAllControlLimits();
+    await this.getLimitTransfer({ year: dayjs().year(), month: dayjs().month() });
     await this.loadData();
   },
   watch: {

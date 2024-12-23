@@ -48,3 +48,8 @@ export function setAllControlLimitsWithFactVolume(state, val) {
     m.fact = val * m.percentage / 100
   });
 }
+
+export function getLimitTransfer(state, val) {
+  state.getTransferLimits = val;
+}
+// getLimitTransfer
