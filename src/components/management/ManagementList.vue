@@ -50,7 +50,7 @@
                 :rows="managementsReserve.usedMonthLimitCustomers" :columns="columnsReserve" row-key="index" hide-bottom
                 flat bordered />
             </div>
-            <div v-if="currentUser?.role.includes('ADMIN')">
+            <div v-if="currentUser?.role.includes('ADMIN') && connection == 'mmkmetiz'">
               <div>
                 <br>
                 <div class="text-h5 text-center">Пренос лимитов</div>
@@ -83,6 +83,7 @@
 <script>
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
 import { formatCustomer } from "src/helpers/formatters";
+import { getConnection, api } from "src/boot/axios";
 import VScrolltable from "../base/VScrolltable.vue";
 import OrderHistory from "../limits/History/OrderHistory.vue";
 import dayjs from "dayjs";
@@ -133,6 +134,7 @@ export default {
   },
   data() {
     return {
+      connection: getConnection(),
       _limitTransfer: null,
       _selectedSubdivisionFrom: null,
       _selectedSubdivisionTo: null,
